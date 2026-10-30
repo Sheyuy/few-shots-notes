@@ -1,0 +1,4 @@
+Exact per-seed exchange-shell result (2026-10-30)
+For each of the six valid 496-point seeds, every outside point has conflict degree 2 (32 points), 11 (176 points), or at least 12 (all remaining points). Conflict edges from one outside point against a legal seed form a matching.
+The 704-point pool consisting of one seed plus all its 208 outside points of conflict degree <=11 was solved exactly by MILP. For every seed: status optimal, maximum 496, dual bound 496, 2240 line constraints.
+Consequently no cap of 497 points exists within 11 deletions of any one of these six seeds. This is a per-seed bounded-neighborhood result, not a global upper bound and not a statement about caps mixing deletion neighborhoods of several seeds.

@@ -428,3 +428,141 @@ python3 pure72.py       # 纯形式 Σpq=0 采样 20 万个，合法 0 个
 python3 sat_all.py
 # 预期：37 个图全部 unsat，每图 <1 秒；总计 1167 条 3/5 元子句、35 个变量
 ```
+
+
+## 10. Kimi p005 独立轮次（射影截面 / 非对称搜索 / 精确壳层）
+
+报告：`docs/REPORT_KIMI_P005.md`。以下命令均从本仓库根目录执行。点文件统一采用与官方证书一致的大端三进制。
+
+```bash
+# 精确模型需要 NumPy / SciPy；本次复核环境为 SciPy 1.16.2。
+python3 -m pip install numpy scipy
+export PYTHONPATH="$PWD/src/kimi/p005${PYTHONPATH:+:$PYTHONPATH}"
+R=${R:-/tmp/p005-kimi-replay}
+mkdir -p "$R"
+sha256sum -c data/kimi/p005/MANIFEST.sha256
+```
+
+### 10.1 无需求解器的合法性检查
+
+```bash
+python3 src/kimi/p005/check_points.py \
+  data/kimi/p005/baseline512.txt --expect-size 512 --expect-bad 0
+python3 src/kimi/p005/check_points.py \
+  data/kimi/p005/seeds496/seed{0,1,2,3,4,5}.txt \
+  --expect-size 496 --expect-bad 0
+for k in 29 34 22 10 7 4; do
+  python3 src/kimi/p005/check_points.py \
+    "data/kimi/p005/nearmiss/near${k}.txt" --expect-size 513 --expect-bad "$k"
+done
+```
+
+### 10.2 六个 496 点种子的精确 11 删除邻域
+
+```bash
+for i in 0 1 2 3 4 5; do
+  python3 src/kimi/p005/make_shell.py \
+    "data/kimi/p005/seeds496/seed${i}.txt" 11 "$R/seed${i}-d11.txt"
+  python3 src/kimi/p005/shell_milp.py \
+    "$R/seed${i}-d11.txt" "data/kimi/p005/seeds496/seed${i}.txt" \
+    --remove 11 --minsize 496 --time 180 --prefix "$R/seed${i}-d11"
+done
+# 每次预期：BUILT 704 lines 2240；随后 status 0 / Optimal，
+# objective 496，dual_bound 496，valid True。
+```
+
+这证明的是各种子自身的有界邻域，不是全局上界。仓库已有实际输出：`logs/kimi/p005/exact496-seed*-d11.log`。
+
+### 10.3 原 512 点基线的壳层
+
+```bash
+for d in 4 8 10 11 12; do
+  python3 src/kimi/p005/make_shell.py \
+    data/kimi/p005/baseline512.txt "$d" "$R/baseline-d${d}.txt"
+  python3 src/kimi/p005/shell_milp.py \
+    "$R/baseline-d${d}.txt" data/kimi/p005/baseline512.txt \
+    --remove "$d" --minsize 512 --time 180 --prefix "$R/baseline-d${d}"
+done
+# 全部预期 status 0 / Optimal，objective=dual_bound=512。
+
+# 第 13 壳层可以重跑，但原 180 秒记录不是排除证明。
+python3 src/kimi/p005/make_shell.py \
+  data/kimi/p005/baseline512.txt 13 "$R/baseline-d13.txt"
+python3 src/kimi/p005/shell_milp.py \
+  "$R/baseline-d13.txt" data/kimi/p005/baseline512.txt \
+  --remove 13 --minsize 512 --time 180 --prefix "$R/baseline-d13"
+# 原日志：status 1，incumbent 512，dual_bound 534，未判定。
+```
+
+### 10.4 近 miss 的精确点覆盖
+
+```bash
+for k in 29 34 22 10 7 4; do
+  python3 src/kimi/p005/analyze_nearmiss.py \
+    "data/kimi/p005/nearmiss/near${k}.txt" --time 120 \
+    --output "$R/near${k}-repaired.txt"
+done
+# 最小覆盖依次为 29、17、7、3、2、1；合法修复大小依次为
+# 484、496、506、510、511、512。
+
+python3 src/kimi/p005/analyze_nearmiss.py \
+  data/kimi/p005/nearmiss/near22.txt \
+  --baseline data/kimi/p005/baseline512.txt --keep-new \
+  --output "$R/near22-keep-new-repaired.txt"
+# 强制保留 7 个非基线点时，精确覆盖为 22，合法大小为 491。
+```
+
+只有 `status 0 / Optimal` 才能读作精确最小覆盖；时间限制状态不能这么解释。
+
+### 10.5 全空间“一删二换”穷举
+
+```bash
+g++ -O3 -std=c++20 src/kimi/p005/exchange_1to2.cpp -o "$R/exchange_1to2"
+seq 0 6560 > "$R/full6561.txt"
+OUTPUT_PREFIX="$R/exchange" "$R/exchange_1to2" "$R/full6561.txt" \
+  data/kimi/p005/seeds496/seed{0,1,2,3,4,5}.txt
+# 每个种子：outside 6065，pairs 18389080，found 0。
+```
+
+### 10.6 射影帽与历史子空间记录
+
+```bash
+g++ -O3 -std=c++17 src/kimi/p005/verify_projective_cap.cpp -o "$R/verify_projective_cap"
+"$R/verify_projective_cap" data/kimi/p005/projective/pg10-cap2744.txt 11 2744
+"$R/verify_projective_cap" data/kimi/p005/projective/pg11-cap6464.txt 12 6464
+"$R/verify_projective_cap" data/kimi/p005/projective/pg12-cap13312.txt 13 13312
+
+python3 src/kimi/p005/check_section_record.py \
+  data/kimi/p005/projective/pg10-cap2744.txt \
+  data/kimi/p005/projective/pg10-functionals.bin \
+  results/kimi/p005/section-records/pg10-codim2-448.txt 11
+python3 src/kimi/p005/check_section_record.py \
+  data/kimi/p005/projective/pg11-cap6464.txt \
+  data/kimi/p005/projective/pg11-functionals.bin \
+  results/kimi/p005/section-records/pg11-codim3-472.txt 12
+python3 src/kimi/p005/check_section_record.py \
+  data/kimi/p005/projective/pg12-cap13312.txt \
+  data/kimi/p005/projective/pg12-sample-functionals.bin \
+  results/kimi/p005/section-records/pg12-codim4-496.txt 13
+# 三条均应 PASS；这里直接复核历史记录，不需要重跑随机搜索。
+```
+
+大型关联掩码未入库，可用 `make_functionals.py` 和 `build_cap_masks.cpp` 重新生成。`codim2_search.cpp`、`codim3_search.cpp`、`codim4_search.cpp` 保留原始交替最佳响应实现；PG12 采样搜索编译时使用 `-DHVAL=131072`。这些是新的随机运行，不是上述历史记录复核的必要步骤。
+
+### 10.7 全局非对称随机搜索（代表性新运行）
+
+```bash
+gcc -O3 -std=c11 src/kimi/p005/asym_anchors_target.c -o "$R/asym_anchors"
+gcc -O3 -std=c11 src/kimi/p005/weighted2.c -o "$R/weighted2"
+
+DBIAS=0 TARGET=497 "$R/asym_anchors" \
+  1 1000000 data/kimi/p005/seeds496/seed0.txt "$R/asym" \
+  0 8 1000000 17 0.12 3 1000000
+
+DBIAS=0 FREEREMOVE=1 RESETW=1 "$R/weighted2" \
+  1 1000000 513 data/kimi/p005/nearmiss/near10.txt "$R/weighted" \
+  0 17 0.12 3 100 1000000 0
+# 搜索程序以 0 表示找到合法目标，以 1 表示预算耗尽而未找到；
+# 返回 1 不是数学上的不存在性结论。实际历史快照已归档，无需靠这些
+# 新随机运行重现近 miss 后再做精确分析。
+```
