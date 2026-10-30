@@ -353,4 +353,78 @@ A: p003 的全量 SAT 有 200 万条子句，可能需要数小时。推荐先�
 A: 这是增量计数 bug 的典型表现。我遇到过一次：`count4/indep5` 把相邻点对误当独立点对。**每次找到候选都必须用官方 verifier 复核**，不要相信搜索程序的输出。
 
 **Q: 远端 DevEnv 怎么接入？**
-A: 当前沙箱的 SSH 网关禁止端口转发（`administratively prohibited`），沙箱 MCP 也在维护中。如果恢复，可以用 `huaweicloud-devkit_huaweicloud_sandbox_connect` 获取 session_id，然后用 `sandbox_exec` 执行命令。
+A: 已有一条成功路径（CodeArts 轮次，DevEnv_337466，640 核 / 2 TB / Ubuntu 22.04 aarch64）：
+- SSH 直连授权仅 5 分钟；用 `ssh -M -S /tmp/p005.sock -N -f -o ControlPersist=12h ...` 建立 ControlMaster 复用；
+- 远端没有 `python3`/`pip`/`gcc`：可 `curl get-pip.py` 或直接解压 pip wheel 到用户目录（不要写系统目录）；
+- `ortools` 最新版无 aarch64 wheel，必须 `ortools==9.11.4210`；
+- 可本地 `pip download ortools==9.11.4210 --platform manylinux2014_aarch64 --python-version 310 --implementation cp --abi cp310 --dest wheels/`，再 `tar czf - -C wheels . | ssh ... 'tar xzf - -C /workspace/wheels'`，解压到 `PYTHONPATH` 目录；
+- 远端任务用 `setsid + nohup` + 看门狗自恢复。详见 `docs/REPORT_CODEARTS.md` 第 4 节。
+
+## 9. CodeArts 轮次（p001 / p003 / p005 + 远端 640 核）
+
+完整报告：`docs/REPORT_CODEARTS.md`；源码：`src/codearts/`。
+
+依赖：
+
+```bash
+pip install numpy
+pip install ortools==9.11.4210   # x86_64 可用最新版；aarch64 必须该版本
+pip install python-sat           # 仅 p003
+```
+
+### 9.1 p005 · 分层精确最大团
+
+源码：`src/codearts/p005/layers.py`、`layers_exact.py`
+
+```bash
+python3 layers_exact.py
+# 预期：layer 0 |C| 200 best clique 192；layer 1/2 |C| 229 best clique 160
+```
+
+### 9.2 p005 · 跨层交换 / 联合重启 / 仿射重分层
+
+```bash
+python3 exchange.py      # 960 次单点交换，最好总点数 511
+python3 layer_search.py  # 300 次两层联合重启，最好 512
+python3 affine.py        # 120 个随机仿射分层 + 逐层精确，最好 512
+```
+
+### 9.3 p005 · 全局 CP-SAT（重点）
+
+源码：`src/codearts/p005/global_cpsat_hint.py`；需要 `baseline.json`（`{"points": [[0..2]*8, ...]}`）。
+
+```bash
+# 修改脚本里的路径后运行
+python3 global_cpsat_hint.py
+# 预期日志：lines 7173360 -> hint added 512 -> model ready ~183s -> Solve
+# 64 worker 稳定约 137 GB；256 worker 必 OOM
+```
+
+### 9.4 p001 · 覆盖半径量化
+
+源码：`src/codearts/p001/coverage.py`
+
+```bash
+python3 coverage.py
+# 预期：150 起点的最小 max cos ≈ 0.5776（54.7°），无一次 ≤ 0.5
+```
+
+### 9.5 p001 · norm²=72 排查
+
+源码：`src/codearts/p001/norm_check.py`、`pure72.py`
+
+```bash
+python3 norm_check.py   # 修正 DP 采样后：一般候选 10 万个，86 个内积可行但范数 b≠0
+python3 pure72.py       # 纯形式 Σpq=0 采样 20 万个，合法 0 个
+```
+
+注意：`norm_check.py` 的 DP 表必须用 `s - w` 递推（与采样一致）；用 `s + w` 会生成几乎全是单坐标的“假随机”向量。
+
+### 9.6 p003 · 37 个 35 点图加顶点 SAT
+
+源码：`src/codearts/p003/sat_all.py`、`r46_35some.g6`
+
+```bash
+python3 sat_all.py
+# 预期：37 个图全部 unsat，每图 <1 秒；总计 1167 条 3/5 元子句、35 个变量
+```
