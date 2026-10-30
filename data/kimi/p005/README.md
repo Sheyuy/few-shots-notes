@@ -20,6 +20,7 @@ id(p0,...,p7) = 3^7*p0 + 3^6*p1 + ... + p7，pi ∈ {0,1,2}
 - `baseline512-normalized-no-support2.txt`：同一原基线在另一帽内仿射基点下的规范化像，合法 512 点帽；基点外没有任何二支撑点，用于第三 SAT 分区的单位见证正对照。
 - `baseline512-no-support2-basis.txt`：产生上述规范化所选的 9 个源帽点，首行为原点，其余 8 行为独立差向量；搜索重放日志见 `basis-low-support.log`。
 - `baseline512-no-support2-weight3-t0.txt`：无二支撑见证的坐标置换，额外包含全 1 型三支撑点 `e1+e2+e3`（id 3159），用于更细 SAT 分支的单位见证正对照。
+- `baseline512-no-support2-weight3-t1.txt`：同一无二支撑见证的另一坐标置换，额外包含 `e1+e2+2e3`（id 3402），用于第二类三支撑 SAT 分支。
 - `seeds496/seed0.txt` … `seed5.txt`：六个合法、相互不完全相同的 496 点帽，来源于射影帽的仿射截面及后续增长。它们用于逐盆地精确排除，不是一个 497 点候选。
 - `nearmiss/near{29,34,22,10,7,4}.txt`：513 点的非法近 miss；文件名数字是冲突线数，不是合法帽大小。
 - `repaired/`：对应近 miss 经精确点覆盖修复后的合法帽；`near22-keep-new-cap491.txt` 额外强制保留全部 7 个非基线点。

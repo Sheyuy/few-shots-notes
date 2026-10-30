@@ -867,3 +867,33 @@ TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
 另外两个模型的正确解压行数为：轨道 3645 平面模型 11,077,133 行；无二支撑且固定 3159 的细化模型 10,683,188 行。压缩包的实际 SHA-256 见 `logs/kimi/p005/cnf-gzip-integrity.log`。
 
 运行器用 `pipefail` 同时捕捉 gzip 和求解器错误。退出码 10／20 才是 Kissat 的 SAT／UNSAT；0 通常为 UNKNOWN，1 或 2 需先检查解析、解压和调用错误。若二进制位于不支持执行位的挂载点，可设置 `LOADER=/lib64/ld-linux-x86-64.so.2`，第五个参数仍传 Kissat 路径。
+
+
+### 12.8 第二类三支撑分支
+
+```bash
+python3 src/kimi/p005/permute_cap_point.py \
+  data/kimi/p005/baseline512-normalized-no-support2.txt 3402 \
+  "$R/baseline512-no-support2-weight3-t1.txt"
+cmp "$R/baseline512-no-support2-weight3-t1.txt" \
+  data/kimi/p005/baseline512-no-support2-weight3-t1.txt
+
+"$R/gen_global_sat" "$R/global512-no2-weight3-t1-control.cnf" 512 3402 1 1
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-no2-weight3-t1-control.cnf" \
+  "$R/global512-no2-weight3-t1-witness.cnf" \
+  data/kimi/p005/baseline512-no-support2-weight3-t1.txt
+"$KISSAT" --time=60 --sat "$R/global512-no2-weight3-t1-witness.cnf" \
+  > "$R/global512-no2-weight3-t1-witness-kissat.log" 2>&1
+# 预期：vars 516433；clauses 10687515；s SATISFIABLE。
+
+"$R/gen_global_sat" "$R/global513-no2-weight3-t1.cnf" 513 3402 1 1
+test "$(wc -l < "$R/global513-no2-weight3-t1.cnf")" -eq 10687516
+gzip -1 -c "$R/global513-no2-weight3-t1.cnf" \
+  > "$R/global513-no2-weight3-t1.cnf.gz"
+TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-weight3-t1.cnf.gz" "$R/stream-t1-kissat.log" \
+  "$R/stream-t1.rc" 0 "$KISSAT"
+```
+
+退出码 137 表示 SIGKILL，不是 UNSAT；资源受限环境下最多并发两个此类大模型。T1 回读 SAT 解时使用 `--extra 3402`。
