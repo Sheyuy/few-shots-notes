@@ -757,3 +757,50 @@ python3 src/kimi/p005/extract_sat_cap.py \
 ```
 
 实际历史状态以 `logs/kimi/p005/global51*-kissat.log` 的 `s` 行为准。`UNKNOWN`、外部终止和超时都不是 UNSAT；没有 SAT 候选时不得创建 Shot 或写入突破分数。
+
+
+### 12.5 坐标平面加强和无二支撑第三分区
+
+生成器第四个可选参数 `coordinate_planes` 控制是否加入全部 20,412 个坐标平面；第五个参数 `forbid_support2` 控制是否禁用全部支撑 2 点。不需要额外固定点时将第三个参数写为 `-1`。
+
+```bash
+# 重放无二支撑基点的确定性随机搜索；NumPy 即可，使用单线程 BLAS。
+OPENBLAS_NUM_THREADS=1 python3 src/kimi/p005/search_basis_low_support.py \
+  data/kimi/p005/baseline512-normalized.txt "$R/basis-low" \
+  --trials 2000 --seed 20261030
+# 预期最后一条 NEW_BEST 在 trial=1980 得到 weight2=0。
+cmp "$R/basis-low-w2-0.txt" data/kimi/p005/baseline512-normalized-no-support2.txt
+python3 src/kimi/p005/check_points.py \
+  data/kimi/p005/baseline512-normalized-no-support2.txt --expect-size 512 --expect-bad 0
+
+# 二支撑轨道的平面加强正对照。
+"$R/gen_global_sat" "$R/global512-orbit11-planes-control.cnf" 512 2916 1
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-orbit11-planes-control.cnf" \
+  "$R/global512-orbit11-planes-witness.cnf" \
+  data/kimi/p005/baseline512-normalized.txt
+"$KISSAT" --time=60 --sat "$R/global512-orbit11-planes-witness.cnf" \
+  > "$R/global512-orbit11-planes-witness-kissat.log" 2>&1
+# 预期：PLANES forms 20412 clauses 2498805；求解 s SATISFIABLE。
+
+# 无二支撑分区的平面加强正对照。
+"$R/gen_global_sat" "$R/global512-no-support2-planes-control.cnf" 512 -1 1 1
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-no-support2-planes-control.cnf" \
+  "$R/global512-no-support2-planes-witness.cnf" \
+  data/kimi/p005/baseline512-normalized-no-support2.txt
+"$KISSAT" --time=60 --sat "$R/global512-no-support2-planes-witness.cnf" \
+  > "$R/global512-no-support2-planes-witness-kissat.log" 2>&1
+# 预期：FORBID_SUPPORT2 total 112 newly 84；
+# PLANES forms 20412 clauses 2408616；求解 s SATISFIABLE。
+
+# 对应的 513 搜索。
+"$R/gen_global_sat" "$R/global513-orbit11-planes.cnf" 513 2916 1
+"$R/gen_global_sat" "$R/global513-no-support2-planes.cnf" 513 -1 1 1
+"$KISSAT" --time=1200 --sat "$R/global513-orbit11-planes.cnf" \
+  > "$R/global513-orbit11-planes-kissat.log" 2>&1
+"$KISSAT" --time=1200 --sat "$R/global513-no-support2-planes.cnf" \
+  > "$R/global513-no-support2-planes-kissat.log" 2>&1
+```
+
+无二支撑模型的统计应为 6,786,368 条帽子句、2,408,616 条平面子句、517,083 个变量和 10,726,551 条总子句。三个分区合在一起覆盖全部基点规范化帽，但只有求解器明确返回 UNSAT 才能排除对应分区；运行中、超时和外部终止均不作此解释。
