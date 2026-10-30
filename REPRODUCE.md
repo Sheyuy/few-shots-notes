@@ -668,3 +668,92 @@ python3 src/kimi/p005/shell_milp_cuts.py \
   --prefix "$R/only4"
 # 四维单独模型：时间限制，incumbent 512，dual_bound 528，未判定。
 ```
+
+
+
+## 12. Kimi p005 第三轮（全空间 SAT 与单位见证正对照）
+
+继续从仓库根目录执行，并沿用第 10 节的临时目录 `R`。DIMACS 文件约 160 MB／个，不提交到笔记仓库，可用生成器确定性重建。本次求解器为 Kissat 4.0.4，源码提交 `8af8e56f174b778aef3aa45af9f739b2a5f492c2`。
+
+### 12.1 编译并复核两个规范化 512 点见证
+
+```bash
+git clone https://github.com/arminbiere/kissat.git "$R/kissat-src"
+(
+  cd "$R/kissat-src"
+  git checkout 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+  sh configure
+  make -j2
+)
+KISSAT="$R/kissat-src/build/kissat"
+g++ -O3 -std=c++17 src/kimi/p005/gen_global_sat.cpp -o "$R/gen_global_sat"
+
+python3 src/kimi/p005/check_points.py \
+  data/kimi/p005/baseline512-normalized.txt --expect-size 512 --expect-bad 0
+python3 src/kimi/p005/check_points.py \
+  data/kimi/p005/baseline512-normalized-orbit12.txt --expect-size 512 --expect-bad 0
+```
+
+若挂载点不支持执行位或符号链接，把 Kissat 源码复制到本地临时文件系统后再执行 `sh configure` 和 `make`，并恢复 `configure`、`scripts/*.sh` 的执行权限。
+
+### 12.2 无额外固定点的模型与直接编码正对照
+
+```bash
+"$R/gen_global_sat" "$R/global512-control.cnf" 512
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-control.cnf" "$R/global512-witness.cnf" \
+  data/kimi/p005/baseline512-normalized.txt
+"$KISSAT" --time=60 --sat "$R/global512-witness.cnf" \
+  > "$R/global512-witness-kissat.log" 2>&1
+# 求解器退出码 10 表示 SAT；归档日志在约 3.25 秒求解时间返回
+# s SATISFIABLE。自由 512 和自由 513 历史运行均为 UNKNOWN，未判定。
+
+"$R/gen_global_sat" "$R/global513.cnf" 513
+"$KISSAT" --time=600 --sat "$R/global513.cnf" \
+  > "$R/global513-kissat.log" 2>&1
+# 这是一次昂贵的重新搜索，不是复现数学结论所必需；超时只能记 UNKNOWN。
+```
+
+无额外固定点的模型应有 7,173,360 条输入三点线、7,055,910 条化简后帽子句、327,679 个比较器；两个目标模型均为 523,689 个变量、8,607,295 条子句。
+
+### 12.3 二支撑轨道的正对照和 513 分支
+
+```bash
+# 轨道 1：e1+e2，id 2916
+"$R/gen_global_sat" "$R/global512-orbit11-control.cnf" 512 2916
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-orbit11-control.cnf" "$R/global512-orbit11-witness.cnf" \
+  data/kimi/p005/baseline512-normalized.txt
+"$KISSAT" --time=60 --sat "$R/global512-orbit11-witness.cnf" \
+  > "$R/global512-orbit11-witness-kissat.log" 2>&1
+
+# 轨道 2：e1+2e2，id 3645
+"$R/gen_global_sat" "$R/global512-orbit12-control.cnf" 512 3645
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-orbit12-control.cnf" "$R/global512-orbit12-witness.cnf" \
+  data/kimi/p005/baseline512-normalized-orbit12.txt
+"$KISSAT" --time=60 --sat "$R/global512-orbit12-witness.cnf" \
+  > "$R/global512-orbit12-witness-kissat.log" 2>&1
+# 两个日志都应在约 3.36 秒求解时间返回 s SATISFIABLE。
+
+"$R/gen_global_sat" "$R/global513-orbit11.cnf" 513 2916
+"$R/gen_global_sat" "$R/global513-orbit12.cnf" 513 3645
+"$KISSAT" --time=1200 --sat "$R/global513-orbit11.cnf" \
+  > "$R/global513-orbit11-kissat.log" 2>&1
+"$KISSAT" --time=1200 --sat "$R/global513-orbit12.cnf" \
+  > "$R/global513-orbit12-kissat.log" 2>&1
+```
+
+两个轨道只覆盖“基点外至少有一个支撑 2 点”的规范化帽，不覆盖完全无二支撑外部点的情形。
+
+### 12.4 若日志出现 SAT，回读并独立检查
+
+```bash
+python3 src/kimi/p005/extract_sat_cap.py \
+  "$R/global513-orbit11-kissat.log" "$R/candidate513.txt" \
+  --extra 2916 --min-size 513
+# 第二轨道改用 --extra 3645。脚本会补回常量基点，并逐点对检查帽集合法性。
+# 之后仍须转换为官方 certificate.json，并由官方 tools/check.py 返回 0。
+```
+
+实际历史状态以 `logs/kimi/p005/global51*-kissat.log` 的 `s` 行为准。`UNKNOWN`、外部终止和超时都不是 UNSAT；没有 SAT 候选时不得创建 Shot 或写入突破分数。

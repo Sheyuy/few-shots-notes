@@ -15,6 +15,8 @@ id(p0,...,p7) = 3^7*p0 + 3^6*p1 + ... + p7，pi ∈ {0,1,2}
 - `fixed236-near41.txt`：永久保留该 236 点层的 513 点非法近 miss，含 41 条冲突线。
 - `fixed236-repaired472.txt`：禁止删除 236 个固定点时的精确最小覆盖修复结果，合法 472 点帽；最优覆盖不唯一，复跑可得到不同但等大的修复集。
 - `baseline512.txt`：官方 512 点基线转成上述整数编码；官方 verifier 复验见 `logs/kimi/p005/official-baseline-verify.log`。
+- `baseline512-normalized.txt`：原基线的可逆仿射像，合法 512 点帽，包含 SAT 模型固定的 9 个基点及二支撑点 id 2916。
+- `baseline512-normalized-orbit12.txt`：上述规范化帽的坐标置换，合法 512 点帽，包含同一组基点及二支撑点 id 3645；用于第二 SAT 轨道的单位见证正对照。
 - `seeds496/seed0.txt` … `seed5.txt`：六个合法、相互不完全相同的 496 点帽，来源于射影帽的仿射截面及后续增长。它们用于逐盆地精确排除，不是一个 497 点候选。
 - `nearmiss/near{29,34,22,10,7,4}.txt`：513 点的非法近 miss；文件名数字是冲突线数，不是合法帽大小。
 - `repaired/`：对应近 miss 经精确点覆盖修复后的合法帽；`near22-keep-new-cap491.txt` 额外强制保留全部 7 个非基线点。
