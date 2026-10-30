@@ -842,3 +842,28 @@ python3 src/kimi/p005/add_sat_witness.py \
 ```
 
 细化分支只优先探索无二支撑总分区的一部分。若回读该模型的 SAT 解，`extract_sat_cap.py` 应使用 `--extra 3159`；仍然必须通过独立帽集检查和官方 verifier。
+
+
+### 12.7 大 CNF 的压缩持久化与流式求解
+
+直接在持久挂载写大于约 200 MiB 的 CNF 曾在本次环境中造成截断。不要只信生成器的 `DONE`：必须同时检查头部、实际行数和解压后的完整性。
+
+```bash
+# 以轨道 2916 为例；在本地临时文件系统生成。
+"$R/gen_global_sat" "$R/global513-orbit11-planes.cnf" 513 2916 1
+head -n 1 "$R/global513-orbit11-planes.cnf"
+test "$(wc -l < "$R/global513-orbit11-planes.cnf")" -eq 11078225
+gzip -1 -c "$R/global513-orbit11-planes.cnf" \
+  > "$R/global513-orbit11-planes.cnf.gz"
+gzip -t "$R/global513-orbit11-planes.cnf.gz"
+test "$(gzip -dc "$R/global513-orbit11-planes.cnf.gz" | wc -l)" -eq 11078225
+
+# 流式求解；第五个参数是本地 Kissat 可执行文件。
+TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-orbit11-planes.cnf.gz" \
+  "$R/stream-orbit11-kissat.log" "$R/stream-orbit11.rc" 3 "$KISSAT"
+```
+
+另外两个模型的正确解压行数为：轨道 3645 平面模型 11,077,133 行；无二支撑且固定 3159 的细化模型 10,683,188 行。压缩包的实际 SHA-256 见 `logs/kimi/p005/cnf-gzip-integrity.log`。
+
+运行器用 `pipefail` 同时捕捉 gzip 和求解器错误。退出码 10／20 才是 Kissat 的 SAT／UNSAT；0 通常为 UNKNOWN，1 或 2 需先检查解析、解压和调用错误。若二进制位于不支持执行位的挂载点，可设置 `LOADER=/lib64/ld-linux-x86-64.so.2`，第五个参数仍传 Kissat 路径。

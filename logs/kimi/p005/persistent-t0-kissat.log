@@ -1,0 +1,19 @@
+c ---- [ banner ] ------------------------------------------------------------
+c
+c Kissat SAT Solver
+c 
+c Copyright (c) 2021-2024 Armin Biere University of Freiburg
+c Copyright (c) 2019-2021 Armin Biere Johannes Kepler University Linz
+c 
+c Version 4.0.4 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+c gcc (Debian 12.2.0-14+deb12u1) 12.2.0 -W -Wall -O3 -DNDEBUG
+c Fri Oct 30 16:34:36 CST 2026 Linux k2116084458329882628 5.10.134-18.0.12.lifsea8.x86_64 x86_64
+c
+c ---- [ parsing ] -----------------------------------------------------------
+c
+c opened and reading DIMACS file:
+c
+c   /mnt/agents/output/few-shots-work/p005/cnf/global513-no2-weight3-t0.cnf
+c
+c parsed 'p cnf 0 0' header
+kissat: error: /mnt/agents/output/few-shots-work/p005/cnf/global513-no2-weight3-t0.cnf:2: parse error: maximum variable index exceeded (try '--relaxed' parsing)
