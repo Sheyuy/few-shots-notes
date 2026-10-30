@@ -1,4 +1,4 @@
-# build artifacts
+# build artifacts (never commit binaries)
 *.o
 *.dSYM/
 tsp_scan
@@ -19,24 +19,10 @@ jobshop_hga
 diag
 labs_sa
 
-# problem instances / baseline data (NOT redistributed)
-instance.txt
-baseline_orders.txt
-baseline_pts.txt
-coords.txt
-baseline_tour.txt
-*.tour
-*.tsp
-
-# run outputs
-*.log
-best*.txt
-candidate*.txt
-ils_best_tour.txt
-better.json
-certificate.json
-
 # python
 __pycache__/
 *.pyc
 .venv/
+
+# editor / os
+.DS_Store
