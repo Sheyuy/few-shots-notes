@@ -897,3 +897,72 @@ TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 退出码 137 表示 SIGKILL，不是 UNSAT；资源受限环境下最多并发两个此类大模型。T1 回读 SAT 解时使用 `--extra 3402`。
+
+
+### 12.9 固定 192 点层、放开另外两层的 SAT 模型
+
+该模型是原 512 基线的受限分支，不是全空间完备分区。它固定第一坐标为 0 的 192 个基线点，允许另外两层同时改变；与固定两层后优化单层不同。
+
+```bash
+g++ -O3 -std=c++17 src/kimi/p005/gen_fixed_layer_sat.cpp \
+  -o "$R/gen_fixed_layer_sat"
+
+# 直接生成带原基线单位见证的 512 正对照。
+"$R/gen_fixed_layer_sat" "$R/fixed192-512-witness.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 512 \
+  "$R/fixed192.map" data/kimi/p005/baseline512.txt
+# 应有：192 个固定点、4374 个原始自由变量、1593594 条三元帽子句、
+# 419904 条跨层二元子句；加见证后共 3037567 条子句。
+"$KISSAT" --time=60 --sat "$R/fixed192-512-witness.cnf" \
+  > "$R/fixed192-512-witness-kissat.log" 2>&1
+# 求解器退出码 10 表示 SAT；归档日志在 1.13 秒求解时间返回 SAT。
+
+python3 src/kimi/p005/extract_fixed_layer_sat.py \
+  "$R/fixed192-512-witness-kissat.log" "$R/fixed192.map" \
+  data/kimi/p005/baseline512.txt 0 0 "$R/fixed192-recovered512.txt" \
+  --min-size 512
+cmp "$R/fixed192-recovered512.txt" data/kimi/p005/baseline512.txt
+
+# 生成不带见证的 513 主模型：固定 192 点，自由层目标为 321 点。
+"$R/gen_fixed_layer_sat" "$R/fixed192-513.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 513 "$R/fixed192.map"
+test "$(wc -l < "$R/fixed192-513.cnf")" -eq 3033194
+gzip -1 -c "$R/fixed192-513.cnf" > "$R/fixed192-513.cnf.gz"
+gzip -t "$R/fixed192-513.cnf.gz"
+test "$(gzip -dc "$R/fixed192-513.cnf.gz" | wc -l)" -eq 3033194
+TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed192-513.cnf.gz" "$R/stream-fixed192-kissat.log" \
+  "$R/stream-fixed192.rc" 0 "$KISSAT"
+```
+
+若主模型出现 SAT，使用同一映射回读并独立验证，再进入官方证书流程：
+
+```bash
+python3 src/kimi/p005/extract_fixed_layer_sat.py \
+  "$R/stream-fixed192-kissat.log" "$R/fixed192.map" \
+  data/kimi/p005/baseline512.txt 0 0 "$R/fixed192-candidate513.txt" \
+  --min-size 513
+```
+
+`UNKNOWN`、外部杀死或超时均不表示这个固定层分支不可行，更不表示全空间不存在 513 点帽。
+
+### 12.10 其余两类三支撑见证
+
+```bash
+python3 src/kimi/p005/permute_cap_point.py \
+  data/kimi/p005/baseline512-normalized-no-support2.txt 4131 \
+  "$R/baseline512-no-support2-weight3-t2.txt"
+python3 src/kimi/p005/permute_cap_point.py \
+  data/kimi/p005/baseline512-normalized-no-support2.txt 6318 \
+  "$R/baseline512-no-support2-weight3-t3.txt"
+cmp "$R/baseline512-no-support2-weight3-t2.txt" \
+  data/kimi/p005/baseline512-no-support2-weight3-t2.txt
+cmp "$R/baseline512-no-support2-weight3-t3.txt" \
+  data/kimi/p005/baseline512-no-support2-weight3-t3.txt
+python3 src/kimi/p005/check_points.py \
+  data/kimi/p005/baseline512-no-support2-weight3-t2.txt --expect-size 512 --expect-bad 0
+python3 src/kimi/p005/check_points.py \
+  data/kimi/p005/baseline512-no-support2-weight3-t3.txt --expect-size 512 --expect-bad 0
+```
+
+对应的全局生成器参数分别为 `513 4131 1 1` 和 `513 6318 1 1`；若求得 SAT，回读时分别使用 `--extra 4131`、`--extra 6318`。即使四个三支撑分支全部 UNSAT，也只排除“无二支撑但至少有一个三支撑点”的情形；不覆盖同时无二、三支撑点的情形，也不改变两个二支撑分区各自的状态。
