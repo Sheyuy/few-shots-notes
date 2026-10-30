@@ -67,12 +67,14 @@ static void check_cap(const set<int> &points) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 6 || argc > 9) {
-        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt|-] [witness_cap.txt|-] [balance_free_layers]\n");
+    if (argc < 6 || argc > 10) {
+        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt|-] [witness_cap.txt|-] [balance_free_layers] [exact_first_free_layer]\n");
         return 2;
     }
     string cap_path = argv[2], map_path = (argc >= 7 && string(argv[6]) != "-") ? argv[6] : "";
     bool balance = argc >= 9 && atoi(argv[8]);
+    int exact_first = argc >= 10 ? atoi(argv[9]) : -1;
+    if (exact_first >= 0) balance = true;
     int coord = atoi(argv[3]), value = atoi(argv[4]), target = atoi(argv[5]);
     if (coord < 0 || coord >= 8 || value < 0 || value >= 3) {
         fprintf(stderr, "invalid coordinate or layer value\n"); return 2;
@@ -174,11 +176,20 @@ int main(int argc, char **argv) {
                         if ((i + j) / (2 * p) == (i + j + k) / (2 * p))
                             comparator(layer_wires[i + j], layer_wires[i + j + k],
                                        layer_wires[i + j], layer_wires[i + j + k]);
-        int minimum_first = (free_target + 1) / 2;
+        int minimum_first = exact_first >= 0 ? exact_first : (free_target + 1) / 2;
+        if (minimum_first < 1 || minimum_first > layer_points) {
+            fprintf(stderr, "invalid first free layer cardinality %d\n", minimum_first); return 5;
+        }
         int layer_need = layer_wires[minimum_first - 1];
         if (layer_need == FALSE_W) { fprintf(stderr, "balanced cardinality impossible\n"); return 5; }
         if (layer_need != TRUE_W) emit({layer_need});
         fprintf(stderr, "BALANCED first_free_value %d minimum %d\n", first_free_value, minimum_first);
+        if (exact_first >= 0) {
+            int too_many = layer_wires[exact_first];
+            if (too_many == TRUE_W) { fprintf(stderr, "exact cardinality impossible\n"); return 5; }
+            if (too_many != FALSE_W) emit({-too_many});
+            fprintf(stderr, "EXACT first_free_value %d size %d\n", first_free_value, exact_first);
+        }
     }
     if (argc >= 8 && string(argv[7]) != "-") {
         set<int> witness = read_points(argv[7]);

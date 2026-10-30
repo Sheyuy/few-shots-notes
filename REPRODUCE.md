@@ -1065,3 +1065,32 @@ python3 src/kimi/p005/check_points.py \
 ```
 
 `PROTECTFILE` 的每个点都必须属于初始点文件；禁用文件覆盖固定层的全部非基线点。主搜索若只降低冲突数而未达到 0，不得把近 miss 当作合法帽。
+
+
+### 12.13 精确固定第一自由层大小
+
+固定层生成器还接受最后一个可选参数 `exact_first_free_layer`。它会同时启用平衡网络，并断言第一自由层恰好具有指定点数。
+
+```bash
+# 已知 512 解的 160／160 正对照。
+"$R/gen_fixed_layer_sat" "$R/fixed192-exact160-control512-witness.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 512 \
+  "$R/fixed192-exact.map" data/kimi/p005/baseline512.txt 1 160
+"$KISSAT" --time=60 --sat "$R/fixed192-exact160-control512-witness.cnf" \
+  > "$R/fixed192-exact160-control512-witness-kissat.log" 2>&1
+# 应有 clauses 3468705（含单位见证）；归档在 1.49 秒返回 SAT。
+
+# 513 的 161／160 主分支。
+"$R/gen_fixed_layer_sat" "$R/fixed192-exact161-513.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 513 \
+  "$R/fixed192-exact.map" - 1 161
+test "$(wc -l < "$R/fixed192-exact161-513.cnf")" -eq 3464332
+gzip -1 -c "$R/fixed192-exact161-513.cnf" \
+  > "$R/fixed192-exact161-513.cnf.gz"
+gzip -t "$R/fixed192-exact161-513.cnf.gz"
+TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed192-exact161-513.cnf.gz" "$R/stream-fixed192-exact161-kissat.log" \
+  "$R/stream-fixed192-exact161.rc" 0 "$KISSAT"
+```
+
+SAT 回读仍使用 `extract_fixed_layer_sat.py` 和同一映射。若求解其他分布，可替换最后的 161；每个精确分支都必须单独记录状态，不能把某一个分布的超时或 UNSAT 推广到整个固定层模型。
