@@ -804,3 +804,41 @@ python3 src/kimi/p005/add_sat_witness.py \
 ```
 
 无二支撑模型的统计应为 6,786,368 条帽子句、2,408,616 条平面子句、517,083 个变量和 10,726,551 条总子句。三个分区合在一起覆盖全部基点规范化帽，但只有求解器明确返回 UNSAT 才能排除对应分区；运行中、超时和外部终止均不作此解释。
+
+
+### 12.6 第二轨道平面化与全一型三支撑细化
+
+```bash
+# 第二二支撑轨道的平面正对照。
+"$R/gen_global_sat" "$R/global512-orbit12-planes-control.cnf" 512 3645 1
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-orbit12-planes-control.cnf" \
+  "$R/global512-orbit12-planes-witness.cnf" \
+  data/kimi/p005/baseline512-normalized-orbit12.txt
+"$KISSAT" --time=60 --sat "$R/global512-orbit12-planes-witness.cnf" \
+  > "$R/global512-orbit12-planes-witness-kissat.log" 2>&1
+# 预期：PLANES clauses 2497695；求解 s SATISFIABLE。
+
+# 自动选择具有相同 0/1/2 坐标计数的源点，并置换成 id 3159。
+python3 src/kimi/p005/permute_cap_point.py \
+  data/kimi/p005/baseline512-normalized-no-support2.txt 3159 \
+  "$R/baseline512-no-support2-weight3-t0.txt"
+cmp "$R/baseline512-no-support2-weight3-t0.txt" \
+  data/kimi/p005/baseline512-no-support2-weight3-t0.txt
+
+"$R/gen_global_sat" "$R/global512-no2-weight3-t0-control.cnf" 512 3159 1 1
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-no2-weight3-t0-control.cnf" \
+  "$R/global512-no2-weight3-t0-witness.cnf" \
+  data/kimi/p005/baseline512-no-support2-weight3-t0.txt
+"$KISSAT" --time=60 --sat "$R/global512-no2-weight3-t0-witness.cnf" \
+  > "$R/global512-no2-weight3-t0-witness-kissat.log" 2>&1
+# 预期：CAP emitted 6757928；PLANES clauses 2395738；
+# vars 516401；clauses 10683187；求解 s SATISFIABLE。
+
+"$R/gen_global_sat" "$R/global513-no2-weight3-t0.cnf" 513 3159 1 1
+"$KISSAT" --time=1200 --sat "$R/global513-no2-weight3-t0.cnf" \
+  > "$R/global513-no2-weight3-t0-kissat.log" 2>&1
+```
+
+细化分支只优先探索无二支撑总分区的一部分。若回读该模型的 SAT 解，`extract_sat_cap.py` 应使用 `--extra 3159`；仍然必须通过独立帽集检查和官方 verifier。
