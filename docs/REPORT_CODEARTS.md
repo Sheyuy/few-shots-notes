@@ -143,6 +143,17 @@ python3 src/codearts/p005/global_cpsat_hint.py
 
 结合 A/B/C：**512 是一个又深又窄的盆地**，现有 CP-SAT/局部工具都只能围绕它打转；513 若存在，需要与 baseline 差异很大的构造，而不是邻域搜索。
 
+**D. 第 13 壳层（Kimi 未判定窗口）的 CP-SAT 复核**
+
+Kimi 的 MILP 在原基线第 13 壳层（池 1216 点、30,784 条线约束）只给出 incumbent 512、dual 534，记为未判定。我们换 CP-SAT 复核同一个池：
+
+- 本地 8 worker / 300 秒：`FEASIBLE 512`；
+- 远端 64 worker / 1800 秒：`FEASIBLE 512`（`chosen=512, baseline kept=512`）。
+
+两次都只回到 baseline 本身，既没有 513，也没有 `OPTIMAL`。**因此第 13 壳层仍不能写成 UNSAT / 排除**，只是又一条“在给定算力下没有找到 513”的记录。若要真正收口这一层，需要更强的 MILP/SAT 或更长的双界收敛。
+
+**收尾判断（CodeArts 轮次）**：p005 的所有可执行路线——局部变换、分层精确团、仿射重分层、全局 CP-SAT（6 小时）、对称破缺、171/171/171、禁止 baseline、第 13 壳层——均未产生 513，也没有一条给出严格全局上界。512 与 513 的最终判定仍需要 FunSearch 式进化或完整 SAT/MILP 的长时间求解。
+
 ---
 
 ## 2. p001 · 11 维接吻数（Kissing number in dimension 11）
