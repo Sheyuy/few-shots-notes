@@ -1094,3 +1094,51 @@ TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 SAT 回读仍使用 `extract_fixed_layer_sat.py` 和同一映射。若求解其他分布，可替换最后的 161；每个精确分支都必须单独记录状态，不能把某一个分布的超时或 UNSAT 推广到整个固定层模型。
+
+## 11. CodeArts 轮次：p005 后续否证（对称破缺 / 171 分层 / 禁止 baseline / 第 13 壳层）
+
+依赖：`numpy`、`ortools`（x86_64 用最新版即可；aarch64 必须 `ortools==9.11.4210`）。
+
+### 11.1 标准点对称破缺
+
+```bash
+# d=6 对照（已知 cap(6)=112）：有破缺 83、无破缺 92，均远低于 112
+python3 src/codearts/p005/symbreak.py 6 600 8
+python3 src/codearts/p005/symbreak.py 6 600 8 nofix
+# d=8：固定 0,e1..e8 后最大化（|C|=6516，候选几乎不缩小）
+python3 src/codearts/p005/symbreak.py 8 21600 64 fix /workspace/p005/results/sym8_max.json
+```
+
+### 11.2 171/171/171 分层
+
+```bash
+python3 src/codearts/p005/fixed_layer21.py 171 1 1800 32
+# 固定层 0 的 171 点子集，优化层 1/2
+# 实测：层 1/2 候选仍 229、精确最大团 160+160，总上限 491，不可能到 513
+```
+
+### 11.3 禁止 baseline 的另盆地搜索
+
+```bash
+python3 src/codearts/p005/diff512.py 1 3600 64
+# 全局 6561 变量 + AddBoolOr（至少一点与 baseline 不同）
+# 3600s / 64 worker -> FEASIBLE 511；解是 baseline 删 1 点（union=512, inter=511）
+```
+
+### 11.4 第 13 壳层（Kimi 未判定窗口）
+
+```bash
+python3 src/codearts/p005/shell_cpsat.py 13 1800 64
+# 池 1216 点、30784 条线约束
+# 本地 300s 与远端 64 worker / 1800s 均 FEASIBLE 512（chosen=512, baseline kept=512）
+# 注意：FEASIBLE 512 不是 UNSAT，第 13 壳层仍属未判定
+```
+
+### 11.5 远端批处理入口
+
+```bash
+bash src/codearts/p005/deploy_symbreak.sh          # 需要 /workspace/p005/ 与 PYTHONPATH 下的 ortools
+bash src/codearts/p005/deploy_layer21.sh 1 2 3 4
+```
+
+所有 `FEASIBLE 512` / `UNKNOWN` / 超时都只记为“未判定”，不得写成 UNSAT。
