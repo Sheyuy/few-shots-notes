@@ -67,11 +67,12 @@ static void check_cap(const set<int> &points) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 6 || argc > 8) {
-        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt] [witness_cap.txt]\n");
+    if (argc < 6 || argc > 9) {
+        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt|-] [witness_cap.txt|-] [balance_free_layers]\n");
         return 2;
     }
-    string cap_path = argv[2], map_path = argc >= 7 ? argv[6] : "";
+    string cap_path = argv[2], map_path = (argc >= 7 && string(argv[6]) != "-") ? argv[6] : "";
+    bool balance = argc >= 9 && atoi(argv[8]);
     int coord = atoi(argv[3]), value = atoi(argv[4]), target = atoi(argv[5]);
     if (coord < 0 || coord >= 8 || value < 0 || value >= 3) {
         fprintf(stderr, "invalid coordinate or layer value\n"); return 2;
@@ -156,7 +157,30 @@ int main(int argc, char **argv) {
     int need = wires[free_target - 1];
     if (need == FALSE_W) { fprintf(stderr, "cardinality impossible\n"); return 5; }
     if (need != TRUE_W) emit({need});
-    if (argc == 8) {
+    if (balance) {
+        // Scaling only the fixed coordinate swaps the two free layers and fixes
+        // every point in the fixed layer.  Hence some affine-equivalent solution
+        // has at least ceil(free_target/2) points in the first free layer.
+        const int LPN = 4096, first_free_value = (value + 1) % 3;
+        vector<int> layer_wires(LPN, FALSE_W);
+        int layer_points = 0;
+        for (int x = 0; x < N; x++) if (coordinate(x, coord) == first_free_value)
+            layer_wires[layer_points++] = variable[x];
+        if (layer_points != 2187) { fprintf(stderr, "bad free layer size\n"); return 5; }
+        for (int p = 1; p < LPN; p <<= 1)
+            for (int k = p; k >= 1; k >>= 1)
+                for (int j = k % p; j + k < LPN; j += 2 * k)
+                    for (int i = 0; i < k; i++)
+                        if ((i + j) / (2 * p) == (i + j + k) / (2 * p))
+                            comparator(layer_wires[i + j], layer_wires[i + j + k],
+                                       layer_wires[i + j], layer_wires[i + j + k]);
+        int minimum_first = (free_target + 1) / 2;
+        int layer_need = layer_wires[minimum_first - 1];
+        if (layer_need == FALSE_W) { fprintf(stderr, "balanced cardinality impossible\n"); return 5; }
+        if (layer_need != TRUE_W) emit({layer_need});
+        fprintf(stderr, "BALANCED first_free_value %d minimum %d\n", first_free_value, minimum_first);
+    }
+    if (argc >= 8 && string(argv[7]) != "-") {
         set<int> witness = read_points(argv[7]);
         check_cap(witness);
         for (int x : fixed) if (!witness.count(x)) {

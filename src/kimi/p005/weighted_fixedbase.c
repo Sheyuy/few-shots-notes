@@ -5,7 +5,7 @@
 #include <time.h>
 #define N 6561
 #define MAXC 600
-static uint8_t hi[N],lo[N],member[N],third4[81][81],allowed[N],protected_point[N];
+static uint8_t hi[N],lo[N],member[N],third4[81][81],allowed[N],protected_point[N],forced_protected[N];
 static uint16_t negp[N];
 static int conf[N],S[MAXC],bestS[MAXC],cur_dirs,bestdirs;
 static int64_t wconf[N];
@@ -75,13 +75,18 @@ int main(int argc,char **argv){
   for(int x=0;x<N;x++){hi[x]=x/81;lo[x]=x%81;int y=0,a=x,p=1;for(int i=0;i<8;i++){y+=(3-a%3)%3*p;a/=3;p*=3;}negp[x]=y;}
   for(int a=0;a<81;a++)for(int b=0;b<81;b++){int aa=a,bb=b,w=0,pl=1;for(int i=0;i<4;i++){w+=((3-(aa%3+bb%3)%3)%3)*pl;aa/=3;bb/=3;pl*=3;}third4[a][b]=w;}
   int base[MAXC],nb=0;FILE *f=fopen(capfile,"r");if(!f){perror("capfile");return 2;}char line[256];while(fgets(line,sizeof(line),f)){if(line[0]=='#'||line[0]=='\n')continue;base[nb++]=atoi(line);}fclose(f);memset(allowed,1,sizeof(allowed));
+  if(getenv("PROTECTFILE")){
+    int nprotect=0;f=fopen(getenv("PROTECTFILE"),"r");if(!f){perror(getenv("PROTECTFILE"));return 2;}
+    while(fgets(line,sizeof(line),f)){if(line[0]=='#'||line[0]=='\n')continue;int x=atoi(line),inbase=0;for(int i=0;i<nb;i++)if(base[i]==x)inbase=1;if(x<0||x>=N||!inbase){fprintf(stderr,"protected point outside initial cap: %d\n",x);return 2;}if(!forced_protected[x]){forced_protected[x]=1;nprotect++;}}
+    fclose(f);printf("pid %d protected %d file %s\n",pid,nprotect,getenv("PROTECTFILE"));fflush(stdout);
+  }
   if(argc>13){int nban=0;f=fopen(argv[13],"r");if(!f){perror(argv[13]);return 2;}while(fgets(line,sizeof(line),f)){if(line[0]=='#'||line[0]=='\n')continue;int x=atoi(line);if(x>=0&&x<N&&allowed[x]){allowed[x]=0;nban++;}}fclose(f);printf("pid %d banned %d file %s\n",pid,nban,argv[13]);fflush(stdout);}
   for(int i=0;i<nb;i++)if(!allowed[base[i]]){fprintf(stderr,"base contains banned point\n");return 2;}
   if(nb>target){fprintf(stderr,"base larger than target\n");return 2;}
   int n=0,bad=0,bestbad=1000000;int64_t badw=0;unsigned long long last_improve=0,restarts=0;clock_t t0=clock();
   for(unsigned long long iter=0;iter<iterations;iter++){
     if(iter==0||iter-last_improve>stall){
-      memset(member,0,sizeof(member));memset(protected_point,0,sizeof(protected_point));memset(tabu,0,sizeof(tabu));if(resetw)for(size_t wj=0;wj<(size_t)N*N;wj++)lw[wj]=1;n=0;for(int i=0;i<nb;i++){S[n++]=base[i];member[base[i]]=1;if(fixbase)protected_point[base[i]]=1;}recompute(n);bad=count_bad(n);badw=count_badw(n);cur_dirs=count_dirs(n);
+      memset(member,0,sizeof(member));memset(protected_point,0,sizeof(protected_point));memset(tabu,0,sizeof(tabu));if(resetw)for(size_t wj=0;wj<(size_t)N*N;wj++)lw[wj]=1;n=0;for(int i=0;i<nb;i++){S[n++]=base[i];member[base[i]]=1;if(fixbase)protected_point[base[i]]=1;}for(int x=0;x<N;x++)if(forced_protected[x])protected_point[x]=1;recompute(n);bad=count_bad(n);badw=count_badw(n);cur_dirs=count_dirs(n);
       while(n<target){int x=choose_add(n,iter,bad,bestbad,0.15,3,alpha);add_point(x,&n,&bad,&badw);}
       if(iter==0||bad<bestbad||(bad==bestbad&&cur_dirs>bestdirs)){bestbad=bad;bestdirs=cur_dirs;memcpy(bestS,S,n*sizeof(int));snprintf(path,sizeof(path),"%s-wclosest-%d.txt",prefix,pid);save_points(path,bestS,n,bad,iter);}
       last_improve=iter;restarts++;printf("pid %d restart %llu iter %llu bad %d bestbad %d\n",pid,restarts,iter,bad,bestbad);fflush(stdout);

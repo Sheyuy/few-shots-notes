@@ -921,7 +921,8 @@ python3 src/kimi/p005/extract_fixed_layer_sat.py \
   "$R/fixed192-512-witness-kissat.log" "$R/fixed192.map" \
   data/kimi/p005/baseline512.txt 0 0 "$R/fixed192-recovered512.txt" \
   --min-size 512
-cmp "$R/fixed192-recovered512.txt" data/kimi/p005/baseline512.txt
+sort -n data/kimi/p005/baseline512.txt > "$R/baseline512-sorted.txt"
+cmp "$R/fixed192-recovered512.txt" "$R/baseline512-sorted.txt"
 
 # 生成不带见证的 513 主模型：固定 192 点，自由层目标为 321 点。
 "$R/gen_fixed_layer_sat" "$R/fixed192-513.cnf" \
@@ -966,3 +967,101 @@ python3 src/kimi/p005/check_points.py \
 ```
 
 对应的全局生成器参数分别为 `513 4131 1 1` 和 `513 6318 1 1`；若求得 SAT，回读时分别使用 `--extra 4131`、`--extra 6318`。即使四个三支撑分支全部 UNSAT，也只排除“无二支撑但至少有一个三支撑点”的情形；不覆盖同时无二、三支撑点的情形，也不改变两个二支撑分区各自的状态。
+
+
+### 12.11 T2／T3 正对照与固定层对称破缺
+
+T2、T3 的完整正对照流程如下（以 T2 为例；T3 把 `t2`、`4131` 分别换成 `t3`、`6318`）：
+
+```bash
+"$R/gen_global_sat" "$R/global512-no2-weight3-t2-control.cnf" \
+  512 4131 1 1
+python3 src/kimi/p005/add_sat_witness.py \
+  "$R/global512-no2-weight3-t2-control.cnf" \
+  "$R/global512-no2-weight3-t2-witness.cnf" \
+  data/kimi/p005/baseline512-no-support2-weight3-t2.txt
+"$KISSAT" --time=60 --sat "$R/global512-no2-weight3-t2-witness.cnf" \
+  > "$R/global512-no2-weight3-t2-witness-kissat.log" 2>&1
+python3 src/kimi/p005/extract_sat_cap.py \
+  "$R/global512-no2-weight3-t2-witness-kissat.log" "$R/t2-recovered512.txt" \
+  --extra 4131 --min-size 512
+sort -n data/kimi/p005/baseline512-no-support2-weight3-t2.txt \
+  > "$R/t2-cap-sorted.txt"
+cmp "$R/t2-recovered512.txt" "$R/t2-cap-sorted.txt"
+# 归档 T2 正对照在 4.07 秒返回 SAT；T3 也为 4.07 秒。
+
+"$R/gen_global_sat" "$R/global513-no2-weight3-t2.cnf" 513 4131 1 1
+test "$(wc -l < "$R/global513-no2-weight3-t2.cnf")" -eq 10691988
+# T3 主模型应为 10696289 行。
+```
+
+固定层生成器的最后三个可选参数为 `map.txt|-`、`witness_cap.txt|-`、`balance_free_layers`。最后的平衡参数利用两自由层互换对称性；512 对照要求第一自由层至少 160 点，513 主模型要求至少 161 点。
+
+```bash
+"$R/gen_fixed_layer_sat" "$R/fixed192-balanced512-witness.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 512 \
+  "$R/fixed192-balanced.map" data/kimi/p005/baseline512.txt 1
+"$KISSAT" --time=60 --sat "$R/fixed192-balanced512-witness.cnf" \
+  > "$R/fixed192-balanced512-witness-kissat.log" 2>&1
+# 应有 vars 487984、clauses 3468704（含单位见证）；
+# 归档日志在 1.52 秒返回 SAT。
+
+"$R/gen_fixed_layer_sat" "$R/fixed192-balanced513.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 513 \
+  "$R/fixed192-balanced.map" - 1
+test "$(wc -l < "$R/fixed192-balanced513.cnf")" -eq 3464331
+gzip -1 -c "$R/fixed192-balanced513.cnf" \
+  > "$R/fixed192-balanced513.cnf.gz"
+gzip -t "$R/fixed192-balanced513.cnf.gz"
+TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed192-balanced513.cnf.gz" "$R/stream-fixed192-balanced-kissat.log" \
+  "$R/stream-fixed192-balanced.rc" 0 "$KISSAT"
+```
+
+该对称破缺只固定层分支内有效：坐标值缩放固定第 0 层并互换两个自由层，因此没有遗漏该分支的仿射等价解。它不能被直接套用到其他全局基点模型。
+
+
+### 12.12 固定层动态加权候选生成器
+
+先确定性重建三类输入，并与归档文件比较：
+
+```bash
+python3 src/kimi/p005/make_fixed_layer_weighted.py \
+  data/kimi/p005/baseline512.txt 0 0 "$R/fixed192"
+cmp "$R/fixed192-base.txt" data/kimi/p005/fixed192-base.txt
+cmp "$R/fixed192-banned.txt" data/kimi/p005/fixed192-banned.txt
+cmp "$R/fixed192-initial513.txt" data/kimi/p005/fixed192-initial513.txt
+python3 src/kimi/p005/check_points.py \
+  "$R/fixed192-initial513.txt" --expect-size 513 --expect-bad 8
+gcc -O3 -std=c11 src/kimi/p005/weighted_fixedbase.c \
+  -o "$R/weighted_fixedbase"
+```
+
+保护点机制的合法 512 控制：
+
+```bash
+PROTECTFILE="$R/fixed192-base.txt" DBIAS=0 FIXBASE=0 \
+"$R/weighted_fixedbase" \
+  0 1000 512 data/kimi/p005/baseline512.txt "$R/fixed192-control" \
+  0 7 0.15 3 1000 100000 0 "$R/fixed192-banned.txt" \
+  > "$R/fixed192-weighted-control.log" 2>&1
+python3 src/kimi/p005/check_points.py \
+  "$R/fixed192-control-wvalid-0.txt" --expect-size 512 --expect-bad 0
+```
+
+程序对任何合法目标都会打印通用的 `BREAKTHROUGH` 字样；这里的 512 控制不是纪录突破。只有独立检查和官方 verifier 才能确认提交资格。
+
+513 主搜索可从下列命令复放；它是启发式候选生成，不是排除性证明，运行预算可调整：
+
+```bash
+PROTECTFILE="$R/fixed192-base.txt" DBIAS=0 FIXBASE=0 RESETW=1 \
+"$R/weighted_fixedbase" \
+  20261030 20000000 513 "$R/fixed192-initial513.txt" "$R/fixed192-weighted" \
+  0 7 0.15 3 1000 3000000 0 "$R/fixed192-banned.txt" \
+  > "$R/fixed192-weighted.log" 2>&1
+# 若生成 fixed192-weighted-wvalid-0.txt：
+python3 src/kimi/p005/check_points.py \
+  "$R/fixed192-weighted-wvalid-0.txt" --expect-size 513 --expect-bad 0
+```
+
+`PROTECTFILE` 的每个点都必须属于初始点文件；禁用文件覆盖固定层的全部非基线点。主搜索若只降低冲突数而未达到 0，不得把近 miss 当作合法帽。
