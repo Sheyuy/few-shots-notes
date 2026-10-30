@@ -1,0 +1,28 @@
+# build artifacts (never commit binaries)
+*.o
+*.dSYM/
+tsp_scan
+tsp_3opt
+tsp_ils
+tsp_ils_dlb
+cap_slice
+cap_grow
+cap_asc
+cap_exact
+cap_walk
+cap_layer_exact
+cap_layer_lns
+jobshop_sa
+jobshop_ig
+jobshop_tabu
+jobshop_hga
+diag
+labs_sa
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# editor / os
+.DS_Store
