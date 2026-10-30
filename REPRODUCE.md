@@ -566,3 +566,105 @@ DBIAS=0 FREEREMOVE=1 RESETW=1 "$R/weighted2" \
 # 返回 1 不是数学上的不存在性结论。实际历史快照已归档，无需靠这些
 # 新随机运行重现近 miss 后再做精确分析。
 ```
+
+
+## 11. Kimi p005 第二轮（固定层 / 子空间切割 / 236 点构造）
+
+继续从仓库根目录执行，并沿用第 10 节的 `PYTHONPATH` 和临时目录 `R`。
+
+### 11.1 确定性生成并修复 236 点固定层近 miss
+
+```bash
+python3 src/kimi/p005/make_cap7_236.py "$R/cap236"
+python3 src/kimi/p005/check_points.py \
+  "$R/cap236/seed8-fixed236.txt" --expect-size 236 --expect-bad 0
+# 预期：PASS cap7 size 236；嵌入层也是合法 236 点帽。
+
+python3 src/kimi/p005/repair_nearmiss.py \
+  data/kimi/p005/fixed236-near41.txt \
+  --fixed data/kimi/p005/seed8-fixed236.txt \
+  --prefix "$R/fixed236" --time 60
+# 预期：status 0，conflict_lines 41，cover 41，dual 41，
+# repaired 472，valid True，fixed_retained 236。
+# 最优覆盖不唯一，复跑的具体 472 点可以与归档不同。
+```
+
+### 11.2 第 13 壳层的固定层联合重构
+
+```bash
+# 归档的 baseline-d13.txt 与平面切割就是本轮实际输入。
+for c in {0..7}; do
+  for v in 0 1 2; do
+    python3 src/kimi/p005/shell_milp_cuts.py \
+      results/kimi/p005/pools/baseline-d13.txt \
+      data/kimi/p005/baseline512.txt \
+      --remove 13 --minsize 512 --time 60 \
+      --cuts results/kimi/p005/cuts/baseline-d13-plane-cuts.txt \
+      --fix-coordinate "$c" --fix-value "$v" \
+      --prefix "$R/fixed-${c}-${v}"
+  done
+done
+# 24/24 预期 status 0 / Optimal，objective=dual_bound=512，valid True。
+# 这只排除至少一个坐标层完全不变的改进，不是完整第 13 壳层证明。
+```
+
+### 11.3 三维和四维加强模型
+
+```bash
+python3 src/kimi/p005/check_cuts.py \
+  results/kimi/p005/pools/baseline-d13.txt \
+  data/kimi/p005/baseline512.txt \
+  results/kimi/p005/cuts/baseline-d13-strong3-cuts.txt
+python3 src/kimi/p005/check_cuts.py \
+  results/kimi/p005/pools/baseline-d13.txt \
+  data/kimi/p005/baseline512.txt \
+  results/kimi/p005/cuts/baseline-d13-strong4-cuts.txt
+# 两个文件都应 PASS；混合行格式为 bound n indices...。
+
+python3 src/kimi/p005/shell_milp_cuts.py \
+  results/kimi/p005/pools/baseline-d13.txt \
+  data/kimi/p005/baseline512.txt \
+  --remove 13 --minsize 512 --time 300 \
+  --cuts results/kimi/p005/cuts/baseline-d13-strong3-cuts.txt \
+  --prefix "$R/strong3"
+# 原结果：时间限制，incumbent 512，dual_bound 514，未判定。
+```
+
+切割生成器 `plane_cuts.cpp`、`subspace3_cuts.cpp`、`subspace4_cuts.cpp` 均已归档；上述精确切割输入也已归档，因此复跑模型不依赖重新做随机或耗时的切割生成。求解器超时不是不可行性证明。
+
+
+### 11.4 仿射副本并集重组
+
+```bash
+python3 src/kimi/p005/recombine_affine.py \
+  data/kimi/p005/baseline512.txt "$R/recombine"
+# 预期三个池分别为 975、982、1410 点；与 results/kimi/p005/pools/
+# 下同名归档文件一致。每个仿射副本自身仍是合法 512 点帽。
+
+python3 src/kimi/p005/shell_milp_cuts.py \
+  results/kimi/p005/pools/recombine-k2-41001-pool.txt \
+  data/kimi/p005/baseline512.txt \
+  --remove 512 --minsize 512 --time 180 --prefix "$R/recombine-k2"
+# 原记录：时间限制且没有 incumbent，未判定；不能读作 UNSAT。
+```
+
+普通搜索回到单一 512 点副本，强制混合锚集也未产生有效构造。上述命令用于复核精确输入和未判定状态，不声称仿射并集已经排除 513。
+
+
+四维模型的实际命令与结果如下：
+
+```bash
+python3 src/kimi/p005/shell_milp_cuts.py \
+  results/kimi/p005/pools/baseline-d13.txt data/kimi/p005/baseline512.txt \
+  --remove 13 --minsize 512 --time 300 \
+  --cuts results/kimi/p005/cuts/baseline-d13-strong4-cuts.txt \
+  --prefix "$R/strong4"
+# 合并模型：时间限制，无 incumbent，未判定。
+
+python3 src/kimi/p005/shell_milp_cuts.py \
+  results/kimi/p005/pools/baseline-d13.txt data/kimi/p005/baseline512.txt \
+  --remove 13 --minsize 512 --time 300 \
+  --cuts results/kimi/p005/cuts/baseline-d13-only4-cuts.txt \
+  --prefix "$R/only4"
+# 四维单独模型：时间限制，incumbent 512，dual_bound 528，未判定。
+```
