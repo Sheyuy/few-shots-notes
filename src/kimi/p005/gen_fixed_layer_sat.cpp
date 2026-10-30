@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <set>
 #include <string>
@@ -13,7 +14,7 @@ static const int N = 6561, PN = 8192, TRUE_W = INT32_MAX, FALSE_W = 0;
 static uint8_t hi[N], lo[N], third4[81][81];
 static FILE *out;
 static int nextvar;
-static long long clauses = 0, cap3 = 0, cap2 = 0, comparators = 0;
+static long long clauses = 0, cap3 = 0, cap2 = 0, planeclauses = 0, comparators = 0;
 
 static inline int third(int a, int b) {
     return third4[hi[a]][hi[b]] * 81 + third4[lo[a]][lo[b]];
@@ -42,6 +43,32 @@ static int coordinate(int x, int coord) {
     static const int pow3[8] = {2187, 729, 243, 81, 27, 9, 3, 1};
     return (x / pow3[coord]) % 3;
 }
+static void at_most(const vector<int> &wires, int bound) {
+    vector<int> lits;
+    int fixed_true = 0;
+    for (int w : wires) {
+        if (w == FALSE_W) continue;
+        if (w == TRUE_W) { fixed_true++; continue; }
+        lits.push_back(w);
+    }
+    int b = bound - fixed_true;
+    if (b < 0) { fprintf(stderr, "constant plane cardinality conflict\n"); exit(4); }
+    if ((int)lits.size() <= b) return;
+    int need = b + 1;
+    vector<int> pick;
+    function<void(int)> rec = [&](int start) {
+        if ((int)pick.size() == need) {
+            for (int i : pick) fprintf(out, "%d ", -lits[i]);
+            fputs("0\n", out);
+            clauses++; planeclauses++;
+            return;
+        }
+        for (int i = start; i <= (int)lits.size() - (need - (int)pick.size()); i++) {
+            pick.push_back(i); rec(i + 1); pick.pop_back();
+        }
+    };
+    rec(0);
+}
 static set<int> read_points(const string &path) {
     ifstream in(path);
     if (!in) { cerr << "cannot open point file: " << path << "\n"; exit(2); }
@@ -67,13 +94,14 @@ static void check_cap(const set<int> &points) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 6 || argc > 10) {
-        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt|-] [witness_cap.txt|-] [balance_free_layers] [exact_first_free_layer]\n");
+    if (argc < 6 || argc > 11) {
+        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt|-] [witness_cap.txt|-] [balance_free_layers] [exact_first_free_layer] [coordinate_planes]\n");
         return 2;
     }
     string cap_path = argv[2], map_path = (argc >= 7 && string(argv[6]) != "-") ? argv[6] : "";
     bool balance = argc >= 9 && atoi(argv[8]);
     int exact_first = argc >= 10 ? atoi(argv[9]) : -1;
+    bool coordinate_planes = argc >= 11 && atoi(argv[10]);
     if (exact_first >= 0) balance = true;
     int coord = atoi(argv[3]), value = atoi(argv[4]), target = atoi(argv[5]);
     if (coord < 0 || coord >= 8 || value < 0 || value >= 3) {
@@ -148,6 +176,29 @@ int main(int argc, char **argv) {
     fprintf(stderr, "FIXED coordinate %d value %d points %zu free_target %d originals %d\n",
             coord, value, fixed.size(), free_target, originals);
     fprintf(stderr, "CAP lines %lld ternary %lld cross_binary %lld\n", lines, cap3, cap2);
+    if (coordinate_planes) {
+        static const int pow3[8] = {2187, 729, 243, 81, 27, 9, 3, 1};
+        vector<int> wire(N);
+        for (int x = 0; x < N; x++) {
+            wire[x] = coordinate(x, coord) == value
+                ? (fixed.count(x) ? TRUE_W : FALSE_W) : variable[x];
+        }
+        long long forms = 0;
+        for (int i = 0; i < 8; i++) for (int j = i + 1; j < 8; j++)
+            for (int mask = 0; mask < 729; mask++) {
+                int d[8] = {0}, t = mask;
+                for (int k = 0; k < 8; k++) if (k != i && k != j) { d[k] = t % 3; t /= 3; }
+                vector<int> ws;
+                for (int u = 0; u < 3; u++) for (int v = 0; v < 3; v++) {
+                    d[i] = u; d[j] = v;
+                    int x = 0;
+                    for (int k = 0; k < 8; k++) x += d[k] * pow3[k];
+                    ws.push_back(wire[x]);
+                }
+                at_most(ws, 4); forms++;
+            }
+        fprintf(stderr, "PLANES forms %lld clauses %lld\n", forms, planeclauses);
+    }
     vector<int> wires(PN, FALSE_W);
     for (int v = 1; v <= originals; v++) wires[v - 1] = v;
     for (int p = 1; p < PN; p <<= 1)

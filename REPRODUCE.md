@@ -1094,3 +1094,42 @@ TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 SAT 回读仍使用 `extract_fixed_layer_sat.py` 和同一映射。若求解其他分布，可替换最后的 161；每个精确分支都必须单独记录状态，不能把某一个分布的超时或 UNSAT 推广到整个固定层模型。
+
+
+### 12.14 固定层模型的坐标平面加强
+
+生成器在 `exact_first_free_layer` 后还接受 `coordinate_planes`。以下命令先验证已知 512 点解，再重建精确 161／160 的 513 主模型；映射应与原固定层模型完全一致。
+
+```bash
+"$R/gen_fixed_layer_sat" "$R/fixed192-exact160-planes-control512-witness.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 512 \
+  "$R/fixed192-planes-control.map" data/kimi/p005/baseline512.txt 1 160 1
+# 应有 PLANES forms 20412 clauses 1327518；
+# DONE vars 487984 clauses 4796223。
+"$KISSAT" --time=60 --seed=0 --sat \
+  "$R/fixed192-exact160-planes-control512-witness.cnf" \
+  > "$R/fixed192-exact160-planes-control512-kissat.log" 2>&1
+# 归档在 2.02 秒求解时间返回 SAT。
+python3 src/kimi/p005/extract_fixed_layer_sat.py \
+  "$R/fixed192-exact160-planes-control512-kissat.log" \
+  "$R/fixed192-planes-control.map" data/kimi/p005/baseline512.txt 0 0 \
+  "$R/fixed192-planes-recovered512.txt" --min-size 512
+sort -n data/kimi/p005/baseline512.txt > "$R/baseline512-sorted.txt"
+cmp "$R/fixed192-planes-recovered512.txt" "$R/baseline512-sorted.txt"
+
+"$R/gen_fixed_layer_sat" "$R/fixed192-exact161-planes-513.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 513 \
+  "$R/fixed192-planes-main.map" - 1 161 1
+# 应有 DONE vars 487984 clauses 4791849。
+test "$(wc -l < "$R/fixed192-exact161-planes-513.cnf")" -eq 4791850
+gzip -1 -c "$R/fixed192-exact161-planes-513.cnf" \
+  > "$R/fixed192-exact161-planes-513.cnf.gz"
+gzip -t "$R/fixed192-exact161-planes-513.cnf.gz"
+test "$(gzip -dc "$R/fixed192-exact161-planes-513.cnf.gz" | wc -l)" -eq 4791850
+TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed192-exact161-planes-513.cnf.gz" \
+  "$R/stream-fixed192-exact161-planes-kissat.log" \
+  "$R/stream-fixed192-exact161-planes.rc" 0 "$KISSAT"
+```
+
+主模型压缩包 SHA-256 为 `e92b84ae305fa9e1db2abf4fc3b3484ab1682c1b37cb261491b8e4959baa8be0`，实际校验记录见 `logs/kimi/p005/cnf-gzip-integrity-fixed192-planes.log`。平面约束是合法加强，不改变该分支的覆盖范围；SAT 回读仍使用同一映射和 `extract_fixed_layer_sat.py`。
