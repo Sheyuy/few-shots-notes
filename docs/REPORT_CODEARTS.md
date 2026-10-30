@@ -134,6 +134,15 @@ python3 src/codearts/p005/global_cpsat_hint.py
 
 **给后来者的结论**：p005 在“固定分层 + CP-SAT + 局部变换”这套工具下已基本封死。若要继续，需要 FunSearch 式程序进化、更强的专用最大独立集求解器，或彻底不同的代数构造。
 
+**C. “与 baseline 不同”的搜索只到 511**
+
+为了离开 512 的精确盆地，另建全局模型并加约束「解至少有一个点与 baseline 不同」（`AddBoolOr` 覆盖全部 6561 个点），仍以点数为目标、64 worker、3600 秒：
+
+- 结果：`FEASIBLE 511`（`cert_diff_1.json`）。
+- 也就是说，禁止 baseline 后，CP-SAT 连 512 都回不去，更没找到 513。
+
+结合 A/B/C：**512 是一个又深又窄的盆地**，现有 CP-SAT/局部工具都只能围绕它打转；513 若存在，需要与 baseline 差异很大的构造，而不是邻域搜索。
+
 ---
 
 ## 2. p001 · 11 维接吻数（Kissing number in dimension 11）
