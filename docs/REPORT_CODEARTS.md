@@ -86,11 +86,12 @@ python3 problems/p005-cap-set-8d/verify/verify.py problems/p005-cap-set-8d/basel
 - 修复：`num_search_workers = 64`，内存稳定在 137 GB 以内，可长期运行。
 - 结论给后来者：**这种 7M 约束的 CP-SAT 模型，worker 数不要按核数给，按内存给**。
 
-**运行结果（截至本报告）**
+**运行结果（6 小时预算结束）**
 
-- 64 worker 实例连续运行 55 分钟以上，未返回 `status`（仍在搜索）。
-- 第二个实例（32 worker、不同 `random_seed`）并行运行。
-- 6 小时预算内若返回 `OPTIMAL 512`，即在该完整模型内证明 513 不存在；若返回 `FEASIBLE 512`，只说明没找到。
+- 实例 A（64 worker）：`status FEASIBLE obj 512, wall 21635.9 s`，保存 512 点。
+- 实例 B（32 worker、`random_seed=12345`）：`status FEASIBLE obj 512, wall 21653.5 s`，保存 512 点。
+- 两个证书都用官方 verifier 复核：`{"valid":true,"score":"512","canonical_hash":"f76ee04c31a60fb0ee33ab5dc5d99191dfe19b6384a5a88e696287b103e72e6e"}`，**与 baseline 完全相同**。
+- **结论**：6 小时预算内没有找到 513；状态是 `FEASIBLE` 而不是 `OPTIMAL`，因此**不等于证明 513 不存在**，只说明这段算力没找到。
 
 **复现**
 
@@ -103,7 +104,7 @@ python3 src/codearts/p005/global_cpsat_hint.py
 ### 1.6 p005 小结
 
 - 局部：512 是极强局部最优，单层/跨层/仿射重分层全部回到 512。
-- 全局：CP-SAT 已跑通，64 worker 是安全配置；结果待定。
+- 全局：CP-SAT 已跑通，64 worker 是安全配置；6 小时预算内两个实例均返回 `FEASIBLE 512`（未证明最优），证书与 baseline 相同。
 - 给后来者：**不要再从 512 出发做局部变换**；要么全局 CP-SAT 长跑，要么换全新构造（FunSearch 式进化、7 维 236 点 cap 的分层构造等）。
 
 ---
