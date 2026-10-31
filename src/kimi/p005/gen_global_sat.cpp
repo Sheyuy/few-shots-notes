@@ -38,12 +38,13 @@ static void comparator(int a,int b,int &hiout,int &loout){
  emit({-mn,a});emit({-mn,b});emit({mn,-a,-b});
 }
 int main(int argc,char**argv){
- if(argc<2){fprintf(stderr,"usage: gen_global_sat out.cnf [target] [extra_fixed_point|-1] [coordinate_planes] [forbid_support2]\n");return 2;}int target=argc>2?atoi(argv[2]):513;
+ if(argc<2){fprintf(stderr,"usage: gen_global_sat out.cnf [target] [extra_fixed_point|-1] [coordinate_planes] [forbid_support2] [forbid_support3] [fixed_unit_clauses]\n");return 2;}int target=argc>2?atoi(argv[2]):513;
  for(int x=0;x<N;x++){hi[x]=x/81;lo[x]=x%81;}for(int a=0;a<81;a++)for(int b=0;b<81;b++){int aa=a,bb=b,w=0,p=1;for(int i=0;i<4;i++){w+=((3-(aa%3+bb%3)%3)%3)*p;aa/=3;bb/=3;p*=3;}third4[a][b]=w;}
  int basis[9]={0,2187,729,243,81,27,9,3,1};for(int x:basis)fixedv[x]=1;
  for(int i=0;i<9;i++)for(int j=i+1;j<9;j++){int z=third(basis[i],basis[j]);if(!fixedv[z])fixedv[z]=2;else if(fixedv[z]!=2){fprintf(stderr,"basis conflict\n");return 3;}}
  if(argc>3&&atoi(argv[3])>=0){int x=atoi(argv[3]);if(x>=N||fixedv[x]){fprintf(stderr,"invalid extra fixed point %d state %d\n",x,x<N?fixedv[x]:-1);return 3;}fixedv[x]=1;for(int i=0;i<9;i++){int z=third(x,basis[i]);if(fixedv[z]==1){fprintf(stderr,"extra point conflict %d %d %d\n",x,basis[i],z);return 3;}fixedv[z]=2;}fprintf(stderr,"EXTRA_FIXED %d\n",x);}
  if(argc>5&&atoi(argv[5])){int total=0,newly=0;for(int x=0;x<N;x++){int y=x,w=0;for(int i=0;i<8;i++){w+=y%3!=0;y/=3;}if(w==2){total++;if(fixedv[x]==1){fprintf(stderr,"support2 fixed true conflict %d\n",x);return 3;}if(!fixedv[x])newly++;fixedv[x]=2;}}fprintf(stderr,"FORBID_SUPPORT2 total %d newly %d\n",total,newly);}
+ if(argc>6&&atoi(argv[6])){int total=0,newly=0;for(int x=0;x<N;x++){int y=x,w=0;for(int i=0;i<8;i++){w+=y%3!=0;y/=3;}if(w==3){total++;if(fixedv[x]==1){fprintf(stderr,"support3 fixed true conflict %d\n",x);return 3;}if(!fixedv[x])newly++;fixedv[x]=2;}}fprintf(stderr,"FORBID_SUPPORT3 total %d newly %d\n",total,newly);}
  vector<int>wire(N);for(int x=0;x<N;x++)wire[x]=fixedv[x]==1?TRUE_W:(fixedv[x]==2?FALSE_W:x+1);
  f=fopen(argv[1],"w");if(!f){perror(argv[1]);return 2;}
  // Fixed-width header, rewritten after generation.
@@ -59,6 +60,7 @@ int main(int argc,char**argv){
   }
   fprintf(stderr,"PLANES forms %lld clauses %lld\n",forms,planeclauses);
  }
+ if(argc>7&&atoi(argv[7])){int fixed_true_units=0,fixed_false_units=0;for(int x=0;x<N;x++)if(fixedv[x]){emit({fixedv[x]==1?x+1:-(x+1)});if(fixedv[x]==1)fixed_true_units++;else fixed_false_units++;}fprintf(stderr,"FIXED_UNITS true %d false %d\n",fixed_true_units,fixed_false_units);}
  vector<int>sortw(PN,FALSE_W);for(int x=0;x<N;x++)sortw[x]=wire[x];
  for(int p=1;p<PN;p<<=1)for(int k=p;k>=1;k>>=1)for(int j=k%p;j+k<PN;j+=2*k)for(int i=0;i<k;i++)if((i+j)/(2*p)==(i+j+k)/(2*p))comparator(sortw[i+j],sortw[i+j+k],sortw[i+j],sortw[i+j+k]);
  int need=sortw[target-1];if(need==FALSE_W){fprintf(stderr,"cardinality impossible\n");return 5;}if(need!=TRUE_W)emit({need});

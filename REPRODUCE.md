@@ -1189,3 +1189,47 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 轨道分支若 SAT，回读使用 `--extra 2916`；固定层分支若 SAT，仍使用同一固定层映射。两个分支都必须独立检查候选并运行官方 verifier。
+
+
+### 12.17 无二、三支撑全局剩余分区与固定单位
+
+`gen_global_sat` 在 `forbid_support3` 后还接受 `fixed_unit_clauses`。启用后者时，生成器为所有固定真／假原始变量输出单位子句，避免 SAT 日志中未使用变量的默认赋值干扰回读；不启用时保持旧模型的子句计数和复现行为。先用 9 基点做正对照：
+
+```bash
+"$R/gen_global_sat" "$R/global9-no2-no3-control.cnf" 9 -1 0 1 1 1
+# FORBID_SUPPORT2 total 112 newly 84
+# FORBID_SUPPORT3 total 448 newly 448
+# FIXED_UNITS true 9 false 568
+# DONE vars 479069 clauses 6874693
+"$KISSAT" --time=60 --seed=0 --sat "$R/global9-no2-no3-control.cnf" \
+  > "$R/global9-no2-no3-control-kissat.log" 2>&1
+python3 src/kimi/p005/extract_sat_cap.py \
+  "$R/global9-no2-no3-control-kissat.log" "$R/global9-no2-no3-control-recovered.txt" \
+  --min-size 9
+python3 src/kimi/p005/check_points.py \
+  "$R/global9-no2-no3-control-recovered.txt" --expect-size 9 --expect-bad 0
+cmp "$R/global9-no2-no3-control-recovered.txt" \
+  data/kimi/p005/global9-no2-no3-control-recovered.txt
+# 归档求解时间为 1.52 秒；回读只含支撑 0/1 的 9 个基点。
+```
+
+主模型和限时求解：
+
+```bash
+"$R/gen_global_sat" "$R/global513-no2-no3-planes.cnf" 513 -1 1 1 1 1
+# PLANES forms 20412 clauses 2000768
+# DONE vars 479069 clauses 8875462
+test "$(wc -l < "$R/global513-no2-no3-planes.cnf")" -eq 8875463
+gzip -1 -c "$R/global513-no2-no3-planes.cnf" \
+  > "$R/global513-no2-no3-planes.cnf.gz"
+gzip -t "$R/global513-no2-no3-planes.cnf.gz"
+test "$(gzip -dc "$R/global513-no2-no3-planes.cnf.gz" | wc -l)" -eq 8875463
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-no3-planes.cnf.gz" \
+  "$R/20261101-global-no23-seed0-kissat.log" \
+  "$R/20261101-global-no23-seed0.rc" 0 "$KISSAT"
+```
+
+主模型 SHA-256 为 `ecf98babd9420063c3fb635562198d0eb81e2b46e3e9770332e875a22c32c71c`。SAT 回读不需要额外固定点参数；独立检查后再运行官方 verifier。旧模型未输出固定单位，若出现 SAT，应重新生成带单位模型或明确恢复固定状态，不能直接照搬未检查的回读结果。
+
+第一自由层精确 163 模型只需把第 12.16 节命令中的 162 改为 163、文件名相应替换；第二自由层至少 158。其主模型 SHA-256 为 `fc67cdb394a059b6408d73e8b73ccfc1dfe745fb61c2f129068ab2663374e244`。
