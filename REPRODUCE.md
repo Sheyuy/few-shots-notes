@@ -1142,3 +1142,136 @@ bash src/codearts/p005/deploy_layer21.sh 1 2 3 4
 ```
 
 所有 `FEASIBLE 512` / `UNKNOWN` / 超时都只记为“未判定”，不得写成 UNSAT。
+
+## 13. SCNet 2026-10-31：p004 深挖与 p005 收尾
+
+本轮代码在 `src/scnet/`，数据在 `data/scnet/p004/`。所有命令都从仓库根目录执行，
+并假设 few-shots 克隆可由 `FEW_SHOTS_REPO` 找到。
+
+### 13.0 环境
+
+```bash
+export FEW_SHOTS_REPO=/abs/path/to/few-shots
+python3 --version            # 需要 >= 3.12（官方 verifier 用 tomllib）
+# OR-Tools 只在 frontier9.py / sweep.py 需要：
+#   pip install ortools==9.15.6755
+# C++ 需要 g++ >= 11 且支持 -fopenmp（Linux）
+```
+
+macOS 没有 libomp 时，可用临时 `omp.h` 桩串行编译，只用于跑自检；性能数字不能这样复现。
+
+### 13.1 p004：论文构造逐字复现（约 1 秒）
+
+```bash
+cd src/scnet/p004
+python3 model.py
+# SELFTEST adjacency=10049 random_2SAT=300 direct_extension_cases=160 PASS
+# CONTROL pairs=8 X=367 active_X=46 contact_signatures=22 variables=352 clauses=916 reconstructed_points=134753
+
+python3 paper_construct.py --compare /path/to/CC_10_7_134753.txt
+# SIZE 134753 B 359 A 20 D 26
+# OFFICIAL_VERIFY {"valid":true,"score":"134753","canonical_hash":"650b0556..."}
+# COMPARE {"reference":134753,"mine":134753,"only_reference":0,"only_mine":0}
+```
+
+反例自检（`J1` 漏掉 pair 7）：
+
+```bash
+python3 - <<'PY'
+import paper_construct as pc, model as m
+pairs=[tuple(map(tuple,p)) for p in m.PAIRS8]
+C,_,_,_=pc.build(J0=(0,5,6,7),pairs=pairs)
+print(len(C), m.is_valid(C))     # 134753 False  -> 构建器拒绝，不会误报成功
+PY
+```
+
+### 13.2 p004：三个归档点集
+
+```bash
+cd ../../data/scnet/p004
+python3 verify_points.py cc_10_7_134753_paper.txt       # 650b05567deb...
+python3 verify_points.py cc_10_7_134753_rearranged.txt  # fe928a1cb18c...
+python3 verify_points.py cc_10_7_134753_9pair17.txt     # 1e69296d58d1...
+```
+
+预期三者都是 `{"valid":true,"score":"134753"}`，但 `canonical_hash` 互不相同。
+
+### 13.3 p004：九对族最小删点（OR-Tools）
+
+```bash
+cd ../../src/scnet/p004
+python3 frontier9.py --variant R2 --x patch --seconds 60
+# FRONTIER9_BOUND {"omissions":17,"proven_optimal":true,"size":134753}
+# FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d..."}
+
+python3 frontier9.py --variant R1 --x patch --seconds 60
+# 18 -> 134752
+
+python3 frontier9.py --variant R2 --x x0 --seconds 60
+# 32 -> 134738
+```
+
+`17` 是这六个固定模型的证明最优值；门槛是 16，所以差 1 个槽位。
+`--variant` 与 `--x` 的六种组合见 `src/scnet/p004/README.md` 的表。
+
+### 13.4 p004：交换排除（C++/OpenMP）
+
+```bash
+cd src/scnet/p004
+g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
+./sixm3 --self-test
+# SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
+# MASK_SELFTEST random_pairs=100000 PASS baseline=134753
+
+./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 1 --threads 8 --seconds 300
+# COUNTS m0=0 m1=5178 m2=144861 m3=999144 m4=2131704 m5=2550704 m6=3197204 blocker_mismatches=0 truncations=0
+# COMPLETE exchanges_up_to=1 no_improvement=1
+```
+
+`--max-k 5` 的完整运行在 640 核远端做过（所有阶段 `complete=1 found=0`）。
+k=6 只跑了自然 6-集与 rank-5 单扩展，`max_k_completed=5`；深层与连通 6-集未跑。
+
+平台搜索（启发式，需要先按 13.4 的方式拼 `lns4.c`）：
+
+```bash
+sed 's/^int main(int argc,char\*\* argv){/int audited_baseline_main(int argc,char** argv){/' sixm3.c > /tmp/core.cpp
+cat /tmp/core.cpp lns4.c > /tmp/lns4_all.cpp
+g++ -x c++ -std=c++17 -O3 -fopenmp /tmp/lns4_all.cpp -o lns4
+./lns4 --self-test
+./lns4 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --chains 8 --seconds 120 --radius 1024
+```
+
+### 13.5 p005：基线与结构
+
+```bash
+cd src/scnet/p005
+python3 - <<'PY'
+import json
+from paths import P005
+import analyze
+PY
+# n = 512 unique = 512
+# hist outside: ...  min cnt outside: ...
+```
+
+`analyze.py` 会打印集外点的冲突数直方图；基线 0 个可加点、三层切片 192/160/160。
+
+### 13.6 p005：r ≤ 13 的删点-回填
+
+```bash
+mkdir -p /tmp/p005run && cd /tmp/p005run
+python3 /abs/path/src/scnet/p005/make_baseline_idx.py > baseline.idx
+gcc -O3 -march=native /abs/path/src/scnet/p005/rk13.c -o rk13
+./rk13 13
+# 输出每个 r 的最多可加点数；r=13 时为 2（净 -11）
+```
+
+### 13.7 p005：CP-SAT（未判定，不是否证）
+
+```bash
+python3 /abs/path/src/scnet/p005/solve513.py
+# 6561 变量；max_time_in_seconds=900；预期 UNKNOWN 或 FEASIBLE 512，绝不是 UNSAT
+```
+
+固定单层的版本是 `two_slice.py`（固定 x0=0 的 192 点，另两层求 ≥321）。
+任何 `UNKNOWN`/`FEASIBLE`/超时/OOM 都只能记为“未判定”。
