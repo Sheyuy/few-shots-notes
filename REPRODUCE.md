@@ -1204,6 +1204,9 @@ python3 frontier9.py --variant R2 --x patch --seconds 60
 # FRONTIER9_BOUND {"omissions":17,"proven_optimal":true,"size":134753}
 # FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d..."}
 
+# 加 --write /tmp/9pair17.txt 可导出点集。最优解不唯一，导出的集合可能与
+# data/scnet/p004/cc_10_7_134753_9pair17.txt 不同，但都应是 17 空位、134,753 点。
+
 python3 frontier9.py --variant R1 --x patch --seconds 60
 # 18 -> 134752
 
@@ -1245,13 +1248,11 @@ g++ -x c++ -std=c++17 -O3 -fopenmp /tmp/lns4_all.cpp -o lns4
 
 ```bash
 cd src/scnet/p005
-python3 - <<'PY'
-import json
-from paths import P005
-import analyze
-PY
+python3 analyze.py
 # n = 512 unique = 512
-# hist outside: ...  min cnt outside: ...
+# hist outside: [(4, 16), (8, 16), (10, 64), (11, 192), (12, 32), (13, 384), (14, 192), (15, 128)] max 256
+# min cnt outside: 4
+# outside cnt<=2: 0
 ```
 
 `analyze.py` 会打印集外点的冲突数直方图；基线 0 个可加点、三层切片 192/160/160。

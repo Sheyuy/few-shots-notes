@@ -24,7 +24,8 @@ python3 verify_points.py cc_10_7_134753_paper.txt
 ## 说明
 
 - 9pair17 的 17 是**该固定九对族的最小删点数**（CP-SAT 证明 OPTIMAL），
-  不是“整个 p004 至少需要删 17 点”的结论。
+  不是“整个 p004 至少需要删 17 点”的结论；最优解不唯一，重跑
+  `frontier9.py --write` 可能得到另一个同样 17 空位、同样 134,753 点的集合。
 - rearranged 集合只有“无法直接加点”这一性质经过检验；它同样通过了
   k ≤ 5 的交换排除（见 `src/scnet/p004/README.md`）。
 - 所有文件的点均为 0–6 的数字串，不含坐标分隔符；`verify_points.py` 会去掉空白，
