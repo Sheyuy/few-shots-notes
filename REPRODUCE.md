@@ -1133,3 +1133,27 @@ TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 主模型压缩包 SHA-256 为 `e92b84ae305fa9e1db2abf4fc3b3484ab1682c1b37cb261491b8e4959baa8be0`，实际校验记录见 `logs/kimi/p005/cnf-gzip-integrity-fixed192-planes.log`。平面约束是合法加强，不改变该分支的覆盖范围；SAT 回读仍使用同一映射和 `extract_fixed_layer_sat.py`。
+
+
+### 12.15 540 秒限时与加权参数变体
+
+在约十分钟后可能收到外部 SIGTERM 的环境中，可把上述 SAT 运行器的 `TIME=1200` 改为 `TIME=540`。T3 的限时复现命令为：
+
+```bash
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-weight3-t3.cnf.gz" "$R/stream6-t3-kissat.log" \
+  "$R/stream6-t3.rc" 2 "$KISSAT"
+# 归档：s UNKNOWN，398.14 秒求解时间，退出码 0。
+```
+
+首个固定层加权搜索使用第 12.12 节参数、种子 20261031 和 540 秒外部时限；退出码 124 表示 `timeout` 到期。它完成约 600 万次迭代，但最佳文件仍是初始的 8 冲突近 miss。第二轮参数变体可用下列命令复放：
+
+```bash
+PROTECTFILE="$R/fixed192-base.txt" DBIAS=0 FIXBASE=0 RESETW=1 \
+timeout -k 5 540 "$R/weighted_fixedbase" \
+  20261032 20000000 513 "$R/fixed192-initial513.txt" "$R/fixed192-weighted-20261032" \
+  0 11 0.25 5 500 500000 0 "$R/fixed192-banned.txt" \
+  > "$R/fixed192-weighted-20261032.log" 2>&1
+```
+
+这里依次修改禁忌期、噪声、随机游走范围、加权间隔和停滞重启阈值。退出码 124 只表示启发式搜索被限时停止；若没有 `wvalid` 文件，就没有合法候选。即使有输出，也仍须用 `check_points.py` 和官方 verifier 独立确认。
