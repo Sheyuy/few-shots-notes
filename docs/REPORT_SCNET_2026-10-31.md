@@ -164,7 +164,7 @@ STAGE  natural_k1 sets_or_anchor_instances=5152 eligible=26 max_pool=2 complete=
 COMPLETE exchanges_up_to=1 no_improvement=1
 ```
 
-`m0 = 0` 就是“没有可加点”，与旧程序的极大性结论一致。远端 `--max-k 5` 的运行：
+`m0 = 0` 就是“没有可加点”，与旧程序的极大性结论一致。远端 `--max-k 5` 的运行（现已由本地 600 秒运行复现）：
 
 ```
 COUNTS m0=0 m1=5178 m2=144861 m3=999144 m4=2131704 m5=2550704
@@ -174,14 +174,23 @@ KEYS   rank1=5152 rank2=136379 rank3=966479 rank4=2076092 rank5=2479863
 所有 k=1..5 阶段 complete=1 found=0
 ```
 
-**k=6 只做了部分覆盖**（远端记录）：
+**k=6 只做了部分覆盖**（2026-11-01 本地串行 600 秒，日志
+`logs/scnet/p004/sixm3_k6_600s.log`）：
 
 ```
-natural_k6        sets=3,003,919  eligible=387,149  max_pool=26  found=0
-rank5_extensions  instances=41,986,400 eligible=3,593,064 max_pool=27 found=0
-RESULT max_k_completed=5 requested_max_k=6 found=0 truncations=0
+STAGE natural_k6           sets=3,003,919     eligible=387,149   complete=1 found=0
+STAGE rank5_extensions_k6  instances=41,986,400 eligible=3,593,064 complete=1 found=0
+RESULT {"status":"completed","max_k_completed":5,"requested_max_k":6,"found":0,"truncations":0}
 ```
 
+`status=completed` 指“程序把它为 k=6 设计的两阶段跑完”，**不是** k=6 全覆盖：
+源码在 `k==6` 时只跑 `naturalStage(6)` 与 `anchorStage(5,6)` 就 `break`，
+所以 `max_k_completed` 停在 5；深层 rank4/rank3 扩展与连通 6-集没有实现。
+
+同一次运行还把 k ≤ 5 的全部阶段在本地完整跑了一遍（此前只有远端记录）：
+`natural_k1..5`、`rank3_k4`、`rank4/rank3_k5`、`connected_pair_k3..k5` 均
+`complete=1 found=0`；k=5 的 rank3 阶段处理了 **181,817,650** 个实例，
+连通对阶段生成 17,040,783 个 5-集（去重后 6,511,209）。
 深层 k=6 扩展与连通 6-集**没有跑**，所以正确表述是“k ≤ 5 排除；k=6 部分覆盖，
 未发现改进”，不是“k ≤ 6 排除”。
 
@@ -402,7 +411,7 @@ src/scnet/p004/R367.txt            论文用 367 点独立集
 src/scnet/p005/*.py, *.c           p005 的统计、CP-SAT、局部搜索（清单见 src/scnet/p005/README.md）
 data/scnet/p004/                   三个 134,753 点集 + 校验脚本 + MANIFEST
 data/scnet/p005/cap6_best.json     85 点 F₃⁶ 帽集（子搜索未到 112）
-logs/scnet/p005/                   CP-SAT 与局部搜索日志（UNKNOWN/超时都保留）
+logs/scnet/p004/, p005/           交换排除与 CP-SAT/局部搜索日志（含 UNKNOWN 与中断）
 docs/CLAIM-EVIDENCE.md             每条结论 → 脚本/日志/数据的对照表
 ```
 

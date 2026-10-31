@@ -17,9 +17,9 @@
 | 2 | 论文构造逐字复现，与参考文件 0 差异 | 精确 | `src/scnet/p004/paper_construct.py --compare` | 归档 |
 | 3 | 56 种 `J0` 中只有 `{0,5,6}` 给出独立集（134,753 点） | 精确 | `src/scnet/p004/j0_scan2.py` | 归档 |
 | 4 | 三个 134,753 点集都合法且互不相同 | 精确 | `data/scnet/p004/*.txt` + `verify_points.py` + `MANIFEST.sha256` | 归档 |
-| 5 | k ≤ 5 的 k→k+1 交换在论文集上 `found=0`、`complete=1` | 精确（限该点集） | `src/scnet/p004/sixm3.c`，远端 640 核运行 | 代码归档，日志缺失 |
+| 5 | k ≤ 5 的 k→k+1 交换在论文集上全部 `complete=1 found=0` | 精确（限该点集） | `sixm3.c` + `logs/scnet/p004/sixm3_k6_600s.log`（本地串行 600 秒） | 归档 |
 | 6 | 同上，在重排集上 `found=0` | 精确（限该点集） | 同上 | 代码归档，日志缺失 |
-| 7 | k = 6 的部分覆盖计数（3,003,919 个 6-集；41,986,400 个 rank5 实例） | 有限范围（未跑完 k=6） | `sixm3.c` 远端运行 | 代码归档，日志缺失 |
+| 7 | k = 6 的两个设计内阶段：3,003,919 个自然 6-集 + 41,986,400 个 rank5 实例，均 `found=0` | 有限范围（k=6 未全覆盖） | `sixm3.c` + 同一份日志（`max_k_completed=5`） | 归档 |
 | 8 | 平台/中性重排 652,515 步后仍 0 可加点 | 启发式 | `src/scnet/p004/lns4.c` → `cc_10_7_134753_rearranged.txt` | 代码归档 |
 | 9 | 九对族 50 个候选在固定 X 下全部 UNSAT | 精确（限 50 个模型） | `sweep.py`（`optional_test`） | 归档 |
 | 10 | R2:patch 最少 17 空位 → 134,753 点（`1e69296d58d1…`） | 精确（限该模型） | `frontier9.py --variant R2 --x patch` | 归档 |

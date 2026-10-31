@@ -92,13 +92,18 @@ STAGE  natural_k1 sets=5152 eligible=26 max_pool=2 complete=1 found=0
 `m0 = 0` ⇔ 没有可加点（极大集）。远端 `--max-k 5` 的所有阶段
 `complete=1 found=0`。
 
-### k=6 只做了部分覆盖（远端记录）
+### k=6 只做了部分覆盖（2026-11-01 本地 600 秒，日志已归档）
 
 ```
-natural_k6        sets=3,003,919   eligible=387,149    max_pool=26  found=0
-rank5_extensions  instances=41,986,400 eligible=3,593,064 max_pool=27 found=0
-RESULT max_k_completed=5 requested_max_k=6 found=0 truncations=0
+STAGE natural_k6           sets=3,003,919     eligible=387,149   complete=1 found=0
+STAGE rank5_extensions_k6  instances=41,986,400 eligible=3,593,064 complete=1 found=0
+RESULT {"status":"completed","max_k_completed":5,"requested_max_k":6,"found":0,"truncations":0}
 ```
+
+`completed` 只表示“k=6 的两个设计内阶段跑完”：源码在 `k==6` 时跑完
+`naturalStage(6)` 和 `anchorStage(5,6)` 就 `break`，`max_k_completed` 因此是 5。
+同一次运行也把 k ≤ 5 的所有阶段跑成 `complete=1 found=0`（k=5 的 rank3 阶段
+1.8 亿个实例），此前只有远端记录。
 
 深层 k=6 扩展与连通 6-集**未跑**。正确说法是“k ≤ 5 排除；k=6 部分覆盖”。
 

@@ -1231,8 +1231,21 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 # COMPLETE exchanges_up_to=1 no_improvement=1
 ```
 
-`--max-k 5` 的完整运行在 640 核远端做过（所有阶段 `complete=1 found=0`）。
-k=6 只跑了自然 6-集与 rank-5 单扩展，`max_k_completed=5`；深层与连通 6-集未跑。
+```bash
+./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 6 --threads 8 --seconds 600
+# STAGE natural_k1..natural_k5、rank3_k4、rank4/rank3_k5、connected_pair_k3..k5 全部 complete=1 found=0
+# STAGE natural_k6          sets=3,003,919     eligible=387,149   complete=1 found=0
+# STAGE rank5_extensions_k6 instances=41,986,400 eligible=3,593,064 complete=1 found=0
+# RESULT {"status":"completed","max_k_completed":5,"requested_max_k":6,"found":0,"truncations":0}
+```
+
+`status=completed` 只表示“程序把它为 k=6 设计的两阶段跑完”，**不是** k=6 全覆盖：
+源码在 `k==6` 时跑完 `naturalStage(6)`、`anchorStage(5,6)` 就 `break`，
+`max_k_completed` 因此永远是 5。深层 rank4/rank3 扩展与连通 6-集没有实现。
+
+本机没有 libomp，用 `-I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c` 编译出来是**串行**的，
+600 秒刚好跑完上面这些阶段；有 OpenMP 的机器会快很多。日志见
+`logs/scnet/p004/sixm3_k6_600s.log`。
 
 平台搜索（启发式，需要先按 13.4 的方式拼 `lns4.c`）：
 
