@@ -12,7 +12,7 @@
 | p001 接吻数 11 维 | 604 向量 | 604 | 否 | POCS 无空隙；覆盖半径 54.7°；norm=72 全排查 |
 | p003 R(4,6) 下界 | 35 顶点 | 35 | 否 | 37 个 35 点图全部 UNSAT（含 CodeArts 独立复核） |
 | p004 C7 香农容量 | 134,753 点 | 134,753 | 否 | 论文构造逐字复现（0 差异）；审计后 k≤5 交换在两个不同点集上全无解（m0=0，truncations=0）；九对族最优删 17 槽（门槛 16，差 1），134,770→134,753 |
-| p005 8 维帽集 | 512 点 | 512 | 否 | 局部刚性；r≤13 删点-回填穷举最多回填 2；六种子 11 删除/基线 12 删除邻域精确排除（Kimi）；全局 CP-SAT 6 小时 FEASIBLE 512（CodeArts，64 worker）；对称破缺/171 分层否证；禁止 baseline 的另盆地搜索只到 511（CodeArts）；第 13 壳层 CP-SAT 1800s 仍 `FEASIBLE 512`（CodeArts）；本轮全局 513 与分层子问题全程 `UNKNOWN`（含 240 GiB OOM），从未 `UNSAT` |
+| p005 8 维帽集 | 512 点 | 512 | 否 | 局部刚性（集外每点冲突 ≥4，其 4 对互不相交）；结构化删点 KK=10 最多回填 2（KK=11–13 未跑，不作结论）；六种子 11 删除/基线 12 删除邻域精确排除（Kimi）；全局 CP-SAT 6 小时 FEASIBLE 512（CodeArts，64 worker）；对称破缺/171 分层否证；禁止 baseline 的另盆地搜索只到 511（CodeArts）；第 13 壳层 CP-SAT 1800s 仍 `FEASIBLE 512`（CodeArts）；本轮全局 513 与分层子问题全程 `UNKNOWN`（含 240 GiB OOM），从未 `UNSAT` |
 | p006 LABS-100 | E=578 | 742（劣于基线） | 否 | 启发式搜索远未达标 |
 | p008 AES S-box 电路 | 102 门 | 102 | 否 | 无重复/死门/常量门可删 |
 
@@ -40,7 +40,8 @@
 - [p008 AES 电路](p008/README.md)
 - [CodeArts 轮次完整报告（p001/p003/p005 + 远端 640 核经验）](docs/REPORT_CODEARTS.md)
 - [Kimi p005 独立轮次：射影截面、非对称搜索、精确壳层](docs/REPORT_KIMI_P005.md)
-- [SCNet 2026-10-31：p004 审计/九对族 17 空位 + p005 r≤13 与 CP-SAT 边界](docs/REPORT_SCNET_2026-10-31.md)
+- [SCNet 2026-10-31：p004 审计/九对族 17 空位 + p005 插入代价与 CP-SAT 边界](docs/REPORT_SCNET_2026-10-31.md)
+- [结论 → 证据对照表：每个数字指向脚本/日志/数据](docs/CLAIM-EVIDENCE.md)
 
 ## 环境与工具
 

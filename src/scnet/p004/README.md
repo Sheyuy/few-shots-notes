@@ -14,6 +14,7 @@ C7 香农容量：C7<sup>⊠10</sup> 的独立集。本目录是这一轮全部�
 | `frontier9.py` | 九对族的最小删点优化（CP-SAT），复现“17 空位 → 134,753” | OR-Tools |
 | `sweep.py` | 九对候选（50 个）、R1/R2 变体、自同构扫描、非对称补丁搜索；**含可续跑的检查点** | OR-Tools |
 | `cand9.py` | 重新枚举第 9 对的 50 个候选（pool(D8) 计算） | 仅标准库 + `model.py` |
+| `j0_scan2.py` | 56 种 `J0` 全扫描（3-子集 × 8 对），只有 `{0,5,6}` 给出独立集 | 仅标准库 |
 | `sixm3.c` | 审计重写的 k→k+1 交换排除（C++17，OpenMP），自检 + 完备性标志 | g++ ≥ 11 |
 | `lns4.c` | 平台/中性重排搜索（启发式，非穷举），需与 `sixm3.c` 拼成一个编译单元 | g++ ≥ 11 |
 
@@ -32,6 +33,9 @@ python3 paper_construct.py --compare /path/to/CC_10_7_134753.txt
 # OFFICIAL_VERIFY {"valid": true, "score": "134753", "canonical_hash": "650b0556...", "message": "ok"}
 # COMPARE {"reference": 134753, "mine": 134753, "only_reference": 0, "only_mine": 0}
 ```
+
+`J0={0,5,6}` 不是任意选的：`python3 j0_scan2.py` 把 8 个私有对里的 3-子集全部试一遍
+（56 种），**只有 `{0,5,6}` 给出独立集**（134,753 点），其余 55 种都在跨前缀冲突处失败。
 
 `paper_construct.py` 的 `J0={0,5,6}`、`J1={1,2,3,4,7}` 必须**包含 pair 7**。
 把它误写成 `J1={1,2,3,4}` 时集合大小仍是 134,753，但不是独立集（与正确集合的

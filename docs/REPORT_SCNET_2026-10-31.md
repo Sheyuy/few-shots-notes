@@ -21,8 +21,9 @@
   在两个不同的 134,753 点集上，k ≤ 5 的 k→k+1 交换被**审计后的程序**完整排除
   （`m0=0`，`truncations=0`）。九对参数族的最好结果是 **17 个空位**，
   而达到 134,754 只需要 **16 个**——差 1 个空位，但这一步没有跨过去。
-- **p005**：r ≤ 13 的删点-回填被穷举，最多回填 2 点；全局 CP-SAT 在 513 上始终
-  `UNKNOWN`，从未 `UNSAT`。因此 512 仍是唯一可验证的值，513 需要新构造。
+- **p005**：集外每点至少 4 个冲突对，插入任何点都要先删 ≥4 点；结构化删点（KK=10）
+  最多回填 2 点。全局 CP-SAT 在 513 上始终 `UNKNOWN`，从未 `UNSAT`。因此 512 仍是
+  唯一可验证的值，513 需要新构造。
 
 ---
 
@@ -86,6 +87,10 @@ SIZE 134753 B 359 A 20 D 26
 OFFICIAL_VERIFY {"valid":true,"score":"134753","canonical_hash":"650b0556…"}
 COMPARE {"reference":134753,"mine":134753,"only_reference":0,"only_mine":0}
 ```
+
+**J0 为什么是 {0,5,6}**（`src/scnet/p004/j0_scan2.py`）：8 个私有对里选 3 个放 J0 共 56 种，
+逐一按同一公式造集并检查，**只有 {0,5,6} 给出独立集**（134,753 点），其余 55 种都在
+`cross p=… q=…` 一类冲突处失败。J0 不是随手挑的。
 
 **踩过的坑**：`J1` 必须包含 pair 7。漏掉时集合大小仍是 134,753，但不是独立集，
 与正确集合的对称差是 340 点（170/170）；官方 verifier 直接拒绝。本轮早期曾因此
@@ -294,14 +299,20 @@ UNKNOWN**。那 1 个未判定不能用来说明任何方向的结论。
 
 | 尝试 | 结果 | 强度 |
 | --- | --- | --- |
-| 删 r ≤ 13 点后回填（`rk13.c` 枚举） | 最多回填 2 点（r=13，净 −11） | 精确 |
-| r→r+1 交换 | 不存在（需 r+1 个可加点，上限 2） | 精确 |
+| 集外点插入代价（`analyze.py` + `transversals.py`） | 每点冲突 ≥4；冲突数 = 4 的 16 点其 4 对互不相交 ⇒ 至少删 4 点 | 精确 |
+| 结构化删点（`r10.c`，KK=10：逐点取 10 对，枚举 2¹⁰ 种删法） | 最多回填 2 点（x=2472，净 −8） | 精确，限该族；日志 `logs/scnet/p005/rk13.log` |
+| KK = 11/12/13（`rk.c`/`rk12.c`/`rk13.c`） | 代码在，本轮无运行日志 | 未判定 |
 | 增长式构造（`grow2.c`） | 最好 328 | 启发式 |
 | 640 核 600 种子最小冲突 | 最好 E=7，无 E=0 | 启发式（远端记录） |
 | 全局 K=513 CP-SAT | 本地 + 远端 2×2 小时均 `UNKNOWN` | 未判定 |
 | 固定单层 f=0/1/2、随机 ℓ 层子问题 | `UNKNOWN` | 未判定 |
 | 3 个完整模型 | 240 GiB cgroup 下 OOM | 未判定 |
 | 乘积路线（需 112 点 F₃⁶ 帽集） | 本地搜索只到 85 | 搜索失败，不是不存在 |
+
+**勘误（同日）**：本报告早期版本写过“r ≤ 13 的删点-回填被穷举，最多回填 2 点”，
+把 `rk13.c` 当成了“r=13 的完全枚举”。复核源码后确认它的真实语义是：对每个集外点
+取 **KK 个互不相交**的冲突对，枚举“各删一端”的 2^KK 种删法再统计全局可加点数——
+不是所有 r ≤ 13 的组合。只有 KK=10 的日志被保留。原强结论撤回，替换为上表版本。
 
 注意最后一行：α(F₃⁶)=112 是已知可达的，本地只搜到 85 说明子搜索太弱。
 把它写成“乘积路线被排除”会是错误的。
@@ -323,6 +334,7 @@ python3 $FEW_SHOTS_REPO/problems/p004-shannon-capacity-c7/verify/verify.py \
 
 # 2) 论文构造复现（0 差异）
 cd src/scnet/p004 && python3 model.py && python3 paper_construct.py
+python3 j0_scan2.py          # 56 种 J0，只有 (0,5,6) 为 True
 
 # 3) 三个归档点集的官方校验
 cd ../../data/scnet/p004
@@ -343,7 +355,8 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 # 6) p005 基线与其结构
 python3 $FEW_SHOTS_REPO/problems/p005-cap-set-8d/verify/verify.py \
         $FEW_SHOTS_REPO/problems/p005-cap-set-8d/baseline
-cd ../p005 && python3 analyze.py
+cd ../p005 && python3 analyze.py && python3 transversals.py
+# 结构化删点需要 baseline.idx，步骤见 src/scnet/p005/README.md
 ```
 
 ---
@@ -372,12 +385,16 @@ src/scnet/p004/model.py            审计后的配对条带模型 + 自检
 src/scnet/p004/paper_construct.py  论文构造逐字复现
 src/scnet/p004/frontier9.py        九对族最小删点（CP-SAT）
 src/scnet/p004/sweep.py            50 候选 / 自同构 / 非对称搜索 + 检查点
+src/scnet/p004/j0_scan2.py         56 种 J0 的全扫描（只有 {0,5,6} 有效）
 src/scnet/p004/cand9.py            第 9 对候选枚举
 src/scnet/p004/sixm3.c             审计后的 k→k+1 交换排除
 src/scnet/p004/lns4.c              平台/中性重排（启发式）
 src/scnet/p004/R367.txt            论文用 367 点独立集
-src/scnet/p005/*.py, *.c           p005 的统计、CP-SAT、局部搜索
+src/scnet/p005/*.py, *.c           p005 的统计、CP-SAT、局部搜索（清单见 src/scnet/p005/README.md）
 data/scnet/p004/                   三个 134,753 点集 + 校验脚本 + MANIFEST
+data/scnet/p005/cap6_best.json     85 点 F₃⁶ 帽集（子搜索未到 112）
+logs/scnet/p005/                   CP-SAT 与局部搜索日志（UNKNOWN/超时都保留）
+docs/CLAIM-EVIDENCE.md             每条结论 → 脚本/日志/数据的对照表
 ```
 
 许可证：本仓库代码为 MIT（见 `LICENSE`）。本轮新增的点集文件由公开论文构造与本轮计算生成，引用时请注明来源；论文构造本身的知识产权归原作者。

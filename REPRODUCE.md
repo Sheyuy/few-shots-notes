@@ -1257,22 +1257,52 @@ python3 analyze.py
 
 `analyze.py` 会打印集外点的冲突数直方图；基线 0 个可加点、三层切片 192/160/160。
 
-### 13.6 p005：r ≤ 13 的删点-回填
+接着看冲突数恰好为 4 的那 16 个点：
+
+```bash
+python3 transversals.py
+# conf4 points: 16
+# number of distinct transversals: 256
+# max frequency: 1
+# transversals unlocking >=2 conf4 points: 0
+# all conf4 pairs disjoint: True
+```
+
+即：这 16 个点各自的 4 个冲突对两两不相交，而 256 种“每对删一端”的横截里没有
+一个能同时解锁 ≥2 个点。所以插入任何集外点至少删 4 点（净 ≤ −3）。
+
+### 13.6 p005：结构化删点（KK = 10）
 
 ```bash
 mkdir -p /tmp/p005run && cd /tmp/p005run
 python3 /abs/path/src/scnet/p005/make_baseline_idx.py > baseline.idx
-gcc -O3 -march=native /abs/path/src/scnet/p005/rk13.c -o rk13
-./rk13 13
-# 输出每个 r 的最多可加点数；r=13 时为 2（净 -11）
+gcc -O3 -march=native /abs/path/src/scnet/p005/r10.c -o r10
+./r10
+# k10 points 384
+# best 2 x=2472 mask=8160
+# FINAL max addable after 10-removal: 2 (x=2472)
 ```
 
+程序语义：对每个集外点取 10 个互不相交的冲突对，枚举 2^10 种“各删一端”，统计
+全局可加点数。`rk.c`/`rk12.c`/`rk13.c` 是同一程序的 KK=11/12/13 版本（打印字符串
+仍写 “10-removal” 是历史遗留）；本轮**只有 KK=10 的运行日志**保留在
+`logs/scnet/p005/rk13.log`，KK=11–13 未跑或未留存，不能写成“r ≤ 13 已穷举”。
+
 ### 13.7 p005：CP-SAT（未判定，不是否证）
+
+本节的脚本都需要 OR-Tools（版本见 §13.3 的注释；本地测试用 9.15.6755）。
 
 ```bash
 python3 /abs/path/src/scnet/p005/solve513.py
 # 6561 变量；max_time_in_seconds=900；预期 UNKNOWN 或 FEASIBLE 512，绝不是 UNSAT
 ```
 
-固定单层的版本是 `two_slice.py`（固定 x0=0 的 192 点，另两层求 ≥321）。
+固定单层的版本是 `two_slice.py`（固定 x0=0 的 192 点，另两层求 ≥321）；
+变体有 `two_slice_f.py`（f=1）、`two_slice_hint.py`（512 hint）、`two_slice_long.py`（长跑）、
+`two_slice_rand.py`（随机层）、`two_slice_remote.py`（远端 64 worker）。
 任何 `UNKNOWN`/`FEASIBLE`/超时/OOM 都只能记为“未判定”。
+
+保留的日志在 `logs/scnet/p005/`：`cp_solve2.log`（全局 7,173,360 条线约束，967 秒 `UNKNOWN`）、
+`cp_alt.log` / `cp_hint.log`（344 秒 `UNKNOWN`）、`two_slice*.log`（611–3,607 秒 `UNKNOWN`）、
+`product.log`（F₃⁶ 子问题只到 85 点）、`rk13.log`（KK=10，最多回填 2）。
+`data/scnet/p005/cap6_best.json` 是那 85 点 F₃⁶ 帽集，可用 6 位三进制展开复核（无三点共线）。
