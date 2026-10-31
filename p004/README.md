@@ -131,7 +131,7 @@ RESULT max_k_completed=5 requested_max_k=6 found=0 truncations=0
 | 允许 ≤16 空位的 CP-SAT | 49 INFEASIBLE + 1 UNKNOWN |
 | 权重化最小删点（6 个固定模型，全部 OPTIMAL） | **17 / 18 / 32** |
 | 双侧补丁 BFS 40 类 | 最好 17 |
-| 非对称补丁 100 类 | 最好 17；91 OPTIMAL / 9 FEASIBLE |
+| 非对称补丁 **243 个状态（整族闭合）** | 最好 17；231 OPTIMAL / 11 FEASIBLE；无 ≤16 |
 
 最优的 17 空位构造（R2 + `tr(R)+patch`）：
 
@@ -144,7 +144,8 @@ FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d…"}
 `17 + 134,753 = 134,770`，所以它离 134,754 只差一个槽位。
 
 非对称搜索的检查点在 `src/scnet/p004/sweep.py` 的 `ASYM_CHECKPOINT`：
-`seen=195`、`expanded=93`、`frontier=102`、最小可行删点 17。可从这 102 个状态续跑。
+`seen=243`、`expanded=243`、`frontier=0`、最小可行删点 17。2026-11-01 已把
+102 个待展开状态全部展开，**这一族闭合**：243 个状态里没有一类的可行值或下界 ≤16。
 
 ## 7. 未完成 / 不能说
 
@@ -153,7 +154,7 @@ FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d…"}
 - **`|D|=9, s=9`**：规模 134,770、容错 16，算术上更宽；但需要 9 点独立自由区，
   本轮没找到，属未完成。
 - **α(C7⁵) ≥ 368**：若成立直接 135,424；没有新计算。
-- **102 个非对称前沿状态**：未展开完。
+- ~~102 个非对称前沿状态~~：2026-11-01 已闭合（243 个状态，最小 17）。
 
 ## 8. 数据
 

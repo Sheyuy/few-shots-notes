@@ -25,7 +25,8 @@
 | 10 | R2:patch 最少 17 空位 → 134,753 点（`1e69296d58d1…`） | 精确（限该模型） | `frontier9.py --variant R2 --x patch` | 归档 |
 | 11 | R1:patch / R1:tr / R1:x0 为 18 空位 → 134,752 点 | 精确（限这三个模型） | `frontier9.py --variant R1 …` | 归档 |
 | 12 | R2:x0 / R2:tr 为 32 空位 → 134,738 点 | 精确（限这两个模型） | `frontier9.py --variant R2 --x x0/tr` | 归档 |
-| 13 | 非对称族 100 个类：91 `OPTIMAL` + 9 `FEASIBLE`，最小空位 17 | 精确/未判定 | `sweep.py` 里的 `ASYM_CHECKPOINT`（`history` 100 条，深度 10/40/50） | 归档（检查点） |
+| 13 | 非对称族整族闭合：243 个状态（根 + 242 类），231 `OPTIMAL` + 11 `FEASIBLE`，最小可行空位 17、最小下界 17 | 精确（限该族） | `sweep.py` 的 `ASYM_CHECKPOINT`（`seen=243`、`expanded=243`、`frontier=0`） | 归档（检查点） |
+| 13b | `cand9.py` 的 50 个“第 9 对候选”全部不能构成 9 私有对结构（39 对数不符 / 10 辅助集不独立 / 1 baseR 不独立） | 精确（限这 50 个） | `root_scan.py` + `cand9.py`（`--limit` 可只跑前几个） | 归档 |
 | 14 | 双侧补丁 BFS 40 类全部 ≥17 | 精确（限 40 类） | 一次性内联脚本 | 未归档 |
 | 15 | 2→2 成对交换 0 个可行单元 | 有限范围 | 一次性内联脚本 | 未归档 |
 | 16 | 200 个变换 / 10,000 个模型 `strict_SAT=0` | 有限范围 | `sweep.py` 自同构扫描 | 归档 |
