@@ -1072,7 +1072,7 @@ python3 src/kimi/p005/check_points.py \
 固定层生成器还接受最后一个可选参数 `exact_first_free_layer`。它会同时启用平衡网络，并断言第一自由层恰好具有指定点数。
 
 ```bash
-# 已知 512 解的 160／160 正对照。
+# 已知 512 解的第一自由层精确 160 正对照。
 "$R/gen_fixed_layer_sat" "$R/fixed192-exact160-control512-witness.cnf" \
   data/kimi/p005/baseline512.txt 0 0 512 \
   "$R/fixed192-exact.map" data/kimi/p005/baseline512.txt 1 160
@@ -1080,7 +1080,7 @@ python3 src/kimi/p005/check_points.py \
   > "$R/fixed192-exact160-control512-witness-kissat.log" 2>&1
 # 应有 clauses 3468705（含单位见证）；归档在 1.49 秒返回 SAT。
 
-# 513 的 161／160 主分支。
+# 513 的第一自由层精确 161 主分支。
 "$R/gen_fixed_layer_sat" "$R/fixed192-exact161-513.cnf" \
   data/kimi/p005/baseline512.txt 0 0 513 \
   "$R/fixed192-exact.map" - 1 161
@@ -1093,12 +1093,12 @@ TIME=1200 bash src/kimi/p005/run_compressed_sat.sh \
   "$R/stream-fixed192-exact161.rc" 0 "$KISSAT"
 ```
 
-SAT 回读仍使用 `extract_fixed_layer_sat.py` 和同一映射。若求解其他分布，可替换最后的 161；每个精确分支都必须单独记录状态，不能把某一个分布的超时或 UNSAT 推广到整个固定层模型。
+SAT 回读仍使用 `extract_fixed_layer_sat.py` 和同一映射。若求解其他第一自由层精确值，可替换最后的 161；每个精确分支都必须单独记录状态，不能把某一个分支的超时或 UNSAT 推广到整个固定层模型。注意自由层总数约束是“至少目标点数”：第一自由层精确 161 时，第二自由层是至少 160，而不是恰好 160。
 
 
 ### 12.14 固定层模型的坐标平面加强
 
-生成器在 `exact_first_free_layer` 后还接受 `coordinate_planes`。以下命令先验证已知 512 点解，再重建精确 161／160 的 513 主模型；映射应与原固定层模型完全一致。
+生成器在 `exact_first_free_layer` 后还接受 `coordinate_planes`。以下命令先验证已知 512 点解，再重建第一自由层精确 161 的 513 主模型；映射应与原固定层模型完全一致。
 
 ```bash
 "$R/gen_fixed_layer_sat" "$R/fixed192-exact160-planes-control512-witness.cnf" \
@@ -1157,3 +1157,35 @@ timeout -k 5 540 "$R/weighted_fixedbase" \
 ```
 
 这里依次修改禁忌期、噪声、随机游走范围、加权间隔和停滞重启阈值。退出码 124 只表示启发式搜索被限时停止；若没有 `wvalid` 文件，就没有合法候选。即使有输出，也仍须用 `check_points.py` 和官方 verifier 独立确认。
+
+
+### 12.16 第一自由层精确 162 与全局轨道限时分支
+
+把平面加强固定层生成器的 `exact_first_free_layer` 改为 162，可重建当前新分支：
+
+```bash
+"$R/gen_fixed_layer_sat" "$R/fixed192-exact162-planes-513.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 513 \
+  "$R/fixed192-exact162.map" - 1 162 1
+# DONE vars 487984 clauses 4791849；第二自由层至少 159，不是恰好 159。
+test "$(wc -l < "$R/fixed192-exact162-planes-513.cnf")" -eq 4791850
+gzip -1 -c "$R/fixed192-exact162-planes-513.cnf" \
+  > "$R/fixed192-exact162-planes-513.cnf.gz"
+gzip -t "$R/fixed192-exact162-planes-513.cnf.gz"
+test "$(gzip -dc "$R/fixed192-exact162-planes-513.cnf.gz" | wc -l)" -eq 4791850
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed192-exact162-planes-513.cnf.gz" \
+  "$R/20261101-fixed192-exact162-seed0-kissat.log" \
+  "$R/20261101-fixed192-exact162-seed0.rc" 0 "$KISSAT"
+```
+
+该压缩模型的 SHA-256 为 `c79eca18900d164688289aacd123e013780543e21ee1ef5557655bc8c9286213`。同时运行的全局二支撑轨道 2916 分支复现如下：
+
+```bash
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-orbit11-planes.cnf.gz" \
+  "$R/20261101-orbit11-seed5-kissat.log" \
+  "$R/20261101-orbit11-seed5.rc" 5 "$KISSAT"
+```
+
+轨道分支若 SAT，回读使用 `--extra 2916`；固定层分支若 SAT，仍使用同一固定层映射。两个分支都必须独立检查候选并运行官方 verifier。
