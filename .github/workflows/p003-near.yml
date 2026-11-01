@@ -1,0 +1,106 @@
+name: p003-near
+# "Near-SAT": pin a known valid 35-vertex (4,6)-graph, free k of its edges, and
+# leave a 36th vertex completely free.  The free variables are k+35 instead of
+# 630, so the instance is decided in seconds instead of never.
+#
+# Locally measured (base graph = the first known Exoo graph):
+#   k=0   -> UNSAT in 5 s   (cross-checks extsat's independent conclusion)
+#   k=4   -> UNSAT in 5 s
+#   k=8   -> UNSAT in 5 s
+#   k=16  -> UNSAT in 4 s
+#   k=32  -> UNSAT in 7 s
+# so a solution, if it exists near this base, will show up at some k.
+#
+#   gh workflow run p003-near.yml -f ks=0,4,8,16,32,64,128 -f graphs=0,1,2
+
+on:
+  workflow_dispatch:
+    inputs:
+      ks:
+        description: "comma separated list of k values (edges freed in the base graph)"
+        required: true
+        default: "0,4,8,16,32,64,128"
+      graphs:
+        description: "comma separated indices into the known 35-vertex graphs"
+        required: true
+        default: "0,1,2,3,4"
+      minutes:
+        description: "per-instance solver limit in minutes"
+        required: true
+        default: "30"
+      seed:
+        description: "RNG seed for choosing the freed edges"
+        required: false
+        default: "7"
+
+permissions:
+  contents: read
+
+jobs:
+  solve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o sat36 src/mavis/p003/sat36.c
+          curl -sSL -o kissat.zip \
+            https://github.com/arminbiere/kissat/releases/download/rel-4.0.4/kissat-4.0.4-linux-amd64.zip
+          unzip -o -q kissat.zip
+          chmod +x kissat-4.0.4-linux-amd64
+          echo built
+
+      - name: ladder
+        run: |
+          set -e
+          mkdir -p out
+          python3 - <<'PY'
+          import json
+          gs = json.load(open("src/mavis/p003/exoo35_graphs.json"))
+          for i, g in enumerate(gs):
+              json.dump({"adjacency": g["adjacency"]}, open(f"/tmp/g35_{i}.json", "w"))
+          print("wrote", len(gs), "base graphs")
+          PY
+          for gi in $(echo "${{ inputs.graphs }}" | tr ',' ' '); do
+            for k in $(echo "${{ inputs.ks }}" | tr ',' ' '); do
+              GIDX="$gi" python3 - <<'PY'
+          import json, os
+          a = json.load(open("/tmp/g35_%s.json" % os.environ["GIDX"]))["adjacency"]
+          print(sum(int(c) for c in a[0]))
+          PY
+              DEG=$(GIDX="$gi" python3 -c 'import json,os; a=json.load(open("/tmp/g35_%s.json"%os.environ["GIDX"]))["adjacency"]; print(sum(int(c) for c in a[0]))')
+              python3 src/mavis/p003/near_sat.py "out/g${gi}_k${k}.cnf" "/tmp/g35_${gi}.json" "$k" \
+                      --seed "${{ inputs.seed }}" || continue
+              PIN="out/g${gi}_k${k}.cnf.pin" ./sat36 "out/g${gi}_k${k}.cnf" 4 "$DEG" >/dev/null 2>&1 || true
+              timeout "${{ inputs.minutes }}m" ./kissat-4.0.4-linux-amd64 "out/g${gi}_k${k}.cnf" \
+                  > "out/g${gi}_k${k}.log" 2>&1 || true
+              echo "g=$gi k=$k : $(grep -E '^s ' "out/g${gi}_k${k}.log" | tail -1)"
+              if grep -q "^s SATISFIABLE" "out/g${gi}_k${k}.log"; then
+                mkdir -p "out/cert_g${gi}_k${k}"
+                python3 src/mavis/p003/sat2shot.py "out/g${gi}_k${k}.log" --n 36 --out "out/cert_g${gi}_k${k}" || true
+              fi
+            done
+          done
+          echo "--- summary ---"
+          grep -h "^s " out/*.log | sort | uniq -c
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-near-${{ inputs.seed }}-${{ github.run_id }}
+          path: out/
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 near-SAT ladder"
+            for f in out/*.log; do
+              echo "$(basename "$f"): $(grep -E '^s ' "$f" | tail -1)"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
