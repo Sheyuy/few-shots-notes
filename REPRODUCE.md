@@ -1185,16 +1185,29 @@ print(len(C), m.is_valid(C))     # 134753 False  -> 构建器拒绝，不会误�
 PY
 ```
 
-### 13.2 p004：三个归档点集
+### 13.2 p004：五个归档点集
 
 ```bash
 cd ../../data/scnet/p004
 python3 verify_points.py cc_10_7_134753_paper.txt       # 650b05567deb...
 python3 verify_points.py cc_10_7_134753_rearranged.txt  # fe928a1cb18c...
 python3 verify_points.py cc_10_7_134753_9pair17.txt     # 1e69296d58d1...
+python3 verify_points.py cc_10_7_134753_r1c19.txt       # d2172281e517...
+python3 verify_points.py cc_10_7_134753_r2c3.txt        # 4dda701170fb...
 ```
 
-预期三者都是 `{"valid":true,"score":"134753"}`，但 `canonical_hash` 互不相同。
+预期五个都是 `{"valid":true,"score":"134753"}`，但 `canonical_hash` 互不相同。
+verifier 只查独立，不查极大；补查 `m0`：
+
+```bash
+cd ../../src/scnet/p004
+g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3
+./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_r1c19.txt --max-k 1 --threads 1 --seconds 120
+# COUNTS m0=0 ...
+```
+
+五个集合的 `m0` 都是 0（见 `data/scnet/p004/README.md`）。`r1c19`/`r2c3` 可以用
+`emit_class.py` 从检查点重建（CP-SAT 最优解不唯一，重建出的集合哈希可能不同）。
 
 ### 13.3 p004：九对族最小删点（OR-Tools）
 

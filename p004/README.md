@@ -137,6 +137,7 @@ RESULT {"status":"completed","max_k_completed":5,"requested_max_k":6,"found":0,"
 | 权重化最小删点（6 个固定模型，全部 OPTIMAL） | **17 / 18 / 32** |
 | 双侧补丁 BFS 40 类 | 最好 17 |
 | 非对称补丁 **243 个状态（整族闭合）** | 最好 17；231 OPTIMAL / 11 FEASIBLE；无 ≤16 |
+| R1 非对称补丁 **243 个状态（整族闭合）** | 最好 17（仅根）；234 OPTIMAL / 9 FEASIBLE；其余 ≥18 |
 
 最优的 17 空位构造（R2 + `tr(R)+patch`）：
 
@@ -163,12 +164,15 @@ FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d…"}
 
 ## 8. 数据
 
-`data/scnet/p004/` 有三个互不相同的 134,753 点集（论文集、重排集、九对 17 空位集），
-以及 `verify_points.py` 和 `MANIFEST.sha256`：
+`data/scnet/p004/` 有 **五个**互不相同的 134,753 点集（论文集、重排集、九对 17 空位集、
+R1 族第 19 类、R2 族第 3 类），全部经 verifier 确认且 `m0 = 0`，以及
+`verify_points.py`、`asym_r1_checkpoint.json` 和 `MANIFEST.sha256`：
 
 ```bash
 cd data/scnet/p004
 python3 verify_points.py cc_10_7_134753_paper.txt      # 650b0556…
 python3 verify_points.py cc_10_7_134753_rearranged.txt # fe928a1c…
 python3 verify_points.py cc_10_7_134753_9pair17.txt    # 1e69296d…
+python3 verify_points.py cc_10_7_134753_r1c19.txt      # d2172281…
+python3 verify_points.py cc_10_7_134753_r2c3.txt       # 4dda7011…
 ```
