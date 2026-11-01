@@ -73,7 +73,7 @@ jobs:
           git checkout -B "progress/${{ github.run_id }}" || true
           while kill -0 $PID 2>/dev/null; do
             sleep 600
-            git add -A out.log cnf.cnf 2>/dev/null || true
+            git add -f out.log 2>/dev/null || true   # never commit the 120MB CNF
             git commit -q -m "progress $(date -u +%H:%M:%S)" 2>/dev/null || true
             git push -q -f origin "progress/${{ github.run_id }}" 2>/dev/null || true
           done
