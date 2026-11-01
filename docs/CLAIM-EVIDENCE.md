@@ -20,7 +20,7 @@
 | 5 | k ≤ 5 的 k→k+1 交换在论文集上全部 `complete=1 found=0` | 精确（限该点集） | `sixm3.c` + `logs/scnet/p004/sixm3_k6_600s.log`（本地串行 600 秒） | 归档 |
 | 6 | 同上，在重排集上 `found=0` | 精确（限该点集） | 同上 | 代码归档，日志缺失 |
 | 7 | k = 6 的两个设计内阶段：3,003,919 个自然 6-集 + 41,986,400 个 rank5 实例，均 `found=0` | 有限范围（k=6 未全覆盖） | `sixm3.c` + 同一份日志（`max_k_completed=5`） | 归档 |
-| 7b | k=6 深层的 rank-4 锚点扩展：16/64 分片、161,031,153 个实例，`complete=1 found=0` | 有限范围（覆盖 25% 的 rank-4 锚点，rank-3 未跑） | `sixm3.c --deep6 --shard i/64` + `logs/scnet/p004/sixm3_rank4_k6_shards_0-15of64.log` | 归档 |
+| 7b | k=6 深层的 rank-4 锚点扩展：64/64 分片、644,208,231 个实例，全部 `complete=1 found=0` | 完整（所有含 rank-4 边的 6-集）；秩恰为 3 的 6-集与连通 6-集未覆盖 | `sixm3.c --deep6 --shard i/64` + `logs/scnet/p004/sixm3_rank4_k6_all64.log` | 归档 |
 | 8 | 平台/中性重排 652,515 步后仍 0 可加点 | 启发式 | `src/scnet/p004/lns4.c` → `cc_10_7_134753_rearranged.txt` | 代码归档 |
 | 9 | 九对族 50 个候选在固定 X 下全部 UNSAT | 精确（限 50 个模型） | `sweep.py`（`optional_test`） | 归档 |
 | 10 | R2:patch 最少 17 空位 → 134,753 点（`1e69296d58d1…`） | 精确（限该模型） | `frontier9.py --variant R2 --x patch` | 归档 |

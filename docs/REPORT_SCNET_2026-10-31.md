@@ -195,18 +195,24 @@ RESULT {"status":"completed","max_k_completed":5,"requested_max_k":6,"found":0,"
 未发现改进”，不是“k ≤ 6 排除”。
 
 **k=6 的深两层：实测规模（2026-11-01）**。给 `sixm3.c` 加了 `--deep6`（打开
-`anchorStage(4,6)` 与 `anchorStage(3,6)`）、`--only-deep6`（跳过已完成的 k≤5）和
-`--shard i/n`（把按 head 索引的循环限制到 i mod n）。以 1/64 分片实测：
+`anchorStage(4,6)`）、`--only-deep6`（跳过已完成的 k≤5）和
+`--shard i/n`（把按 head 索引的循环限制到 i mod n）。`anchorStage(3,6)` 需要**深度 3**
+的扩展，`extensions()` 只做到深度 2，所以这一层没有实现：程序打印
+`SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented` 后正常收尾，而不是
+中途报错。以 1/64 分片实测：
 `rank4_extensions_k6` 的 1/64 用 50.7 秒产生 1,004 万实例，推算全阶段约 **6.4 亿实例、
 单进程约 54 分钟**；`rank3_extensions_k6` 只会更大。8 个分片并行时每个进程掉到约
 3 万实例/秒（内存带宽受限），总吞吐几乎不增，所以“多开进程”并不能把这一阶段压缩到
 可接受的时间。
 
-本轮实际跑了 `rank4_extensions_k6` 的 **16/64 个分片**：16 个分片全部 `complete=1`，
-合计 **161,031,153** 个实例，`found=0`（日志
-`logs/scnet/p004/sixm3_rank4_k6_shards_0-15of64.log`）。这覆盖 rank-4 锚点的 25%，
-剩下 48 个分片约需 48 分钟单进程；`rank3_extensions_k6` 完全没有跑。
-结论：k=6 深层在本机仍属未覆盖，不能写成已排除。
+`rank4_extensions_k6` 随后**整段跑完**：64 个分片全部 `complete=1`，合计
+**644,208,231** 个实例，`found=0`，无 `ERROR`（日志
+`logs/scnet/p004/sixm3_rank4_k6_all64.log`）。也就是说，**所有包含 rank-4 边的 6-集
+都检查过，没有找到改进**（每片约 1,000 万实例、50–60 秒，全段约 64 分钟单进程）。
+
+`anchorStage(3,6)` 没有实现（需要深度 3 的扩展），程序会打印 `SKIP` 后正常结束。
+它能新增的只有“秩恰好为 3”的 6-集——含 rank-4 子集的 6-集已被上面 64 个分片覆盖；
+再加上完全没有实现的连通 6-集（`pairStage(6)`），k=6 仍是部分覆盖。
 
 ---
 

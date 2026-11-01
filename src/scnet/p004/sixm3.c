@@ -6,8 +6,10 @@
 // edges; rank-(k-1) edges plus one connected extension; rank-3 edges plus one/two
 // connected extensions for k=5; and ALL connected pair-graph sets (not just paths
 // and stars). Records/pools are dynamically sized. Timeouts are INCOMPLETE.
-// --deep6 adds the two deep k=6 stages (rank4 and rank3 anchors); without it the
-// k=6 branch keeps the historical behaviour (natural + rank5 only). --shard i/n
+// --deep6 adds the deep k=6 stage over rank-4 anchors; the rank-3 anchor stage is NOT
+// implemented (it needs a depth-3 extension, extensions() stops at depth 2) and prints
+// SKIP instead of aborting. Without --deep6 the k=6 branch keeps the historical
+// behaviour (natural + rank5 only). --shard i/n
 // restricts every head-indexed loop to i mod n, so a long stage can be covered by
 // n separate runs; a shard's complete=1 only covers that shard.
 #include <algorithm>
@@ -341,7 +343,7 @@ int main(int argc,char** argv){
         if(onlyDeep6){
             require(maxK==6,"--only-deep6 requires --max-k 6");
             anchorStage(4,6);
-            if(!stopped())anchorStage(3,6);
+            if(!stopped())std::cout<<"SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented\n"<<std::flush;
             if(!expired&&!found){
                 if(shardCount==1){completed=6;std::cout<<"COMPLETE exchanges_up_to=6 no_improvement=1\n"<<std::flush;}
                 else std::cout<<"SHARD_STAGE_DONE k=6 shard="<<shardIndex<<"/"<<shardCount<<"\n"<<std::flush;
@@ -353,7 +355,7 @@ int main(int argc,char** argv){
                 anchorStage(5,6);if(stopped())break;
                 if(!deep6)break;
                 anchorStage(4,6);if(stopped())break;
-                anchorStage(3,6);if(stopped())break;
+                std::cout<<"SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented\n"<<std::flush;
                 if(shardCount==1){completed=k;std::cout<<"COMPLETE exchanges_up_to="<<k<<" no_improvement=1\n"<<std::flush;}
                 else std::cout<<"SHARD_STAGE_DONE k=6 shard="<<shardIndex<<"/"<<shardCount<<"\n"<<std::flush;
                 break;

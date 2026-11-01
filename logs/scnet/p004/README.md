@@ -38,27 +38,43 @@ g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3
 - 串行 600 秒刚好跑完上述阶段；若不编译 OpenMP（真并行），时间会富裕很多，
   但**没有** k=6 深层的实现，跑再久也不会自动扩展到那里。
 
-## `sixm3_rank4_k6_shards_0-15of64.log`
+## `sixm3_rank4_k6_all64.log`
 
 2026-11-01，`--max-k 6 --only-deep6 --shard i/64 --threads 1 --seconds 300`，
-`i = 0…15`，串行依次运行。每一行 `STAGE rank4_extensions_k6 … complete=1 … shard=i/64`
-是一个分片的完整结果。
+`i = 0…63`，串行依次运行。每个 `STAGE rank4_extensions_k6 … complete=1 … shard=i/64`
+是一个分片的完整结果，紧随其后的 `SKIP rank3_extensions_k6` 是固定输出（见下）。
 
-- 16 个分片全部 `complete=1`、`found=0`；
-- 合计 **161,031,153** 个实例（每个分片约 1,000 万）；
-- 覆盖 `rank4_extensions_k6` 的 **16/64 = 25%** 锚点。
+- **64 个分片全部 `complete=1`，`found=0`，无 `ERROR`**；
+- 合计 **644,208,231** 个实例（每个分片约 1,000 万，最多 1,008 万）；
+- 覆盖 `rank4_extensions_k6` 的 **64/64**，即**所有含 rank-4 边的 6-集**。
+
+因此可以写：“k=6 中，凡包含 rank-4 边的 6-集全部检查过，没有改进”。
 
 ### 分片的含义
 
 `--shard i/n` 只作用于按 head 索引的循环（`naturalStage`、`anchorStage`），
 把下标限制为 `i mod n`。`connectedPairs` 的生成不参与分片，所以**不要**把分片的
-`connected_pair_*` 行相加（每个分片都会重跑全量）。这份日志只用了 `--only-deep6`，
+`connected_pair_*` 行相加（每个分片都会重跑全量）。这份日志用了 `--only-deep6`，
 因此没有 k≤5 的重复行。
 
-### 还没覆盖的部分
+### `SKIP` 行
 
-- `rank4_extensions_k6` 的 48/64 个分片（单进程约 48 分钟）；
-- `rank3_extensions_k6` 整段（只会更慢）；
+`anchorStage(3,6)`（rank-3 锚点、深度 3 扩展）**没有实现**：`extensions()` 只支持
+深度 ≤ 2。程序打印
+
+```
+SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented
+```
+
+后正常结束并输出 `RESULT`。早期版本在这里会 `ERROR unsupported extension depth`
+并中断，那 16 个分片的日志已经删除，以这份为准。
+
+### 仍然没覆盖的部分
+
+- `natural_k6` 与 `rank5_extensions_k6`：见 `sixm3_k6_600s.log`（已跑，`found=0`）；
+- rank-3 锚点的深度 3 扩展：未实现。注意它能新增的 6-集只有“秩恰好为 3”的那些——
+  任何含 rank-4 子集的 6-集都已被上面的 64 个分片覆盖；
 - 连通 6-集（`pairStage(6)`，源码里没有实现）。
 
-因此这份日志**不能**支持“k=6 已排除”，只能支持“rank-4 锚点扩展的前 25% 没有改进”。
+所以完整表述是：“k ≤ 5 排除；k=6 覆盖了自然 6-集、rank-5 扩展和全部含 rank-4 边的
+6-集，未发现改进；秩恰好为 3 的 6-集与连通 6-集未覆盖”。
