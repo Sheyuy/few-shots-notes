@@ -1274,11 +1274,14 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 单进程约 54 分钟；8 个分片并行**没有收益**（内存带宽受限，总吞吐与串行相当）。
 
 64 个分片串行跑完约 64 分钟，合计 644,208,231 个实例，全部 `complete=1`、`found=0`
-（`logs/scnet/p004/sixm3_rank4_k6_all64.log`）：所有含 rank-4 边的 6-集都已排除。
+（`logs/scnet/p004/sixm3_rank4_k6_all64.log`）。这一阶段枚举的是
+`a ∪ b`（a 为 4 点 blocker，b 为 2/3/4 点 blocker，`|a∩b| ≥ 1`、`|a∪b| = 6`），
+**不是**“所有含 4 点 blocker 的 6-集”；所以只能说“该阶段定义的 6.44 亿个 6-集没有改进”。
 
 rank-3 锚点那一层**没有实现**：它需要深度 3 的扩展，而 `extensions()` 只支持到深度 2。
-程序会打印 `SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented` 后正常结束；
-这一层要覆盖，需要另写三重扩展的枚举。
+程序会打印 `SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented` 后正常结束。
+本地试做过一个 `--deep3` 变体，但它的剪枝前提是错的（以为“含 4 点 blocker 的 6-集都被
+rank-4 层覆盖”），会漏集合，所以没有归档。
 
 平台搜索（启发式，需要先按 13.4 的方式拼 `lns4.c`）：
 
