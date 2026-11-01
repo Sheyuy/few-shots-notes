@@ -1,0 +1,103 @@
+name: labs100
+# Parallel LABS (low autocorrelation binary sequence, length 100) search on
+# GitHub-hosted runners.  The board record is E = 578; the mod-8 argument in
+# src/mavis/p006/labs_mod8.md shows only E = 574 or 570 ... are reachable
+# below it (E must be 2 or 6 mod 8), so the target is E <= 574.
+#
+#   gh workflow run labs100.yml -f minutes=330 -f procs=2 -f seed=1
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "search time per process in minutes"
+        required: true
+        default: "330"
+      procs:
+        description: "parallel processes (each runner has 2 cores)"
+        required: true
+        default: "2"
+      seed:
+        description: "base RNG seed"
+        required: true
+        default: "1"
+      chunk:
+        description: "ILS chunk size"
+        required: false
+        default: "200000"
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o search3 src/mavis/p006/search3.c -lm
+          gcc -O2 -o merge_best src/mavis/p006/merge_best.py 2>/dev/null || true
+
+      - name: search
+        run: |
+          set -e
+          MIN="${{ inputs.minutes }}"
+          N="${{ inputs.procs }}"
+          SEED="${{ inputs.seed }}"
+          CH="${{ inputs.chunk }}"
+          mkdir -p out
+          for i in $(seq 1 "$N"); do
+            ./search3 --mode ils --rng $((SEED * 1000 + i)) --chunk "$CH" \
+                      --tmin 5 --tmax 15 --lns-m 10 \
+                      --time "$MIN" --out "out/s$i.txt" > "out/s$i.out" 2>&1 &
+          done
+          wait
+          grep -h "BEST E=" out/*.out | sort -t= -k3 -n | head -5 || true
+
+      - name: merge and validate
+        run: |
+          set -e
+          python3 src/mavis/p006/merge_best.py out/best.json out/s*.txt
+          echo "--- mod-8 sanity check (E must be 2 or 6 mod 8 for n=100) ---"
+          python3 - <<'PY'
+          import json
+          d = json.load(open("out/best.json"))
+          seq = d["sequence"]
+          assert len(seq) == 100, len(seq)
+          s = [1 if c == "+" else -1 for c in seq]
+          E = sum((sum(s[i]*s[i+k] for i in range(100-k)))**2 for k in range(1, 100))
+          print("E =", E, "| E mod 8 =", E % 8, "| valid mod-8:", E % 8 in (2, 6))
+          assert E % 8 in (2, 6), "energy violates the mod-8 constraint -> implementation bug"
+          if E < 578:
+              print("*** NEW RECORD: E =", E)
+          PY
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: labs100-${{ inputs.seed }}-${{ github.run_id }}
+          path: |
+            out/best.json
+            out/*.out
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### labs100 seed=${{ inputs.seed }} procs=${{ inputs.procs }}"
+            grep -h "BEST E=" out/*.out 2>/dev/null | head -5 || true
+            python3 -c "
+          import json
+          d=json.load(open('out/best.json'))
+          seq=d['sequence']
+          s=[1 if c=='+' else -1 for c in seq]
+          E=sum((sum(s[i]*s[i+k] for i in range(100-k)))**2 for k in range(1,100))
+          print('best E =', E)
+          " 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
