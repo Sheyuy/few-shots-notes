@@ -92,7 +92,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: p003-near-${{ inputs.seed }}-${{ github.run_id }}
-          path: out/
+          path: |
+            out/*.log
+            out/*.pin
+            out/cert_*/certificate.json
           if-no-files-found: warn
 
       - name: summary
