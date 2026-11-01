@@ -82,7 +82,7 @@ jobs:
           python3 src/mavis/p009/pick_best.py src/mavis/p009/instance.json out out/best.json
           echo "--- independent makespan of the chosen schedule ---"
           python3 - <<'PY'
-          import json
+          import json, sys
           inst = json.load(open("src/mavis/p009/instance.json"))
           d = json.load(open("out/best.json"))
           sys.path.insert(0, "src/mavis/p009")
