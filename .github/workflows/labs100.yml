@@ -33,6 +33,10 @@ on:
         description: "population size (mem mode)"
         required: false
         default: "32"
+      warm:
+        description: "path (in the repo) of a warm-start certificate to start from"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -66,7 +70,9 @@ jobs:
             SECS=$((MIN * 60))
             # warm start from the incumbent world-record sequence (E = 578)
             WARM=""
-            if [ -f src/mavis/p006/best578.json ]; then
+            if [ -n "${{ inputs.warm }}" ] && [ -f "${{ inputs.warm }}" ]; then
+              WARM="--warm ${{ inputs.warm }}"
+            elif [ -f src/mavis/p006/best578.json ]; then
               WARM="--warm src/mavis/p006/best578.json"
             fi
             if [ "$MODE" = "mem" ]; then
