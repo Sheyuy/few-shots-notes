@@ -1482,3 +1482,17 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 固定层主模型 SHA-256 为 `ca3411e1521fda894c3778ea8db9a23e57161935430a48f856543abe9a65b923`。SAT 回读使用 `fixed168-main.map`、坐标 1、层值 2，其余验证流程不变。
+
+
+### 12.25 全量三维模型中断与资源安全回退
+
+第 12.24 节全量全局模型的首次运行归档为退出码 137、最后进度 15.60 秒、无最终 `s` 状态，属于外部 SIGKILL 资源中断。资源安全回退命令为：
+
+```bash
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-no3-planes-flats3max26.cnf.gz" \
+  "$R/20261102-global-no23-flats3max26-seed1-kissat.log" \
+  "$R/20261102-global-no23-flats3max26-seed1.rc" 1 "$KISSAT"
+```
+
+全量模型未被证明 UNSAT；若重试，应避免与其他大模型并发或提供更大的内存预算。

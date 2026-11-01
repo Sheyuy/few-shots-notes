@@ -1,0 +1,37 @@
+c ---- [ banner ] ------------------------------------------------------------
+c
+c Kissat SAT Solver
+c 
+c Copyright (c) 2021-2024 Armin Biere University of Freiburg
+c Copyright (c) 2019-2021 Armin Biere Johannes Kepler University Linz
+c 
+c Version 4.0.4 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+c gcc (Debian 12.2.0-14+deb12u1) 12.2.0 -W -Wall -O3 -DNDEBUG
+c Fri Oct 30 16:34:36 CST 2026 Linux k2116084458329882628 5.10.134-18.0.12.lifsea8.x86_64 x86_64
+c
+c ---- [ parsing ] -----------------------------------------------------------
+c
+c opened and reading DIMACS file:
+c
+c   <stdin>
+c
+c parsed 'p cnf 4214493 20094726' header
+c closing input after reading 434336061 bytes (414 MB)
+c finished parsing after 9.70 seconds
+c
+c ---- [ options ] -----------------------------------------------------------
+c
+c --restartint=50                  (different from default '1')
+c --target=2                       (different from default '1')
+c
+c ---- [ solving ] -----------------------------------------------------------
+c
+c seconds  switched rate     size/glue tier1    binary               remaining
+c         MB reductions conflicts size  tier2        irredundant
+c          level restarts redundant glue  trail                variables
+c
+c *  9.70 989 0 0 0  0 0   0   0 0.0 0 0 0 0 0% 8441672 11639484 3980445 94%
+c lucky 291 units
+c l 13.36 1198 0 0 0  0 0   0   0 0.0 0 0 0 0 0% 8441672 11639484 3980154 94%
+c ( 13.36 1198 0 0 0  0 0   0   0 0.0 0 0 0 0 0% 8441672 11639484 3980154 94%
+c . 15.60 1179 0 0 0  0 0   0   0 0.0 0 0 0 0 0% 8036888 11334236 3980154 94%
