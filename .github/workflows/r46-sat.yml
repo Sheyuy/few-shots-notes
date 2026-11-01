@@ -29,7 +29,7 @@ on:
         default: ""
 
 permissions:
-  contents: read
+  contents: write      # so the solver can push partial progress to a branch
 
 jobs:
   solve:
@@ -64,7 +64,23 @@ jobs:
         run: |
           set -e
           MIN="${{ inputs.minutes }}"
-          timeout "${MIN}m" ./kissat-4.0.4-linux-amd64 cnf.cnf > out.log 2>&1 || true
+          timeout "${MIN}m" ./kissat-4.0.4-linux-amd64 cnf.cnf > out.log 2>&1 &
+          PID=$!
+          # push partial progress to a branch every 10 minutes, so the result is
+          # visible (and survives) even if this session or the job dies
+          git config user.email "solver@local"
+          git config user.name "r46-sat"
+          git checkout -B "progress/${{ github.run_id }}" || true
+          while kill -0 $PID 2>/dev/null; do
+            sleep 600
+            git add -A out.log cnf.cnf 2>/dev/null || true
+            git commit -q -m "progress $(date -u +%H:%M:%S)" 2>/dev/null || true
+            git push -q -f origin "progress/${{ github.run_id }}" 2>/dev/null || true
+          done
+          wait $PID || true
+          git add -A out.log 2>/dev/null || true
+          git commit -q -m "final $(date -u +%H:%M:%S)" 2>/dev/null || true
+          git push -q -f origin "progress/${{ github.run_id }}" 2>/dev/null || true
           echo "--- verdict ---"
           grep -E "^s " out.log || echo "NO VERDICT (timeout)"
           tail -3 out.log
