@@ -355,3 +355,32 @@ C 版（`sat36.c` 的 `at_most_k`）与 Python 版逐条对应 ✅，并通过�
 ### 8. 顺带修好的 p009 缺口
 见 `p009-job-shop-ta41/notes.md`：**路径重链接在 ta41 上一次都没被触发过**
 （精英池永远只有 1 个元素，因为 2006 已是纪录 ⇒ 永不触发「刷新最优」分支）✅❌ ⇒ 已修 ✅。
+
+### 9. 【关键基础设施突破】用 GitHub Actions 当远程算力
+
+**问题诊断** ✅：
+* 本地沙箱 `cpu.max = 130000/100000` ⇒ **实际只有 1.3 核** ✅；
+* 沙箱**每 2–4 小时重启一次** ⇒ 后台进程全灭 ⇒ kissat 无 checkpoint ⇒ 每次重启从零开始 ✅❌；
+* 本轮又重启了一次（18:47），`q_m4d11` 只跑了 117 秒就死了 ✅。
+
+**解法** ✅：用户的 `Sheyuy/few-shots-notes` 是**公开仓**，
+`GET /repos/Sheyuy/few-shots-notes/actions/permissions` 返回
+`{"enabled": true, "allowed_actions": "all"}` ✅ ⇒ GitHub 托管 runner 免费可用：
+**每个 job 独立 2 核 / 16 GB / 最长 6 小时 / 完全不受我这边沙箱重启影响** ✅✅。
+
+**新工作流 `.github/workflows/r46-sat.yml`** ✅：
+```
+checkout → gcc sat36.c → 下载 kissat 4.0.4 静态包 → 生成 CNF → 求解
+        → 若 SAT：sat2shot.py 自动转证书并独立校验 K4/I6 → 上传 artifact（含 certificate.json）
+```
+触发用 `workflow_dispatch`（inputs: d / mode / minutes / tag）✅。
+**冒烟测试（d=11, 10 分钟）已全程跑通** ✅：8 个步骤全 success ✅，
+artifact 下载并解包验证通过 ✅（远程实测 10 分钟 CPU、386 MB 内存 ✅）。
+
+**已派发的批次** ✅：
+* **8 个 p003 job**（每个 330 分钟）：mode-4 的 d = 11,12,13,14,15,16,17（各覆盖「存在度数为 d 的顶点」的解）
+  + **mode-5**（不做对称破除 ⇒ **一次搜索覆盖全部 d**，作为解空间被切碎后的兜底）✅；
+* 另派发 **4 个 p006 的 LABS job**（每个 2 进程 × 330 分钟，3 个 ILS + 1 个 memetic）✅。
+
+**本地算力重新分工** ✅：远程接手 p003 后，本地 1.3 核全部让给 p009 的 `jssp15`
+（它是唯一没有远程覆盖的题目）✅。

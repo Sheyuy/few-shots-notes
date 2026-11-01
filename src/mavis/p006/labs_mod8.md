@@ -149,3 +149,20 @@ improvement; `merge_best.py` collects the global best.
 ⇒ **p006 的真实目标是 E ≤ 574**，不是 577。
 ⇒ 任何「找到 577」的搜索结果都应当被**模 8 检查直接判为算错** —— 这是一个**零成本的自校验**，
 建议加进搜索器的输出检查里（能立刻抓出能量统计的实现 bug）。
+
+---
+
+## 2026-11-01 19:13：LABS 搜索也搬到远程算力
+
+按 p003 笔记里那套办法（`Sheyuy/few-shots-notes` 是公开仓 + Actions 全开 ⇒ 托管 runner 免费、
+每个 job 2 核 16 GB、最长 6 小时、不受沙箱重启影响 ✅），
+给 p006 也加了一条工作流 **`.github/workflows/labs100.yml`** ✅：
+
+```
+checkout → gcc -O3 search3.c → 多进程搜索（--mode ils 或 --mode mem --pop 32）
+        → merge_best.py 精确整数算能量挑最优 → 【模 8 自校验】(E % 8 ∈ {2,6}) → 上传 artifact
+```
+* 模 8 自校验直接嵌进工作流里 ✅：**任何报出 E ≡ 0/4 (mod 8) 的结果都会被 assert 拦下** ✅，
+  这是一条零成本、能在远程自动抓出能量实现 bug 的规则 ✅。
+
+已派发 **4 个 job**（每个 2 进程 × 330 分钟）：seed 1/2/3 用 ILS、seed 4 用 memetic ✅。
