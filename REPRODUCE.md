@@ -1288,3 +1288,79 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 归档结果均为 `s UNKNOWN`、退出码 0：固定层三维切割为 398.37 秒、921 MB，全局剩余分区为 398.43 秒、723 MB。正常超时未判定不等于 UNSAT。
+
+
+### 12.20 全局三维排序网络与固定 176 点层分支
+
+全局生成器第八个可选参数为 `coordinate_flats3_max_free`。无二、三支撑分区取阈值 20，对 2,240 个含 20 个自由点的坐标三维子空间加入至多 9 点排序网络。正对照、回读和主模型如下：
+
+```bash
+"$R/gen_global_sat" "$R/global9-no2-no3-planes-flats3-control.cnf" \
+  9 -1 1 1 1 1 20
+# FLATS3 forms 13608 selected 2240 max_free 20 clauses 1386560
+# DONE vars 940509 clauses 10262021 comparators 755519 target 9
+"$KISSAT" --time=120 --seed=0 --sat \
+  "$R/global9-no2-no3-planes-flats3-control.cnf" \
+  > "$R/global9-no23-flats3-control-kissat.log" 2>&1
+# 预期退出码 10；归档求解时间为 4.26 秒。
+python3 src/kimi/p005/extract_sat_cap.py \
+  "$R/global9-no23-flats3-control-kissat.log" \
+  "$R/global9-no23-flats3-control-recovered.txt" --min-size 9
+python3 src/kimi/p005/check_points.py \
+  "$R/global9-no23-flats3-control-recovered.txt" --expect-size 9 --expect-bad 0
+cmp "$R/global9-no23-flats3-control-recovered.txt" \
+  data/kimi/p005/global9-no2-no3-flats3-control-recovered.txt
+
+"$R/gen_global_sat" "$R/global513-no2-no3-planes-flats3.cnf" \
+  513 -1 1 1 1 1 20
+# DONE vars 940509 clauses 10262022 comparators 755519 target 513
+test "$(wc -l < "$R/global513-no2-no3-planes-flats3.cnf")" -eq 10262023
+gzip -1 -c "$R/global513-no2-no3-planes-flats3.cnf" \
+  > "$R/global513-no2-no3-planes-flats3.cnf.gz"
+gzip -t "$R/global513-no2-no3-planes-flats3.cnf.gz"
+test "$(gzip -dc "$R/global513-no2-no3-planes-flats3.cnf.gz" | wc -l)" -eq 10262023
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-no3-planes-flats3.cnf.gz" \
+  "$R/20261102-global-no23-flats3-seed0-kissat.log" \
+  "$R/20261102-global-no23-flats3-seed0.rc" 0 "$KISSAT"
+```
+
+主模型 SHA-256 为 `233278741ad43fe6337392618d9d5f31842eee96fa0a1d60fe4049e6f6b2a2f3`。SAT 回读使用与九点控制相同的原始变量流程。
+
+固定 176 点层分支固定 `baseline512.txt` 第二坐标为 0 的层。512 正对照把第一自由层精确固定为 168 点；513 主模型则精确固定为 169 点，自由层总数分别为至少 336、337：
+
+```bash
+"$R/gen_fixed_layer_sat" "$R/fixed176-exact168-planes-flats3-control512-witness.cnf" \
+  data/kimi/p005/baseline512.txt 1 0 512 "$R/fixed176-control.map" \
+  data/kimi/p005/baseline512.txt 1 168 1 4
+# FLATS3 forms 5103 selected 232 min_fixed 4 clauses 4306848
+# DONE vars 487984 clauses 9067135 comparators 466942 target 512
+"$KISSAT" --time=120 --seed=0 --sat \
+  "$R/fixed176-exact168-planes-flats3-control512-witness.cnf" \
+  > "$R/fixed176-exact168-flats3-control-kissat.log" 2>&1
+# 预期退出码 10；归档求解时间为 3.90 秒。
+python3 src/kimi/p005/extract_fixed_layer_sat.py \
+  "$R/fixed176-exact168-flats3-control-kissat.log" \
+  "$R/fixed176-control.map" data/kimi/p005/baseline512.txt 1 0 \
+  "$R/fixed176-exact168-flats3-control-recovered512.txt" --min-size 512
+python3 src/kimi/p005/check_points.py \
+  "$R/fixed176-exact168-flats3-control-recovered512.txt" \
+  --expect-size 512 --expect-bad 0
+cmp <(sort -n "$R/fixed176-exact168-flats3-control-recovered512.txt") \
+  <(sort -n data/kimi/p005/baseline512.txt)
+
+"$R/gen_fixed_layer_sat" "$R/fixed176-exact169-planes-flats3-513.cnf" \
+  data/kimi/p005/baseline512.txt 1 0 513 "$R/fixed176-main.map" - 1 169 1 4
+# DONE vars 487984 clauses 9062761 comparators 466942 target 513
+test "$(wc -l < "$R/fixed176-exact169-planes-flats3-513.cnf")" -eq 9062762
+gzip -1 -c "$R/fixed176-exact169-planes-flats3-513.cnf" \
+  > "$R/fixed176-exact169-planes-flats3-513.cnf.gz"
+gzip -t "$R/fixed176-exact169-planes-flats3-513.cnf.gz"
+test "$(gzip -dc "$R/fixed176-exact169-planes-flats3-513.cnf.gz" | wc -l)" -eq 9062762
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed176-exact169-planes-flats3-513.cnf.gz" \
+  "$R/20261102-fixed176-exact169-flats3-seed0-kissat.log" \
+  "$R/20261102-fixed176-exact169-flats3-seed0.rc" 0 "$KISSAT"
+```
+
+固定层主模型 SHA-256 为 `eb2b1bcc7eabe68341064d814001a06d7b2e0a8d73356344b7f51f339a845fcb`。其 SAT 回读使用 `fixed176-main.map`、固定源 `baseline512.txt`、坐标 1、层值 0，随后仍须独立检查和官方 verifier。
