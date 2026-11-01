@@ -1,0 +1,95 @@
+name: p004-dim5
+# Search for a 368-point independent set in C7^5 (Shannon capacity of C7).
+#
+# The board record for p004 is 134753 points in C7^10 (Itty et al. 2026).
+# A 368-point independent set B in C7^5 would give the product B x B with
+# 368^2 = 135424 points, which beats the record on its own.
+#
+# cl5b.c is the "remove k, add k+1" search on the 367-point Polak-Schrijver
+# set: find a set A of points outside R, pairwise non-adjacent, whose union of
+# R-neighbourhoods is smaller than |A|.  The previous brute force (cl5.c)
+# could not finish k >= 5 in 20 minutes; cl5b.c replaces the subset
+# enumeration with a branch-and-bound maximum independent set over bitsets
+# and does k = 5 in 8 seconds, so we can sweep k = 5..16 and split the pair
+# range over several processes.
+#
+#   gh workflow run p004-dim5.yml -f kmin=5 -f kmax=16 -f procs=2
+
+on:
+  workflow_dispatch:
+    inputs:
+      kmin:
+        description: "smallest k to try"
+        required: true
+        default: "5"
+      kmax:
+        description: "largest k to try"
+        required: true
+        default: "16"
+      procs:
+        description: "parallel processes per runner (splitting the pair range)"
+        required: true
+        default: "2"
+      rfile:
+        description: "the 367-point base set"
+        required: false
+        default: "src/mavis/p004/R5.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o cl5b src/mavis/p004/cl5b.c
+          echo "base set: ${{ inputs.rfile }}"
+          head -1 ${{ inputs.rfile }}
+
+      - name: search
+        run: |
+          set -e
+          R="${{ inputs.rfile }}"
+          KMIN="${{ inputs.kmin }}"
+          KMAX="${{ inputs.kmax }}"
+          N="${{ inputs.procs }}"
+          mkdir -p out
+          for K in $(seq "$KMIN" "$KMAX"); do
+            NP=$(./cl5b "$K" "$R" 0 0 count 2>/dev/null | awk '/^pairs /{print $2}')
+            echo "K=$K  candidates/pairs: $NP"
+            if [ -z "$NP" ] || [ "$NP" = "0" ]; then continue; fi
+            CH=$(( (NP + N - 1) / N ))
+            for i in $(seq 0 $((N-1))); do
+              LO=$(( i * CH ))
+              HI=$(( LO + CH - 1 ))
+              if [ "$LO" -ge "$NP" ]; then break; fi
+              ./cl5b "$K" "$R" "$LO" "$HI" > "out/k${K}_p${i}.txt" 2>"out/k${K}_p${i}.err" &
+            done
+            wait
+            cat out/k${K}_p*.txt
+          done
+          echo "--- any improvement? ---"
+          grep -h "IMPROVEMENT" out/*.txt || echo "none"
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p004-dim5-${{ github.run_id }}
+          path: out/
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p004 dim-5 search k=${{ inputs.kmin }}..${{ inputs.kmax }}"
+            grep -h "IMPROVEMENT" out/*.txt 2>/dev/null || echo "no improvement found"
+            for f in out/*.err; do tail -1 "$f" 2>/dev/null; done
+          } >> "$GITHUB_STEP_SUMMARY"
