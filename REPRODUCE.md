@@ -1332,3 +1332,29 @@ python3 /abs/path/src/scnet/p005/solve513.py
 `cp_alt.log` / `cp_hint.log`（344 秒 `UNKNOWN`）、`two_slice*.log`（611–3,607 秒 `UNKNOWN`）、
 `product.log`（F₃⁶ 子问题只到 85 点）、`rk13.log`（KK=10，最多回填 2）。
 `data/scnet/p005/cap6_best.json` 是那 85 点 F₃⁶ 帽集，可用 6 位三进制展开复核（无三点共线）。
+
+---
+
+## 9. mavis · 2026-11-01 补充（解码 Exoo 35 点图 + 近失解流水线）
+
+```bash
+# 1) 解码 Exoo 的 37 个 35 点图并独立校验 K4 / I6
+python3 src/mavis/p003/decode_g6.py refs/r46_35some.g6
+#   -> 37 行全部 n=35 K4=0 I6=0
+
+# 2) 编译并运行近失解 C 优化器（最小化加一个新顶点后的违规数）
+gcc -O2 -o nearmiss src/mavis/p003/nearmiss.c -lm
+./nearmiss g35.txt nm.json 20000 4
+
+# 3) 迭代流水线：删一个顶点补一个顶点 -> 新的合法 35 点图 -> 再尝试扩到 36
+python3 src/mavis/p003/pipeline.py g35.txt pipeline_out 4
+#   -> 任何 min f == 0 的 36 顶点解都会写成 certificate 并可用官方验证器复核
+```
+
+关键恒等式（加一个新顶点 v、邻域 S）：
+
+```
+violations(B + v) = tri(B[S]) + ind5(B[V(B)\S])
+```
+
+所以 f = 0 ⇔ B+v 是合法的 (m+1) 顶点 (4,6)-图。
