@@ -107,3 +107,26 @@ SUMMARY candidates=50 tested=1450 size_134770=1421 valid=0 conflicts={"row": 142
 - 这与“自由区 16 点、`α(V') = 8` ⇒ 最多 8 对”的结构论证一致。
 
 结论只覆盖**这一个 8 对基座**：换基座（例如 R1/R2 族）没有扫过。
+
+## `xk_exchange_2026-11-01.log`
+
+`src/scnet/p004/xk.c` 在 C7⁵ 上对 Polak–Schrijver 的 367 点集 `R` 做**完备**的
+`k`-交换检查：删掉 `R` 的 `k` 个点、加入 `k+1` 个外部点，看能否得到 368 点独立集。
+
+原理：若 368 点集 `S'` 存在，令 `A = S' \ R`、`Rm = R \ S'`，则 `|A| = |Rm|+1`，
+且 `A` 的每个点不能与 `R \ Rm` 相邻，所以 `A` 的 `R`-邻居并集 `T(A)` 满足
+`|T(A)| ≤ |Rm|`。于是枚举 `k` 就是完备的。
+
+```
+== K=3
+NO_3_EXCHANGE nodes=3857 seconds=0.1
+== K=4
+NO_4_EXCHANGE nodes=57792 seconds=1.6
+== K=5
+NO_5_EXCHANGE nodes=777655 seconds=31.7
+== K=6
+NO_6_EXCHANGE nodes=9540882 seconds=440.2
+```
+
+结论：**R367 的 6 点对称差邻域内没有 368 点独立集**；任何 368 点集至少要换掉 7 个点。
+这不是 `α(C7⁵) = 367` 的证明。节点数在两次独立实现（`xk.cpp` 与 `xk.c`）中完全一致。

@@ -1278,6 +1278,16 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 `a ∪ b`（a 为 4 点 blocker，b 为 2/3/4 点 blocker，`|a∩b| ≥ 1`、`|a∪b| = 6`），
 **不是**“所有含 4 点 blocker 的 6-集”；所以只能说“该阶段定义的 6.44 亿个 6-集没有改进”。
 
+C7⁵ 上的 k-交换完备检查（对 367 点集；删 k 加 k+1）：
+
+```bash
+g++ -O2 -std=c++17 src/scnet/p004/xk.c -o xk
+./xk 3    # NO_3_EXCHANGE nodes=3857
+./xk 4    # NO_4_EXCHANGE nodes=57792
+./xk 5    # NO_5_EXCHANGE nodes=777655
+./xk 6    # NO_6_EXCHANGE nodes=9540882   (~7 分钟)
+```
+
 `|D|=9` 的扫描（论文 8 对 + 50 个第 9 对候选 × 29 种 `J0`）：
 
 ```bash
