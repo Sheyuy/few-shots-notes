@@ -1,8 +1,9 @@
 """Check a one-point-per-line file with the official p004 verifier.
 
-    python3 verify_points.py cc_10_7_134753_paper.txt
+    python3.11+ verify_points.py cc_10_7_134753_paper.txt
 
-Set FEW_SHOTS_REPO if the clone is not at the default path.
+Needs Python 3.11+ because the official verifier imports ``tomllib``.
+Set FEW_SHOTS_REPO if the few-shots clone is not at the default path.
 """
 import json
 import os
@@ -21,4 +22,7 @@ pts = [''.join(line.split()) for line in Path(sys.argv[1]).read_text().splitline
 with tempfile.TemporaryDirectory() as d:
     Path(d, 'certificate.json').write_text(json.dumps({'points': pts}))
     r = subprocess.run([sys.executable, str(VERIFIER), d], capture_output=True, text=True)
+if r.returncode != 0 and 'tomllib' in r.stderr:
+    raise SystemExit('need Python 3.11+ (the official verifier imports tomllib); '
+                     'run this with python3.12 or python3.13')
 print(r.stdout.strip() or r.stderr.strip())

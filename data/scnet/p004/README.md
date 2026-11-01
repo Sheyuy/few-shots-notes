@@ -39,7 +39,7 @@ g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3   #
 
 ```bash
 export FEW_SHOTS_REPO=/path/to/few-shots
-python3 verify_points.py cc_10_7_134753_paper.txt
+python3.13 verify_points.py cc_10_7_134753_paper.txt   # 需要 3.11+（官方 verifier 用 tomllib）
 # {"valid":true,"score":"134753","canonical_hash":"650b0556...","message":"ok"}
 ```
 
