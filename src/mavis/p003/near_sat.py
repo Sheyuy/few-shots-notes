@@ -73,9 +73,17 @@ def main():
             if i == v or j == v:
                 freed.add((i, j))
     else:
-        for e in rng.sample(edges, min(k, len(edges))):
+        # NESTED ladder: shuffle ONCE with the seed and free the first k of each
+        # list, so that R(k) subset R(k+1).  Then a single UNSAT at k=K settles
+        # every k <= K for this base graph.  (Independent random subsets per k
+        # would leave holes in the coverage.)
+        eord = edges[:]
+        nord = nonedges[:]
+        rng.shuffle(eord)
+        rng.shuffle(nord)
+        for e in eord[:min(k, len(eord))]:
             freed.add(e)
-        for e in rng.sample(nonedges, min(k, len(nonedges))):
+        for e in nord[:min(k, len(nord))]:
             freed.add(e)
 
     # write the pin file: 35 rows with the freed edges replaced by '-'
