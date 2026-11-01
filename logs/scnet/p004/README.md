@@ -37,3 +37,28 @@ g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3
 - `--seconds` 上限是 600（源码里的 `require`），想要更长只能改代码或分段。
 - 串行 600 秒刚好跑完上述阶段；若不编译 OpenMP（真并行），时间会富裕很多，
   但**没有** k=6 深层的实现，跑再久也不会自动扩展到那里。
+
+## `sixm3_rank4_k6_shards_0-15of64.log`
+
+2026-11-01，`--max-k 6 --only-deep6 --shard i/64 --threads 1 --seconds 300`，
+`i = 0…15`，串行依次运行。每一行 `STAGE rank4_extensions_k6 … complete=1 … shard=i/64`
+是一个分片的完整结果。
+
+- 16 个分片全部 `complete=1`、`found=0`；
+- 合计 **161,031,153** 个实例（每个分片约 1,000 万）；
+- 覆盖 `rank4_extensions_k6` 的 **16/64 = 25%** 锚点。
+
+### 分片的含义
+
+`--shard i/n` 只作用于按 head 索引的循环（`naturalStage`、`anchorStage`），
+把下标限制为 `i mod n`。`connectedPairs` 的生成不参与分片，所以**不要**把分片的
+`connected_pair_*` 行相加（每个分片都会重跑全量）。这份日志只用了 `--only-deep6`，
+因此没有 k≤5 的重复行。
+
+### 还没覆盖的部分
+
+- `rank4_extensions_k6` 的 48/64 个分片（单进程约 48 分钟）；
+- `rank3_extensions_k6` 整段（只会更慢）；
+- 连通 6-集（`pairStage(6)`，源码里没有实现）。
+
+因此这份日志**不能**支持“k=6 已排除”，只能支持“rank-4 锚点扩展的前 25% 没有改进”。

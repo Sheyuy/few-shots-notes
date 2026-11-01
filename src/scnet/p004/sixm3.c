@@ -6,6 +6,10 @@
 // edges; rank-(k-1) edges plus one connected extension; rank-3 edges plus one/two
 // connected extensions for k=5; and ALL connected pair-graph sets (not just paths
 // and stars). Records/pools are dynamically sized. Timeouts are INCOMPLETE.
+// --deep6 adds the two deep k=6 stages (rank4 and rank3 anchors); without it the
+// k=6 branch keeps the historical behaviour (natural + rank5 only). --shard i/n
+// restricts every head-indexed loop to i mod n, so a long stage can be covered by
+// n separate runs; a shard's complete=1 only covers that shard.
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -49,6 +53,8 @@ std::atomic<Q> blockerErrors{0};
 std::chrono::steady_clock::time_point deadline;
 Key witnessD; std::vector<U> witnessA;
 int maxK=5,threads=16,secondsBudget=240;
+int shardIndex=0,shardCount=1;bool deep6=false,onlyDeep6=false;
+inline bool mine(size_t i){return shardCount==1||(i%(size_t)shardCount)==(size_t)shardIndex;}
 
 bool directConflict(U x,U y){
     for(int i=0;i<10;i++){int a=x%7,b=y%7,d=std::abs(a-b);if(d!=0&&d!=1&&d!=6)return false;x/=7;y/=7;}return true;
@@ -245,7 +251,7 @@ void check(const Key& d,Counters& c){
 }
 void report(const std::string& name,const std::vector<Counters>& stats,bool complete){
     Counters s;for(auto c:stats){s.sets+=c.sets;s.eligible+=c.eligible;s.maxpool=std::max(s.maxpool,c.maxpool);}
-    std::cout<<"STAGE "<<name<<" sets_or_anchor_instances="<<s.sets<<" eligible="<<s.eligible<<" max_pool="<<s.maxpool<<" complete="<<complete<<" found="<<found.load()<<"\n"<<std::flush;
+    std::cout<<"STAGE "<<name<<" sets_or_anchor_instances="<<s.sets<<" eligible="<<s.eligible<<" max_pool="<<s.maxpool<<" complete="<<complete<<" found="<<found.load();if(shardCount>1)std::cout<<" shard="<<shardIndex<<"/"<<shardCount;std::cout<<"\n"<<std::flush;
 }
 void sample(const Key& d,const std::string& label){
     auto p=poolOf(d);std::cout<<"SAMPLE {\"label\":\""<<label<<"\",\"removed\":[";
@@ -272,7 +278,7 @@ std::vector<Key> extensions(const Key& a,int rank,int limit){
 void naturalStage(int k){
     std::vector<Counters> stats(omp_get_max_threads());const auto& h=heads[k];
     #pragma omp parallel for schedule(dynamic,128)
-    for(size_t i=0;i<h.size();i++)if(!stopped())check(records[h[i]].b,stats[omp_get_thread_num()]);
+    for(size_t i=0;i<h.size();i++){if(!mine(i))continue;if(!stopped())check(records[h[i]].b,stats[omp_get_thread_num()]);}
     report("natural_k"+std::to_string(k),stats,!expired&&!found);
     if(!h.empty())sample(records[h[h.size()/2]].b,"natural_k"+std::to_string(k));
 }
@@ -280,6 +286,7 @@ void anchorStage(int rank,int k){
     std::vector<Counters> stats(omp_get_max_threads());const auto& h=heads[rank];
     #pragma omp parallel for schedule(dynamic,32)
     for(size_t i=0;i<h.size();i++){
+        if(!mine(i))continue;
         if(stopped())continue;auto first=extensions(records[h[i]].b,rank,k);
         for(const Key& d:first){
             if(found||expired)break;
@@ -320,16 +327,37 @@ int main(int argc,char** argv){
             else if(arg=="--max-k"&&i+1<argc)maxK=std::stoi(argv[++i]);
             else if(arg=="--threads"&&i+1<argc)threads=std::stoi(argv[++i]);
             else if(arg=="--seconds"&&i+1<argc)secondsBudget=std::stoi(argv[++i]);
+            else if(arg=="--deep6")deep6=true;
+            else if(arg=="--only-deep6"){deep6=true;onlyDeep6=true;}
+            else if(arg=="--shard"&&i+1<argc){std::string v=argv[++i];auto pos=v.find('/');require(pos!=std::string::npos,"--shard wants i/n");shardIndex=std::stoi(v.substr(0,pos));shardCount=std::stoi(v.substr(pos+1));require(shardCount>=1&&shardIndex>=0&&shardIndex<shardCount,"bad shard");}
             else throw std::runtime_error("invalid command line");
         }
         require(maxK>=1&&maxK<=6,"max-k must be in [1,5]");require(threads>=1&&threads<=64,"threads must be in [1,64]");
         require(secondsBudget>0&&secondsBudget<=600,"seconds must be in [1,600]");
         omp_set_dynamic(0);omp_set_num_threads(threads);selftest();if(selfOnly)return 0;
+        std::cout<<"SHARD {\"index\":"<<shardIndex<<",\"count\":"<<shardCount<<",\"deep6\":"<<(deep6?1:0)<<"}\n"<<std::flush;
         load(path);collect();deadline=std::chrono::steady_clock::now()+std::chrono::seconds(secondsBudget);
         int completed=0;
+        if(onlyDeep6){
+            require(maxK==6,"--only-deep6 requires --max-k 6");
+            anchorStage(4,6);
+            if(!stopped())anchorStage(3,6);
+            if(!expired&&!found){
+                if(shardCount==1){completed=6;std::cout<<"COMPLETE exchanges_up_to=6 no_improvement=1\n"<<std::flush;}
+                else std::cout<<"SHARD_STAGE_DONE k=6 shard="<<shardIndex<<"/"<<shardCount<<"\n"<<std::flush;
+            }
+        }else
         for(int k=1;k<=maxK;k++){
             naturalStage(k);if(stopped())break;
-            if(k==6){anchorStage(5,6);break;}
+            if(k==6){
+                anchorStage(5,6);if(stopped())break;
+                if(!deep6)break;
+                anchorStage(4,6);if(stopped())break;
+                anchorStage(3,6);if(stopped())break;
+                if(shardCount==1){completed=k;std::cout<<"COMPLETE exchanges_up_to="<<k<<" no_improvement=1\n"<<std::flush;}
+                else std::cout<<"SHARD_STAGE_DONE k=6 shard="<<shardIndex<<"/"<<shardCount<<"\n"<<std::flush;
+                break;
+            }
             for(int r=k-1;r>=3;r--){anchorStage(r,k);if(stopped())break;}
             if(stopped())break;
             if(k>=3)pairStage(k);

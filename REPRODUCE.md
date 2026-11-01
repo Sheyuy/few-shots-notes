@@ -1260,6 +1260,19 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 600 秒刚好跑完上面这些阶段；有 OpenMP 的机器会快很多。日志见
 `logs/scnet/p004/sixm3_k6_600s.log`。
 
+更深的两层（`anchorStage(4,6)`、`anchorStage(3,6)`）默认不跑。打开方式：
+
+```bash
+./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt \
+        --max-k 6 --only-deep6 --shard 0/64 --seconds 300
+# STAGE rank4_extensions_k6 sets_or_anchor_instances=10045995 ... complete=1 shard=0/64
+```
+
+`--deep6` 打开这两层；`--only-deep6` 跳过 k≤5（那些阶段已完成）；`--shard i/n`
+把按 head 索引的循环限制到 `i mod n`，用 64 个分片可以分段覆盖。实测
+`rank4_extensions_k6` 的 1/64 需 50.7 秒、1,004 万实例，推算全阶段约 6.4 亿实例、
+单进程约 54 分钟；8 个分片并行**没有收益**（内存带宽受限，总吞吐与串行相当）。
+
 平台搜索（启发式，需要先按 13.4 的方式拼 `lns4.c`）：
 
 ```bash
