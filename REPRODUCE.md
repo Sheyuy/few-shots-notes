@@ -1274,3 +1274,17 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 主模型 SHA-256 为 `a01bd5c3e81a97ac076f0ba0579b5c58f296d12afb8980a65226bcd0f1372744`。三维切割只加强既有固定层分支，不改变其数学覆盖范围；SAT 回读仍使用同一映射并经过独立验证。
+
+
+### 12.19 第 9.22 节两条最终状态
+
+固定层三维切割命令见第 12.18 节。全局剩余分区的 seed 2 运行只需替换输出文件名和随机种子：
+
+```bash
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-no3-planes.cnf.gz" \
+  "$R/20261101-global-no23-seed2-kissat.log" \
+  "$R/20261101-global-no23-seed2.rc" 2 "$KISSAT"
+```
+
+归档结果均为 `s UNKNOWN`、退出码 0：固定层三维切割为 398.37 秒、921 MB，全局剩余分区为 398.43 秒、723 MB。正常超时未判定不等于 UNSAT。
