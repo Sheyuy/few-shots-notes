@@ -59,7 +59,12 @@ jobs:
           mkdir -p out
           python3 - <<'PY'
           import json
-          gs = json.load(open("src/mavis/p003/exoo35_graphs.json"))
+          gs = []
+          for f in ("src/mavis/p003/exoo35_graphs.json", "src/mavis/p003/pool35_graphs.json"):
+              try:
+                  gs += json.load(open(f))
+              except Exception as e:
+                  print("skip", f, e)
           for i, g in enumerate(gs):
               json.dump({"adjacency": g["adjacency"]}, open(f"/tmp/g35_{i}.json", "w"))
           print("wrote", len(gs), "base graphs")
