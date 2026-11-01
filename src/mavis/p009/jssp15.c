@@ -63,6 +63,7 @@ static inline uint32_t rnd(uint32_t n) { return (uint32_t)(rnd64() % n); }
  * of the makespan).  -1 if the graph has a cycle.                        */
 static int last_aborted = 0;
 static int burst_iters = 0;
+static long n_bursts = 0, n_bridge_steps = 0;
 static int eval_kahn(int *est, int *topo, int cutoff) {
     last_aborted = 0;
     int sp = 0, cnt = 0, end = 0;
@@ -612,7 +613,9 @@ static int path_relink(const int target[NM][NJ], int *best_ms_io, int bseq_io[NM
         }
         nnew++;
         elite_add(mseq, ms);
+        n_bridge_steps++;
         if (burst_iters > 0 && (nnew % 3) == 0 && ms <= *best_ms_io + 25) {
+            n_bursts++;
             /* local search at every intermediate point of the bridge */
             int keep[NM][NJ];
             memcpy(keep, mseq, sizeof(keep));
@@ -1115,8 +1118,8 @@ after_move:
 
         if ((iter % 50000) == 0) {
             if (cur_ms == best_ms && distinct_best(hash_sol())) n_distinct_best++;
-            logmsg("[%8.1fs cpu=%7.1fs iter=%9ld] cur=%d best=%d stall=%ld kicks=%ld restarts=%ld elites=%d evals=%ld distinct_best=%ld\n",
-                   now_sec() - t0, cpu_sec(), iter, cur_ms, best_ms, stall, kicks, restarts, n_elite, n_eval_tot, n_distinct_best);
+            logmsg("[%8.1fs cpu=%7.1fs iter=%9ld] cur=%d best=%d stall=%ld kicks=%ld restarts=%ld elites=%d evals=%ld distinct_best=%ld bursts=%ld bsteps=%ld\n",
+                   now_sec() - t0, cpu_sec(), iter, cur_ms, best_ms, stall, kicks, restarts, n_elite, n_eval_tot, n_distinct_best, n_bursts, n_bridge_steps);
         }
         if (cur_ms >= 0 && cur_ms < best_ms) {
             best_ms = cur_ms;
