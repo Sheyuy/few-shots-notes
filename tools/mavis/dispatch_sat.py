@@ -24,9 +24,9 @@ def _load_pat():
     v = os.environ.get("FS_PAT")
     if v:
         return v.strip()
-    path = os.path.expanduser("~/.fs_pat")
-    if os.path.exists(path):
-        return open(path).read().strip()
+    for path in (os.path.expanduser("~/.fs_pat"), "/workspace/.fs_pat"):
+        if os.path.exists(path):
+            return open(path).read().strip()
     raise SystemExit("set FS_PAT or write the token to ~/.fs_pat")
 
 
