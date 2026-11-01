@@ -14,7 +14,7 @@ static const int N = 6561, PN = 8192, TRUE_W = INT32_MAX, FALSE_W = 0;
 static uint8_t hi[N], lo[N], third4[81][81];
 static FILE *out;
 static int nextvar;
-static long long clauses = 0, cap3 = 0, cap2 = 0, planeclauses = 0, comparators = 0;
+static long long clauses = 0, cap3 = 0, cap2 = 0, planeclauses = 0, flat3clauses = 0, comparators = 0;
 
 static inline int third(int a, int b) {
     return third4[hi[a]][hi[b]] * 81 + third4[lo[a]][lo[b]];
@@ -43,7 +43,7 @@ static int coordinate(int x, int coord) {
     static const int pow3[8] = {2187, 729, 243, 81, 27, 9, 3, 1};
     return (x / pow3[coord]) % 3;
 }
-static void at_most(const vector<int> &wires, int bound) {
+static void at_most(const vector<int> &wires, int bound, long long &counter) {
     vector<int> lits;
     int fixed_true = 0;
     for (int w : wires) {
@@ -60,7 +60,7 @@ static void at_most(const vector<int> &wires, int bound) {
         if ((int)pick.size() == need) {
             for (int i : pick) fprintf(out, "%d ", -lits[i]);
             fputs("0\n", out);
-            clauses++; planeclauses++;
+            clauses++; counter++;
             return;
         }
         for (int i = start; i <= (int)lits.size() - (need - (int)pick.size()); i++) {
@@ -94,14 +94,18 @@ static void check_cap(const set<int> &points) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 6 || argc > 11) {
-        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt|-] [witness_cap.txt|-] [balance_free_layers] [exact_first_free_layer] [coordinate_planes]\n");
+    if (argc < 6 || argc > 12) {
+        fprintf(stderr, "usage: gen_fixed_layer_sat out.cnf full_cap.txt coordinate value target [map.txt|-] [witness_cap.txt|-] [balance_free_layers] [exact_first_free_layer] [coordinate_planes] [coordinate_flats3_min_fixed]\n");
         return 2;
     }
     string cap_path = argv[2], map_path = (argc >= 7 && string(argv[6]) != "-") ? argv[6] : "";
     bool balance = argc >= 9 && atoi(argv[8]);
     int exact_first = argc >= 10 ? atoi(argv[9]) : -1;
     bool coordinate_planes = argc >= 11 && atoi(argv[10]);
+    int flats3_min_fixed = argc >= 12 ? atoi(argv[11]) : -1;
+    if (flats3_min_fixed > 9 || flats3_min_fixed < -1) {
+        fprintf(stderr, "invalid coordinate_flats3_min_fixed %d\n", flats3_min_fixed); return 2;
+    }
     if (exact_first >= 0) balance = true;
     int coord = atoi(argv[3]), value = atoi(argv[4]), target = atoi(argv[5]);
     if (coord < 0 || coord >= 8 || value < 0 || value >= 3) {
@@ -195,9 +199,45 @@ int main(int argc, char **argv) {
                     for (int k = 0; k < 8; k++) x += d[k] * pow3[k];
                     ws.push_back(wire[x]);
                 }
-                at_most(ws, 4); forms++;
+                at_most(ws, 4, planeclauses); forms++;
             }
         fprintf(stderr, "PLANES forms %lld clauses %lld\n", forms, planeclauses);
+    }
+    if (flats3_min_fixed >= 0) {
+        static const int pow3[8] = {2187, 729, 243, 81, 27, 9, 3, 1};
+        vector<int> wire(N);
+        for (int x = 0; x < N; x++) {
+            wire[x] = coordinate(x, coord) == value
+                ? (fixed.count(x) ? TRUE_W : FALSE_W) : variable[x];
+        }
+        long long forms = 0, selected = 0;
+        for (int j = 0; j < 8; j++) if (j != coord)
+            for (int k = j + 1; k < 8; k++) if (k != coord) {
+                int others[5], no = 0;
+                for (int c = 0; c < 8; c++) if (c != coord && c != j && c != k)
+                    others[no++] = c;
+                if (no != 5) { fprintf(stderr, "bad flat3 coordinate selection\n"); return 5; }
+                for (int mask = 0; mask < 243; mask++) {
+                    int d[8] = {0}, t = mask;
+                    for (int c : others) { d[c] = t % 3; t /= 3; }
+                    vector<int> ws;
+                    for (int u = 0; u < 3; u++) for (int v = 0; v < 3; v++)
+                        for (int w = 0; w < 3; w++) {
+                            d[coord] = u; d[j] = v; d[k] = w;
+                            int x = 0;
+                            for (int c = 0; c < 8; c++) x += d[c] * pow3[c];
+                            ws.push_back(wire[x]);
+                        }
+                    int fixed_true = count(ws.begin(), ws.end(), TRUE_W);
+                    if (fixed_true >= flats3_min_fixed) {
+                        at_most(ws, 9, flat3clauses); selected++;
+                    }
+                    forms++;
+                }
+            }
+        if (forms != 5103) { fprintf(stderr, "bad flat3 form count %lld\n", forms); return 5; }
+        fprintf(stderr, "FLATS3 forms %lld selected %lld min_fixed %d clauses %lld\n",
+                forms, selected, flats3_min_fixed, flat3clauses);
     }
     vector<int> wires(PN, FALSE_W);
     for (int v = 1; v <= originals; v++) wires[v - 1] = v;

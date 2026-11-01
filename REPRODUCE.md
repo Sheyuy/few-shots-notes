@@ -1233,3 +1233,44 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 主模型 SHA-256 为 `ecf98babd9420063c3fb635562198d0eb81e2b46e3e9770332e875a22c32c71c`。SAT 回读不需要额外固定点参数；独立检查后再运行官方 verifier。旧模型未输出固定单位，若出现 SAT，应重新生成带单位模型或明确恢复固定状态，不能直接照搬未检查的回读结果。
 
 第一自由层精确 163 模型只需把第 12.16 节命令中的 162 改为 163、文件名相应替换；第二自由层至少 158。其主模型 SHA-256 为 `fc67cdb394a059b6408d73e8b73ccfc1dfe745fb61c2f129068ab2663374e244`。
+
+
+### 12.18 坐标三维子空间切割
+
+先独立验证三维 27 点模型的边界。脚本分别要求至少 10 点和至少 9 点，预期依次为 UNSAT、SAT，并回读检查 9 点帽：
+
+```bash
+python3 src/kimi/p005/check_ag3_cap_bound.py \
+  "$KISSAT" "$R/ag3-check" --loader /lib64/ld-linux-x86-64.so.2
+# 预期：UNSAT AG(3,3) cap size 10；随后 SAT AG(3,3) cap size 9。
+cmp "$R/ag3-check-ag3-cap9-points.txt" data/kimi/p005/ag3-cap9-points.txt
+```
+
+固定层生成器的最后一个可选参数为 `coordinate_flats3_min_fixed`。阈值 4 在 5,103 个跨固定层坐标三维子空间中选择 240 个，各产生 \(\binom{18}{6}=18,564\) 条子句，共 4,455,360 条。正对照和主模型如下：
+
+```bash
+"$R/gen_fixed_layer_sat" "$R/fixed192-exact160-planes-flats3-control512-witness.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 512 "$R/flats3-control.map" \
+  data/kimi/p005/baseline512.txt 1 160 1 4
+# FLATS3 forms 5103 selected 240 min_fixed 4 clauses 4455360
+# DONE vars 487984 clauses 9251583
+"$KISSAT" --time=60 --seed=0 --sat \
+  "$R/fixed192-exact160-planes-flats3-control512-witness.cnf" \
+  > "$R/fixed192-exact160-planes-flats3-control512-kissat.log" 2>&1
+# 归档在 3.84 秒返回 SAT，回读与原基线一致。
+
+"$R/gen_fixed_layer_sat" "$R/fixed192-exact161-planes-flats3-513.cnf" \
+  data/kimi/p005/baseline512.txt 0 0 513 "$R/flats3-main.map" - 1 161 1 4
+# DONE vars 487984 clauses 9247209
+test "$(wc -l < "$R/fixed192-exact161-planes-flats3-513.cnf")" -eq 9247210
+gzip -1 -c "$R/fixed192-exact161-planes-flats3-513.cnf" \
+  > "$R/fixed192-exact161-planes-flats3-513.cnf.gz"
+gzip -t "$R/fixed192-exact161-planes-flats3-513.cnf.gz"
+test "$(gzip -dc "$R/fixed192-exact161-planes-flats3-513.cnf.gz" | wc -l)" -eq 9247210
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed192-exact161-planes-flats3-513.cnf.gz" \
+  "$R/fixed192-exact161-planes-flats3-seed0-kissat.log" \
+  "$R/fixed192-exact161-planes-flats3-seed0.rc" 0 "$KISSAT"
+```
+
+主模型 SHA-256 为 `a01bd5c3e81a97ac076f0ba0579b5c58f296d12afb8980a65226bcd0f1372744`。三维切割只加强既有固定层分支，不改变其数学覆盖范围；SAT 回读仍使用同一映射并经过独立验证。
