@@ -1364,3 +1364,8 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 固定层主模型 SHA-256 为 `eb2b1bcc7eabe68341064d814001a06d7b2e0a8d73356344b7f51f339a845fcb`。其 SAT 回读使用 `fixed176-main.map`、固定源 `baseline512.txt`、坐标 1、层值 0，随后仍须独立检查和官方 verifier。
+
+
+### 12.21 第 9.24 节最终状态
+
+第 12.20 节两条主命令的归档结果均为 `s UNKNOWN`、退出码 0。全局三维网络模型为 398.50 秒、867 MB；固定 176 点层模型为 396.91 秒、928 MB。二者均为正常超时未判定，不是 SAT 或 UNSAT。
