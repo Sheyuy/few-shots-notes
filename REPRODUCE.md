@@ -1358,3 +1358,37 @@ violations(B + v) = tri(B[S]) + ind5(B[V(B)\S])
 ```
 
 所以 f = 0 ⇔ B+v 是合法的 (m+1) 顶点 (4,6)-图。
+
+---
+
+## 8. mavis · 2026-10-30 补充（p003 对称类 SAT / p004 P-S 复现与联合爬山）
+
+源码在 `src/mavis/`，结果与记录在 `results/mavis/`，完整说明见
+`docs/mavis-2026-10-30/README.md` 与 `docs/mavis-2026-10-30/METHOD-LOG.md`。
+
+### 8.1 p003：对称类 SAT
+```bash
+# 生成某个对称类的 CNF（自带群公理自检：封闭性 / 对合性 / 是置换）
+python3 src/mavis/p003/sym_sat.py inf35_6 6
+# 求解（CryptoMiniSat / minisat 均可）
+cryptominisat --verb 1 cnf/inf35_6.cnf > out.log
+# 提取并独立校验（自己数 4-团与独立 6-集，不依赖求解器）
+grep "^v " out.log > out.sat
+python3 src/mavis/p003/extract.py out
+# 官方验证器
+cp out_graph.json certificate.json && python3 verify.py .
+```
+
+### 8.2 p004：dim-5 集 → dim-10 证书
+```bash
+# P-S 的 367 点集 → ×乘积 → dim-10 证书 → 官方验证器
+python3 src/mavis/p004/harvest_dim5.py src/mavis/p004/R_paper.txt my-id
+# 输出 VERIFIER: {"valid":true,"score":"134689",...}
+```
+
+### 8.3 p004 联合爬山（找 368 点的 dim-5 集）
+```bash
+gcc -O2 -o pipe src/mavis/p004/pipe.c
+./pipe vj 382 1 7 49 343 109 3600 12345 0 40 123 40 123 40 src/mavis/p004/ps_bounds.txt
+# 日志里 "global" 是全局最优；>367 即 368 点（×乘积 135424 > 134753，破纪录）
+```
