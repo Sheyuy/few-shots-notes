@@ -79,36 +79,19 @@ jobs:
       - name: pick best and validate
         run: |
           set -e
+          python3 src/mavis/p009/pick_best.py src/mavis/p009/instance.json out out/best.json
+          echo "--- independent makespan of the chosen schedule ---"
           python3 - <<'PY'
-          import json, glob, os
-          best = None
-          bestms = 1 << 30
-          for f in glob.glob("out/s*.json"):
-              try:
-                  d = json.load(open(f))
-              except Exception:
-                  continue
-              if "machines" not in d:
-                  continue
-              # makespan is computed by the solver itself; re-derive it here
-              # from the machine orders to be safe
-              ms = None
-              for line in open(f + ".log", errors="ignore"):
-                  if "NEW BEST" in line:
-                      try:
-                          ms = int(line.split("NEW BEST")[1].strip().split()[0])
-                      except Exception:
-                          pass
-              if ms is None:
-                  continue
-              print("  candidate", f, "makespan", ms)
-              if ms < bestms:
-                  bestms, best = ms, d
-          if best is None:
-              print("no candidate found")
-          else:
-              json.dump(best, open("out/best.json", "w"))
-              print("BEST MAKESPAN:", bestms)
+          import json
+          inst = json.load(open("src/mavis/p009/instance.json"))
+          d = json.load(open("out/best.json"))
+          sys.path.insert(0, "src/mavis/p009")
+          from pick_best import makespan
+          ms = makespan(d["machines"], inst["routes"], inst["durations"])
+          print("recomputed makespan:", ms)
+          assert ms is not None and ms <= 2006, ms
+          if ms < 2006:
+              print("*** NEW RECORD: makespan", ms)
           PY
 
       - name: upload artifacts
