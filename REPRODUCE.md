@@ -1278,6 +1278,13 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 `a ∪ b`（a 为 4 点 blocker，b 为 2/3/4 点 blocker，`|a∩b| ≥ 1`、`|a∪b| = 6`），
 **不是**“所有含 4 点 blocker 的 6-集”；所以只能说“该阶段定义的 6.44 亿个 6-集没有改进”。
 
+`|D|=9` 的扫描（论文 8 对 + 50 个第 9 对候选 × 29 种 `J0`）：
+
+```bash
+cd src/scnet/p004
+FEW_SHOTS_REPO=../../.. python3 d9_scan.py     # 约 45 秒，输出 SUMMARY ... valid=0
+```
+
 rank-3 锚点那一层**没有实现**：它需要深度 3 的扩展，而 `extensions()` 只支持到深度 2。
 程序会打印 `SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented` 后正常结束。
 本地试做过一个 `--deep3` 变体，但它的剪枝前提是错的（以为“含 4 点 blocker 的 6-集都被
