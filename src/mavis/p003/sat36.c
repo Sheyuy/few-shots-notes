@@ -38,6 +38,8 @@ static int DEGLO = 11, DEGHI = 17;
 
 static int eid[40][40];            /* DIMACS var id of the edge (i,j), i<j */
 static int nvars;
+static int min2(int a, int b) { return a < b ? a : b; }
+static void emit(int n, const int *lits);
 
 static int evar(int i, int j)
 {
@@ -56,52 +58,64 @@ static void emit(int n, const int *lits)
     nclauses++;
 }
 
-/* Sinz sequential counter: at most k of the given literals may be true.
- * lits[] holds DIMACS ids (signed).  Returns the number of new variables. */
+/* ------------------------------------------------------------------
+ * at_most_k -- "at most k of these m literals may be true".
+ *
+ * This is the EXACT encoding from card2.py, which was verified exhaustively
+ * (m <= 7, every k, every one of the 2^m assignments checked with kissat
+ * against a brute-force reference).  An earlier Sinz-style counter was
+ * silently over-constraining and made a known-good pinned graph come back
+ * UNSAT -- do not "simplify" this without re-running card2.py's self-test.
+ *
+ * Counter semantics:  s[i][j]  <->  "at least j of lits[0..i-1] are true",
+ * with the constant TRUE for s[i][0] and constant FALSE for s[i][j] with
+ * j > i.  UP clauses force s true, DOWN clauses force s false; together they
+ * make s exact, which is what makes the final clause sound.
+ * ------------------------------------------------------------------ */
 static int at_most_k(const int *lits, int m, int k)
 {
     if (k >= m) return 0;
-    /* s[i][j] : at least j of lits[0..i-1] are true */
-    int **s = malloc(sizeof(int *) * (m + 1));
-    for (int i = 0; i <= m; i++) s[i] = calloc(k + 2, sizeof(int));
-    for (int i = 1; i <= m; i++)
-        for (int j = 1; j <= k; j++) s[i][j] = ++nvars;
+    if (k < 0) { for (int i = 0; i < m; i++) { int b[1]; b[0] = -lits[i]; emit(1, b); } return 0; }
 
-    int buf[8];
-    for (int i = 1; i <= m; i++) {
-        int l = lits[i - 1];
-        /* (~l | s[i][1]) */
-        buf[0] = -l; buf[1] = s[i][1]; emit(2, buf);
-        if (i > 1) {
-            /* (~s[i-1][1] | s[i][1]) */
-            buf[0] = -s[i - 1][1]; buf[1] = s[i][1]; emit(2, buf);
-        } else {
-            /* s[1][1] -> l  :  (~s[1][1] | l) */
-            buf[0] = -s[i][1]; buf[1] = l; emit(2, buf);
-        }
-        for (int j = 2; j <= k; j++) {
-            /* (~l | ~s[i-1][j-1] | s[i][j]) */
-            if (i > 1) {
-                buf[0] = -l; buf[1] = -s[i - 1][j - 1]; buf[2] = s[i][j];
-                emit(3, buf);
-            } else {
-                /* s[1][j] is false for j>=2 */
-                buf[0] = -l; buf[1] = -s[i][j]; emit(2, buf);
-            }
-            /* (~l | ~s[i-1][j]) */
-            if (i > 1) {
-                buf[0] = -l; buf[1] = -s[i - 1][j]; emit(2, buf);
-            } else {
-                buf[0] = -l; buf[1] = -s[i][j]; emit(2, buf);
-            }
+    /* s[i][j] for 1<=i<=m, 1<=j<=min(k+1,i) */
+    int *sv = (int *)calloc((size_t)(m + 1) * (k + 2), sizeof(int));
+#define SV(i, j) sv[(size_t)(i) * (k + 2) + (j)]
+    for (int i = 1; i <= m; i++)
+        for (int j = 1; j <= min2(k + 1, i); j++) SV(i, j) = ++nvars;
+
+    int c[4];
+    /* base i = 1 */
+    c[0] = -lits[0]; c[1] = SV(1, 1); emit(2, c);
+    c[0] = -SV(1, 1); c[1] = lits[0]; emit(2, c);
+
+    for (int i = 2; i <= m; i++) {
+        int x = lits[i - 1];
+        for (int j = 1; j <= min2(k + 1, i); j++) {
+            int sij = SV(i, j);
+            /* A = s[i-1][j-1]: constant TRUE when j == 1 */
+            int A_TRUE = (j == 1);
+            int A = A_TRUE ? 0 : SV(i - 1, j - 1);
+            /* B = s[i-1][j]: constant FALSE when j > i-1 */
+            int B_FALSE = (j > i - 1);
+            int B = B_FALSE ? 0 : SV(i - 1, j);
+            /* U1 */
+            if (j == 1) { c[0] = -x; c[1] = sij; emit(2, c); }
+            /* U2 */
+            if (!B_FALSE) { c[0] = -B; c[1] = sij; emit(2, c); }
+            /* U3 */
+            if (j >= 2) { c[0] = -x; c[1] = -A; c[2] = sij; emit(3, c); }
+            /* D1 */
+            if (!A_TRUE) { c[0] = -sij; c[1] = -x; c[2] = A; emit(3, c); }
+            /* D2 */
+            if (B_FALSE) { c[0] = -sij; c[1] = x; emit(2, c); }
+            else { c[0] = -sij; c[1] = x; c[2] = B; emit(3, c); }
         }
     }
-    /* (~s[m][k]) */
-    buf[0] = -s[m][k]; emit(1, buf);
-
-    for (int i = 0; i <= m; i++) free(s[i]);
-    free(s);
-    return m * k;
+    /* final */
+    c[0] = -SV(m, k + 1); emit(1, c);
+    free(sv);
+    return 0;
+#undef SV
 }
 
 int main(int argc, char **argv)
@@ -130,6 +144,11 @@ int main(int argc, char **argv)
         long a = 1;
         for (int i = 0; i < 4; i++) a = a * (N - i) / (i + 1);
         c_k4 = a;
+        if (mode == 3) {          /* per-vertex form: N * C(N-1,3) */
+            long b = 1;
+            for (int i = 0; i < 3; i++) b = b * (N - 1 - i) / (i + 1);
+            c_k4 = (long)N * b;
+        }
         a = 1;
         for (int i = 0; i < 6; i++) a = a * (N - i) / (i + 1);
         c_i6 = a;
@@ -137,7 +156,7 @@ int main(int argc, char **argv)
     /* degree constraints: per vertex, at most 17 incident edges true, and at
      * most 24 of them false.  Sinz costs about 3*m*k clauses each. */
     long deg_clauses = 0;
-    int use_deg = (mode >= 1) && getenv("USEDEG");
+    int use_deg = (mode >= 4) || ((mode >= 1) && getenv("USEDEG"));
     if (use_deg) {
         int m = N - 1, k1 = DEGHI, k2 = (N-1) - DEGLO;
         deg_clauses = (long)N * (3L * m * k1 + 3L * m * k2 + 4L * m + 4L);
@@ -156,9 +175,22 @@ int main(int argc, char **argv)
     if (!out) { perror(tmpname); return 1; }
     FILE *body = out;
 
-    /* --- K4 clauses: for each 4-subset, ~x over its 6 edges --- */
+    /* --- K4 clauses --- */
     int q[64];
-    {
+    if (mode == 3) {
+        /* Equivalent form: no K4  <=>  every neighbourhood is triangle-free.
+         * For every vertex v and every 3-subset T of V\{v}:  ~x_va | ~x_vb | ~x_vc
+         * -> 36 * C(35,3) = 235620 clauses of size 3 (tighter than 58905 of size 6). */
+        int idx[3];
+        for (int v = 0; v < N; v++)
+        for (idx[0] = 0; idx[0] < N; idx[0]++)
+        for (idx[1] = idx[0] + 1; idx[1] < N; idx[1]++)
+        for (idx[2] = idx[1] + 1; idx[2] < N; idx[2]++) {
+            if (idx[0] == v || idx[1] == v || idx[2] == v) continue;
+            q[0] = -evar(v, idx[0]); q[1] = -evar(v, idx[1]); q[2] = -evar(v, idx[2]);
+            emit(3, q);
+        }
+    } else {
         int idx[4];
         for (idx[0] = 0; idx[0] < N; idx[0]++)
         for (idx[1] = idx[0] + 1; idx[1] < N; idx[1]++)
