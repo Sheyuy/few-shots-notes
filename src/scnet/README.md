@@ -6,7 +6,7 @@
 - 完整报告：[`docs/REPORT_SCNET_2026-10-31.md`](../../docs/REPORT_SCNET_2026-10-31.md)
 - p004 源码与运行方式：[`p004/README.md`](p004/README.md)
 - p005 源码与运行方式：[`p005/README.md`](p005/README.md)
-- 三个 134,753 点集：[`data/scnet/p004/`](../../data/scnet/p004/)
+- 五个 134,753 点集（全部 `m0=0`）：[`data/scnet/p004/`](../../data/scnet/p004/)
 
 `paths.py` 用 `FEW_SHOTS_REPO` 定位 few-shots 克隆；默认值是本机路径，换机器时请设置。
 

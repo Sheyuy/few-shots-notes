@@ -364,9 +364,9 @@ python3 $FEW_SHOTS_REPO/problems/p004-shannon-capacity-c7/verify/verify.py \
 cd src/scnet/p004 && python3 model.py && python3 paper_construct.py
 python3 j0_scan2.py          # 56 种 J0，只有 (0,5,6) 为 True
 
-# 3) 三个归档点集的官方校验
+# 3) 五个归档点集的官方校验
 cd ../../data/scnet/p004
-for f in cc_10_7_134753_paper.txt cc_10_7_134753_rearranged.txt cc_10_7_134753_9pair17.txt; do
+for f in cc_10_7_134753_*.txt; do
   python3 verify_points.py $f
 done
 
@@ -400,7 +400,7 @@ cd ../p005 && python3 analyze.py && python3 transversals.py
    修好后必须让控制组重新产出 134,753 才能继续。
 4. **压缩必须保持权重。** 等签名点合并后，按“变量个数”限制删点会错；要么用
    未压缩模型，要么用多重权重。否则“最优 17”可能只是压缩假象。
-5. **一个数字要能被独立重建。** 三个归档点集都能用 verifier 复算、且哈希互不相同，
+5. **一个数字要能被独立重建。** 五个归档点集都能用 verifier 复算、且哈希互不相同，
    这样“134,753 有很多个”才是可核查的事实，而不是叙述。
 
 ---
@@ -419,7 +419,7 @@ src/scnet/p004/sixm3.c             审计后的 k→k+1 交换排除
 src/scnet/p004/lns4.c              平台/中性重排（启发式）
 src/scnet/p004/R367.txt            论文用 367 点独立集
 src/scnet/p005/*.py, *.c           p005 的统计、CP-SAT、局部搜索（清单见 src/scnet/p005/README.md）
-data/scnet/p004/                   三个 134,753 点集 + 校验脚本 + MANIFEST
+data/scnet/p004/                   五个 134,753 点集 + 两个检查点 + 校验脚本 + MANIFEST
 data/scnet/p005/cap6_best.json     85 点 F₃⁶ 帽集（子搜索未到 112）
 logs/scnet/p004/, p005/           交换排除与 CP-SAT/局部搜索日志（含 UNKNOWN 与中断）
 docs/CLAIM-EVIDENCE.md             每条结论 → 脚本/日志/数据的对照表
