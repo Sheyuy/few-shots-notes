@@ -61,18 +61,27 @@ jobs:
           MODE="${{ inputs.mode }}"
           POP="${{ inputs.pop }}"
           for i in $(seq 1 "$N"); do
+            # NOTE: search3's --time is in SECONDS (the local sweep scripts use
+            # --time 60 for a one-minute run), so convert minutes -> seconds.
+            SECS=$((MIN * 60))
+            # warm start from the incumbent world-record sequence (E = 578)
+            WARM=""
+            if [ -f src/mavis/p006/best578.json ]; then
+              WARM="--warm src/mavis/p006/best578.json"
+            fi
             if [ "$MODE" = "mem" ]; then
               ./search3 --mode mem --pop "$POP" --xover-m 14 --rng $((SEED * 1000 + i)) \
-                        --chunk "$CH" --tmin 5 --tmax 15 --lns-m 10 \
-                        --time "$MIN" --out "out/s$i.txt" > "out/s$i.out" 2>&1 &
+                        --chunk "$CH" --tmin 5 --tmax 15 --lns-m 10 --op tabu $WARM \
+                        --time "$SECS" --out "out/s$i.txt" > "out/s$i.out" 2>&1 &
             else
-              ./search3 --mode ils --rng $((SEED * 1000 + i)) --chunk "$CH" \
-                        --tmin 5 --tmax 15 --lns-m 10 \
-                        --time "$MIN" --out "out/s$i.txt" > "out/s$i.out" 2>&1 &
+              ./search3 --mode ils --op tabu --rng $((SEED * 1000 + i)) --chunk "$CH" \
+                        --tmin 5 --tmax 15 --lns-m 10 $WARM \
+                        --time "$SECS" --out "out/s$i.txt" > "out/s$i.out" 2>&1 &
             fi
           done
           wait
           grep -h "BEST E=" out/*.out | sort -t= -k3 -n | head -5 || true
+          echo "searched $SECS seconds per process"
 
       - name: merge and validate
         run: |
