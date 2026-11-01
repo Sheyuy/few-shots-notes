@@ -251,7 +251,7 @@ int main(int argc, char **argv)
         fclose(pf); free(row);
     }
     /* --- symmetry breaking: N(0) = {1..d} --- */
-    if (mode == 2) {
+    if (mode == 2 || mode == 4) {
         for (int u = 1; u < N; u++) {
             int lit = (u <= dfix) ? evar(0, u) : -evar(0, u);
             q[0] = lit; emit(1, q);
