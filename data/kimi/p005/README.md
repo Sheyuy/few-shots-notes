@@ -30,7 +30,9 @@ id(p0,...,p7) = 3^7*p0 + 3^6*p1 + ... + p7，pi ∈ {0,1,2}
 - `fixed192-weighted-control-valid512.txt`：保护点机制的 512 点合法控制输出。
 - `global9-no2-no3-control-recovered.txt`：无二、三支撑全局编码的 9 基点正对照回读结果；用于验证固定点单位子句和 SAT 回读，不是大帽构造。
 - `global9-no2-no3-flats3-control-recovered.txt`：加入全局三维子空间排序网络切割后的 9 基点正对照回读结果，仍不是大帽构造。
+- `global9-no2-no3-flats3max26-control-recovered.txt`：把全局三维切割扩大到 6,720 个子空间后的 9 基点正对照回读结果。
 - `fixed176-exact168-flats3-control-recovered512.txt`：固定基线第二坐标为 0 的 176 点层、两个自由层各 168 点的 512 点正对照回读结果；点集与原基线一致。
+- `fixed160-exact176-flats3-control-recovered512.txt`：固定基线第四坐标为 0 的 160 点层、两个自由层各 176 点的 512 点正对照回读结果；点集与原基线一致。
 - `ag3-cap9-points.txt`：独立三维小模型求得的 9 点帽，配合 10 点 UNSAT 日志验证坐标三维子空间至多 9 点的割平面边界。
 - `seeds496/seed0.txt` … `seed5.txt`：六个合法、相互不完全相同的 496 点帽，来源于射影帽的仿射截面及后续增长。它们用于逐盆地精确排除，不是一个 497 点候选。
 - `nearmiss/near{29,34,22,10,7,4}.txt`：513 点的非法近 miss；文件名数字是冲突线数，不是合法帽大小。
