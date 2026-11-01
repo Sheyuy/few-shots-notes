@@ -144,7 +144,7 @@ int main(int argc, char **argv)
         long a = 1;
         for (int i = 0; i < 4; i++) a = a * (N - i) / (i + 1);
         c_k4 = a;
-        if (mode == 3) {          /* per-vertex form: N * C(N-1,3) */
+        if (0) {          /* per-vertex form: N * C(N-1,3) */
             long b = 1;
             for (int i = 0; i < 3; i++) b = b * (N - 1 - i) / (i + 1);
             c_k4 = (long)N * b;
@@ -175,22 +175,16 @@ int main(int argc, char **argv)
     if (!out) { perror(tmpname); return 1; }
     FILE *body = out;
 
-    /* --- K4 clauses --- */
+    /* --- K4 clauses: for each 4-subset, ~x over its 6 edges ---
+     *
+     * NOTE: there is no cheaper "per-vertex" form of this constraint.  The
+     * tempting clause (~x_va | ~x_vb | ~x_vc) for every triple in V\{v} would
+     * forbid v from having ANY three neighbours at all (i.e. force deg(v) <= 2)
+     * -- that is NOT "N(v) is triangle-free".  It was implemented, pinned with a
+     * known-good graph and came back UNSAT, which is how the mistake was found.
+     */
     int q[64];
-    if (mode == 3) {
-        /* Equivalent form: no K4  <=>  every neighbourhood is triangle-free.
-         * For every vertex v and every 3-subset T of V\{v}:  ~x_va | ~x_vb | ~x_vc
-         * -> 36 * C(35,3) = 235620 clauses of size 3 (tighter than 58905 of size 6). */
-        int idx[3];
-        for (int v = 0; v < N; v++)
-        for (idx[0] = 0; idx[0] < N; idx[0]++)
-        for (idx[1] = idx[0] + 1; idx[1] < N; idx[1]++)
-        for (idx[2] = idx[1] + 1; idx[2] < N; idx[2]++) {
-            if (idx[0] == v || idx[1] == v || idx[2] == v) continue;
-            q[0] = -evar(v, idx[0]); q[1] = -evar(v, idx[1]); q[2] = -evar(v, idx[2]);
-            emit(3, q);
-        }
-    } else {
+    {
         int idx[4];
         for (idx[0] = 0; idx[0] < N; idx[0]++)
         for (idx[1] = idx[0] + 1; idx[1] < N; idx[1]++)
