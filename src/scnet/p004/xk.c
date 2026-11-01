@@ -15,7 +15,7 @@ static inline bool adj(int a,int b){
 }
 static inline int enc(const int v[5]){int x=0;for(int i=4;i>=0;i--)x=x*7+v[i];return x;}
 int K,m;
-struct Ent{int v;int n;int t[8];};
+struct Ent{int v;int n;int t[16];};
 vector<Ent> L;
 int cur[16], curN=0, curT[16], curTn=0;
 long long nodes=0, cap=0; bool found=false, stopped=false;
