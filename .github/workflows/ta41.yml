@@ -67,7 +67,8 @@ jobs:
           NB="${{ inputs.nb }}"
           mkdir -p out
           for i in $(seq 1 "$N"); do
-            ./jssp15 -i src/mavis/p009/best.json --time "$SECS" --rng $((SEED * 1000 + i)) \
+            # jssp15 flag names: -i init -t seconds -s seed -o out -l log
+            ./jssp15 -i src/mavis/p009/best.json -t "$SECS" -s $((SEED * 1000 + i)) \
                      --nb "$NB" --bridge "$BR" --burst "$BURST" --restart 2000 --multistart 40 \
                      -o "out/s$i.json" -l "out/s$i.log" > "out/s$i.out" 2>&1 &
           done
