@@ -1269,8 +1269,8 @@ gzip -t "$R/fixed192-exact161-planes-flats3-513.cnf.gz"
 test "$(gzip -dc "$R/fixed192-exact161-planes-flats3-513.cnf.gz" | wc -l)" -eq 9247210
 TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
   "$R/fixed192-exact161-planes-flats3-513.cnf.gz" \
-  "$R/fixed192-exact161-planes-flats3-seed0-kissat.log" \
-  "$R/fixed192-exact161-planes-flats3-seed0.rc" 0 "$KISSAT"
+  "$R/20261101-fixed192-exact161-flats3-seed0-kissat.log" \
+  "$R/20261101-fixed192-exact161-flats3-seed0.rc" 0 "$KISSAT"
 ```
 
 主模型 SHA-256 为 `a01bd5c3e81a97ac076f0ba0579b5c58f296d12afb8980a65226bcd0f1372744`。三维切割只加强既有固定层分支，不改变其数学覆盖范围；SAT 回读仍使用同一映射并经过独立验证。
