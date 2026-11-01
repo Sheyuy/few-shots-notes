@@ -74,7 +74,7 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 # SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
 # MASK_SELFTEST random_pairs=100000 PASS baseline=134753
 
-./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 1 --threads 8 --seconds 300
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 1 --threads 8 --seconds 300
 # COUNTS m0=0 m1=5178 m2=144861 m3=999144 m4=2131704 m5=2550704 m6=3197204 blocker_mismatches=0 truncations=0
 # STAGE natural_k1 sets_or_anchor_instances=5152 eligible=26 max_pool=2 complete=1 found=0
 # COMPLETE exchanges_up_to=1 no_improvement=1
@@ -89,7 +89,7 @@ g++ -x c++ -std=c++17 -O3 -fopenmp /tmp/lns4_all.cpp -o lns4
 
 ./lns4 --self-test
 # PLATEAU_SELFTEST graphs=500 targets=9 node_limit_reporting=PASS
-./lns4 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --chains 8 --seconds 120 --radius 1024
+./lns4 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --chains 8 --seconds 120 --radius 1024
 ```
 
 在 macOS 上没有 libomp 时，可以用一个声明 `omp_*` 的临时桩文件串行编译，用于

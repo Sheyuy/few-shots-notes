@@ -1188,7 +1188,8 @@ PY
 ### 13.2 p004：五个归档点集
 
 ```bash
-cd ../../data/scnet/p004
+cd "$(git rev-parse --show-toplevel)"   # 仓库根目录
+cd data/scnet/p004
 python3 verify_points.py cc_10_7_134753_paper.txt       # 650b05567deb...
 python3 verify_points.py cc_10_7_134753_rearranged.txt  # fe928a1cb18c...
 python3 verify_points.py cc_10_7_134753_9pair17.txt     # 1e69296d58d1...
@@ -1200,9 +1201,10 @@ python3 verify_points.py cc_10_7_134753_r2c3.txt        # 4dda701170fb...
 verifier 只查独立，不查极大；补查 `m0`：
 
 ```bash
-cd ../../src/scnet/p004
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
 g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3
-./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_r1c19.txt --max-k 1 --threads 1 --seconds 120
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_r1c19.txt --max-k 1 --threads 1 --seconds 120
 # COUNTS m0=0 ...
 ```
 
@@ -1212,7 +1214,8 @@ g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3
 ### 13.3 p004：九对族最小删点（OR-Tools）
 
 ```bash
-cd ../../src/scnet/p004
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
 python3 frontier9.py --variant R2 --x patch --seconds 60
 # FRONTIER9_BOUND {"omissions":17,"proven_optimal":true,"size":134753}
 # FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d..."}
@@ -1239,13 +1242,13 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 # SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
 # MASK_SELFTEST random_pairs=100000 PASS baseline=134753
 
-./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 1 --threads 8 --seconds 300
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 1 --threads 8 --seconds 300
 # COUNTS m0=0 m1=5178 m2=144861 m3=999144 m4=2131704 m5=2550704 m6=3197204 blocker_mismatches=0 truncations=0
 # COMPLETE exchanges_up_to=1 no_improvement=1
 ```
 
 ```bash
-./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 6 --threads 8 --seconds 600
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 6 --threads 8 --seconds 600
 # STAGE natural_k1..natural_k5、rank3_k4、rank4/rank3_k5、connected_pair_k3..k5 全部 complete=1 found=0
 # STAGE natural_k6          sets=3,003,919     eligible=387,149   complete=1 found=0
 # STAGE rank5_extensions_k6 instances=41,986,400 eligible=3,593,064 complete=1 found=0
@@ -1254,7 +1257,7 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 
 `status=completed` 只表示“程序把它为 k=6 设计的两阶段跑完”，**不是** k=6 全覆盖：
 源码在 `k==6` 时跑完 `naturalStage(6)`、`anchorStage(5,6)` 就 `break`，
-`max_k_completed` 因此永远是 5。深层 rank4/rank3 扩展与连通 6-集没有实现。
+`max_k_completed` 因此永远是 5。rank-3 锚点层与连通 6-集没有实现（rank-4 层见下面的 `--deep6`）。
 
 本机没有 libomp，用 `-I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c` 编译出来是**串行**的，
 600 秒刚好跑完上面这些阶段；有 OpenMP 的机器会快很多。日志见
@@ -1263,7 +1266,7 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 更深的两层（`anchorStage(4,6)`、`anchorStage(3,6)`）默认不跑。打开方式：
 
 ```bash
-./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt \
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt \
         --max-k 6 --only-deep6 --shard 0/64 --seconds 300
 # STAGE rank4_extensions_k6 sets_or_anchor_instances=10045995 ... complete=1 shard=0/64
 ```
@@ -1308,7 +1311,7 @@ sed 's/^int main(int argc,char\*\* argv){/int audited_baseline_main(int argc,cha
 cat /tmp/core.cpp lns4.c > /tmp/lns4_all.cpp
 g++ -x c++ -std=c++17 -O3 -fopenmp /tmp/lns4_all.cpp -o lns4
 ./lns4 --self-test
-./lns4 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --chains 8 --seconds 120 --radius 1024
+./lns4 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --chains 8 --seconds 120 --radius 1024
 ```
 
 ### 13.5 p005：基线与结构

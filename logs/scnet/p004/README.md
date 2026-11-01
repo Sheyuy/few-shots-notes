@@ -9,7 +9,7 @@
 ```bash
 g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3
 ./sixm3 --self-test
-./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 6 --threads 8 --seconds 600
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 6 --threads 8 --seconds 600
 ```
 
 ### 这份日志能证明什么

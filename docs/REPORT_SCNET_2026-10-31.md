@@ -429,20 +429,22 @@ cd src/scnet/p004 && python3 model.py && python3 paper_construct.py
 python3 j0_scan2.py          # 56 种 J0，只有 (0,5,6) 为 True
 
 # 3) 五个归档点集的官方校验
-cd ../../data/scnet/p004
+cd "$(git rev-parse --show-toplevel)"
+cd data/scnet/p004
 for f in cc_10_7_134753_*.txt; do
   python3 verify_points.py $f
 done
 
 # 4) 九对族最优删点（需要 OR-Tools）
-cd ../../src/scnet/p004
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
 python3 frontier9.py --variant R2 --x patch --seconds 60      # 17 空位 -> 134,753
 python3 frontier9.py --variant R1 --x patch --seconds 60      # 18 空位 -> 134,752
 
 # 5) 交换排除（需要 g++ 与 OpenMP）
 g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 ./sixm3 --self-test
-./sixm3 --input ../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 5 --threads 16 --seconds 600
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 5 --threads 16 --seconds 600
 
 # 6) p005 基线与其结构
 python3 $FEW_SHOTS_REPO/problems/p005-cap-set-8d/verify/verify.py \
