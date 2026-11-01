@@ -662,7 +662,15 @@ int main(int argc, char **argv) {
     const char *initfile = NULL, *outfile = "best.json", *logfile = "logs/run.log";
     double tl = 0;
     uint64_t seed = 1;
-    int nbhd = 0;              /* 0=N1 1=N5 2=N6 3=N8 4=N1+N8 */
+    /* nbhd is a BIT MASK, not an enum (the old enum comment was wrong and
+     * silently made --nb 0 mean "no neighbourhood at all" -> 0 iterations):
+     *   1 = N1 (swap two adjacent critical ops)
+     *   2 = N5 (swap inside a critical block)
+     *   4 = N6 (move an op to a block end)
+     *   8 = N8 (move an inner op outside the block)
+     *  16 = coordinated critical-block moves
+     * Example: --nb 1 -> N1, --nb 4 -> N6, --nb 9 -> N1+N8. */
+    int nbhd = 0;
     int tt_base = 0;           /* 0 = literature formula */
     int tt_lo = 0, tt_hi = 0;
     int kick_iv = 3000, restart_iv = 15000, pstr = 3, fastmode = 1, selftest = 0, randout = 0;
