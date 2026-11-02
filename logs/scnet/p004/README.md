@@ -154,3 +154,18 @@ real 2m26s
 `conn6` 是“两个 2 点 blocker 相交、再逐层延伸”的族，和 k≤5 的
 `connected_pair_k3..k5` 同一构造，补齐了 k=6 阶段表里原本缺的一项；
 仍不覆盖“秩恰好为 3”的 6-集。内存峰值约 3.9 GB（3,759 万个 6-集 + 排序缓冲）。
+
+## `sixm3_deep3_k6_all64.log`
+
+`--max-k 6 --only-deep3 --shard i/64 --threads 8`，输入论文集，64 个分片顺序跑。
+单片（`shard=0/64`）：
+
+```
+STAGE rank3_extensions_k6 sets_or_anchor_instances=27560320 eligible=1257861 max_pool=27 complete=1 found=0
+SHARD_STAGE_DONE k=6 shard=0/64
+```
+
+64 片合计 **1,750,092,909** 个 6-集、`eligible=80,849,174`，64/64 `complete=1`、
+`found=0`、`rc=0`，无 `ERROR`；每片约 117 秒，全部约 2.1 小时（8 线程）。
+枚举方式：以每个 3 点 blocker 为锚，逐层与共享一个点的 2/3 点 blocker 求并
+（每次至少加 1 点、并集 ≤ 6），按大小 BFS 去重，大小为 6 的直接检查。

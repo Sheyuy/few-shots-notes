@@ -1258,7 +1258,7 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 
 `status=completed` 只表示“程序把它为 k=6 设计的两阶段跑完”，**不是** k=6 全覆盖：
 源码在 `k==6` 时跑完 `naturalStage(6)`、`anchorStage(5,6)` 就 `break`，
-`max_k_completed` 因此永远是 5。rank-3 锚点层没有实现；连通 6-集用 `--conn6` 打开（见下），rank-4 层见 `--deep6`。
+`max_k_completed` 因此永远是 5。深层各族分别用 `--conn6`、`--deep3`、`--deep6` 打开（见下）。
 
 本机没有 libomp，用 `-I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c` 编译出来是**串行**的，
 600 秒刚好跑完上面这些阶段；有 OpenMP 的机器会快很多。日志见
@@ -1313,7 +1313,20 @@ cd src/scnet/p004
 # 含 k=3..5 的重建，约 2 分 26 秒；内存峰值约 3.9 GB
 ```
 
-rank-3 锚点那一层**没有实现**：它需要深度 3 的扩展，而 `extensions()` 只支持到深度 2。
+rank-3 锚点层（任意深度求并）：
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt \
+        --max-k 6 --only-deep3 --shard 0/64 --threads 8 --seconds 600
+# STAGE rank3_extensions_k6 ... complete=1 found=0 shard=0/64
+```
+
+64 个分片合计 1,750,092,909 个实例，全部 `complete=1 found=0`，8 线程约 2.1 小时
+（单线程约 9–10 小时）。日志 `logs/scnet/p004/sixm3_deep3_k6_all64.log`。
+注意早先那个按 4/5 点 blocker 求并的 `--deep3` 原型剪枝前提是错的、已丢弃；
+现在这版只从 3 点 blocker 出发、与 2/3 点 blocker 求并。
 程序会打印 `SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented` 后正常结束。
 本地试做过一个 `--deep3` 变体，但它的剪枝前提是错的（以为“含 4 点 blocker 的 6-集都被
 rank-4 层覆盖”），会漏集合，所以没有归档。

@@ -57,7 +57,7 @@ std::atomic<Q> blockerErrors{0};
 std::chrono::steady_clock::time_point deadline;
 Key witnessD; std::vector<U> witnessA;
 int maxK=5,threads=16,secondsBudget=240;
-int shardIndex=0,shardCount=1;bool deep6=false,onlyDeep6=false,conn6=false,onlyConn6=false;
+int shardIndex=0,shardCount=1;bool deep6=false,onlyDeep6=false,conn6=false,onlyConn6=false,deep3=false,onlyDeep3=false;
 inline bool mine(size_t i){return shardCount==1||(i%(size_t)shardCount)==(size_t)shardIndex;}
 
 bool directConflict(U x,U y){
@@ -286,6 +286,36 @@ void naturalStage(int k){
     report("natural_k"+std::to_string(k),stats,!expired&&!found);
     if(!h.empty())sample(records[h[h.size()/2]].b,"natural_k"+std::to_string(k));
 }
+void anchorStage3(int k){
+    // rank-3 anchors, arbitrary merge depth: start from one 3-blocker and keep
+    // unioning with 2/3-blockers that share a point, each merge adding >=1 point,
+    // until size k. BFS by size, dedup per level.
+    std::vector<Counters> stats(omp_get_max_threads());const auto& h=heads[3];
+    #pragma omp parallel for schedule(dynamic,16)
+    for(size_t i=0;i<h.size();i++){
+        if(!mine(i))continue;
+        if(stopped())continue;
+        std::vector<Key> cur;cur.push_back(records[h[i]].b);
+        for(int sz=3;sz<k&&!cur.empty();sz++){
+            std::vector<Key> nxt;
+            for(const Key& d:cur){
+                if(stopped())break;
+                auto e=extensions(d,3,k);
+                nxt.insert(nxt.end(),e.begin(),e.end());
+            }
+            if(nxt.empty()){cur.clear();break;}
+            std::sort(nxt.begin(),nxt.end());nxt.erase(std::unique(nxt.begin(),nxt.end()),nxt.end());
+            std::vector<Key> smaller;smaller.reserve(nxt.size()/4+1);
+            for(const Key& x:nxt){
+                if(x.n==k)check(x,stats[omp_get_thread_num()]);
+                else if(x.n<k)smaller.push_back(x);
+            }
+            cur.swap(smaller);
+        }
+    }
+    report("rank3_extensions_k"+std::to_string(k),stats,!expired&&!found);
+}
+
 void anchorStage(int rank,int k){
     std::vector<Counters> stats(omp_get_max_threads());const auto& h=heads[rank];
     #pragma omp parallel for schedule(dynamic,32)
@@ -335,6 +365,8 @@ int main(int argc,char** argv){
             else if(arg=="--only-deep6"){deep6=true;onlyDeep6=true;}
             else if(arg=="--conn6")conn6=true;
             else if(arg=="--only-conn6"){conn6=true;onlyConn6=true;}
+            else if(arg=="--deep3")deep3=true;
+            else if(arg=="--only-deep3"){deep3=true;onlyDeep3=true;}
             else if(arg=="--shard"&&i+1<argc){std::string v=argv[++i];auto pos=v.find('/');require(pos!=std::string::npos,"--shard wants i/n");shardIndex=std::stoi(v.substr(0,pos));shardCount=std::stoi(v.substr(pos+1));require(shardCount>=1&&shardIndex>=0&&shardIndex<shardCount,"bad shard");}
             else throw std::runtime_error("invalid command line");
         }
@@ -344,7 +376,14 @@ int main(int argc,char** argv){
         std::cout<<"SHARD {\"index\":"<<shardIndex<<",\"count\":"<<shardCount<<",\"deep6\":"<<(deep6?1:0)<<"}\n"<<std::flush;
         load(path);collect();deadline=std::chrono::steady_clock::now()+std::chrono::seconds(secondsBudget);
         int completed=0;
-        if(onlyConn6){
+        if(onlyDeep3){
+            require(maxK==6,"--only-deep3 requires --max-k 6");
+            anchorStage3(6);
+            if(!expired&&!found){
+                if(shardCount==1){completed=6;std::cout<<"COMPLETE exchanges_up_to=6 no_improvement=1\n"<<std::flush;}
+                else std::cout<<"SHARD_STAGE_DONE k=6 shard="<<shardIndex<<"/"<<shardCount<<"\n"<<std::flush;
+            }
+        }else if(onlyConn6){
             require(maxK==6,"--only-conn6 requires --max-k 6");
             pairStage(3);if(!stopped())pairStage(4);if(!stopped())pairStage(5);if(!stopped())pairStage(6);
             if(!expired&&!found){completed=6;std::cout<<"COMPLETE exchanges_up_to=6 no_improvement=1\n"<<std::flush;}
@@ -363,7 +402,8 @@ int main(int argc,char** argv){
                 anchorStage(5,6);if(stopped())break;
                 if(!deep6)break;
                 anchorStage(4,6);if(stopped())break;
-                std::cout<<"SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented\n"<<std::flush;
+                if(deep3){anchorStage3(6);if(stopped())break;}
+                else std::cout<<"SKIP rank3_extensions_k6 reason=depth3_disabled(use --deep3)\n"<<std::flush;
                 if(conn6){pairStage(6);if(stopped())break;}
                 if(shardCount==1){completed=k;std::cout<<"COMPLETE exchanges_up_to="<<k<<" no_improvement=1\n"<<std::flush;}
                 else std::cout<<"SHARD_STAGE_DONE k=6 shard="<<shardIndex<<"/"<<shardCount<<"\n"<<std::flush;
