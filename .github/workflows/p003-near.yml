@@ -81,8 +81,10 @@ jobs:
           print(sum(int(c) for c in a[0]))
           PY
               DEG=$(GIDX="$gi" python3 -c 'import json,os; a=json.load(open("/tmp/g35_%s.json"%os.environ["GIDX"]))["adjacency"]; print(sum(int(c) for c in a[0]))')
+              EXTRA=""
+              if [ "${{ inputs.mode }}" = "free-vertex" ]; then EXTRA="--free-vertex"; fi
               python3 src/mavis/p003/near_sat.py "out/g${gi}_k${k}.cnf" "/tmp/g35_${gi}.json" "$k" \
-                      --seed "${{ inputs.seed }}" ${{ inputs.mode == 'free-vertex' && echo --free-vertex || true }} || continue
+                      --seed "${{ inputs.seed }}" $EXTRA || continue
               PIN="out/g${gi}_k${k}.cnf.pin" ./sat36 "out/g${gi}_k${k}.cnf" 4 "$DEG" >/dev/null 2>&1 || true
               timeout "${{ inputs.minutes }}m" ./kissat-4.0.4-linux-amd64 "out/g${gi}_k${k}.cnf" \
                   > "out/g${gi}_k${k}.log" 2>&1 || true
