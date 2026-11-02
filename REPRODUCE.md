@@ -1501,3 +1501,17 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ### 12.26 第 9.29 节最终状态
 
 第 12.25 节回退命令和第 12.24 节固定 168 点层命令均归档为 `s UNKNOWN`、退出码 0。全局 seed 1 为 425.70 秒、1,442 MB；固定 168 点层为 416.95 秒、891 MB。两者都是正常超时未判定，不是 SAT 或 UNSAT。
+
+
+### 12.27 独立四维帽边界
+
+```bash
+python3 src/kimi/p005/check_ag4_cap_bound.py \
+  "$KISSAT" "$R/ag4-normalized-check" \
+  --loader /lib64/ld-linux-x86-64.so.2 --time 120
+# 预期：UNSAT AG(4,3) cap size 21；随后 SAT AG(4,3) cap size 20。
+cmp "$R/ag4-normalized-check-ag4-cap20-points.txt" \
+  data/kimi/p005/ag4-cap20-points.txt
+```
+
+脚本先规范化五个仿射独立点，再依次求解 21、20 点模型。归档求解时间分别为 37.37、0.26 秒。早期未规范化 21 点实例只得到 88.79 秒 `UNKNOWN`，日志单独保留，不能当作上界证明。

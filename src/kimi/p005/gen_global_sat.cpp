@@ -9,7 +9,7 @@ using namespace std;
 static const int N=6561, PN=8192, TRUE_W=INT_MAX, FALSE_W=0;
 static uint8_t hi[N],lo[N],third4[81][81],fixedv[N];
 static inline int third(int a,int b){return third4[hi[a]][hi[b]]*81+third4[lo[a]][lo[b]];}
-static FILE *f;static int nextvar=N+1;static long long clauses=0,capclauses=0,planeclauses=0,flat3clauses=0,comparators=0;
+static FILE *f;static int nextvar=N+1;static long long clauses=0,capclauses=0,planeclauses=0,flat3clauses=0,flat4clauses=0,comparators=0;
 static void emit(initializer_list<int> ls){for(int x:ls)fprintf(f,"%d ",x);fputs("0\n",f);clauses++;}
 static void cap_clause(int a,int b,int c){
  int ws[3]={a,b,c},lits[3],n=0;
@@ -47,7 +47,7 @@ static void at_most_network(const vector<int>&ws,int bound,long long &counter){
  counter+=clauses-before;
 }
 int main(int argc,char**argv){
- if(argc<2){fprintf(stderr,"usage: gen_global_sat out.cnf [target] [extra_fixed_point|-1] [coordinate_planes] [forbid_support2] [forbid_support3] [fixed_unit_clauses] [coordinate_flats3_max_free]\n");return 2;}int target=argc>2?atoi(argv[2]):513;
+ if(argc<2){fprintf(stderr,"usage: gen_global_sat out.cnf [target] [extra_fixed_point|-1] [coordinate_planes] [forbid_support2] [forbid_support3] [fixed_unit_clauses] [coordinate_flats3_max_free] [coordinate_flats4_max_free]\n");return 2;}int target=argc>2?atoi(argv[2]):513;
  for(int x=0;x<N;x++){hi[x]=x/81;lo[x]=x%81;}for(int a=0;a<81;a++)for(int b=0;b<81;b++){int aa=a,bb=b,w=0,p=1;for(int i=0;i<4;i++){w+=((3-(aa%3+bb%3)%3)%3)*p;aa/=3;bb/=3;p*=3;}third4[a][b]=w;}
  int basis[9]={0,2187,729,243,81,27,9,3,1};for(int x:basis)fixedv[x]=1;
  for(int i=0;i<9;i++)for(int j=i+1;j<9;j++){int z=third(basis[i],basis[j]);if(!fixedv[z])fixedv[z]=2;else if(fixedv[z]!=2){fprintf(stderr,"basis conflict\n");return 3;}}
@@ -86,6 +86,24 @@ int main(int argc,char**argv){
   }
   if(forms!=13608){fprintf(stderr,"bad global flat3 form count %lld\n",forms);return 5;}
   fprintf(stderr,"FLATS3 forms %lld selected %lld max_free %d clauses %lld\n",forms,selected,max_free,flat3clauses);
+ }
+ if(argc>9&&atoi(argv[9])>=0){
+  int max_free=atoi(argv[9]);int pow3[8]={2187,729,243,81,27,9,3,1};long long forms=0,selected=0;
+  for(int i=0;i<8;i++)for(int j=i+1;j<8;j++)for(int k=j+1;k<8;k++)for(int l=k+1;l<8;l++){
+   int others[4],no=0;for(int c=0;c<8;c++)if(c!=i&&c!=j&&c!=k&&c!=l)others[no++]=c;
+   for(int mask=0;mask<81;mask++){
+    int d[8]={0},t=mask;for(int c:others){d[c]=t%3;t/=3;}
+    vector<int>ws;for(int u=0;u<3;u++)for(int v=0;v<3;v++)for(int w=0;w<3;w++)for(int z=0;z<3;z++){
+     d[i]=u;d[j]=v;d[k]=w;d[l]=z;int x=0;for(int c=0;c<8;c++)x+=d[c]*pow3[c];ws.push_back(wire[x]);
+    }
+    int free_points=count_if(ws.begin(),ws.end(),[](int w){return w!=TRUE_W&&w!=FALSE_W;});
+    int fixed_true=count(ws.begin(),ws.end(),TRUE_W);
+    if(free_points<=max_free&&free_points>20-fixed_true){at_most_network(ws,20,flat4clauses);selected++;}
+    forms++;
+   }
+  }
+  if(forms!=5670){fprintf(stderr,"bad global flat4 form count %lld\n",forms);return 5;}
+  fprintf(stderr,"FLATS4 forms %lld selected %lld max_free %d clauses %lld\n",forms,selected,max_free,flat4clauses);
  }
  if(argc>7&&atoi(argv[7])){int fixed_true_units=0,fixed_false_units=0;for(int x=0;x<N;x++)if(fixedv[x]){emit({fixedv[x]==1?x+1:-(x+1)});if(fixedv[x]==1)fixed_true_units++;else fixed_false_units++;}fprintf(stderr,"FIXED_UNITS true %d false %d\n",fixed_true_units,fixed_false_units);}
  vector<int>sortw(PN,FALSE_W);for(int x=0;x<N;x++)sortw[x]=wire[x];
