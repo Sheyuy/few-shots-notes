@@ -39,11 +39,14 @@ def main():
     k = int(sys.argv[3])
     seed = 12345
     free_vertex = False
+    n_free_vertices = 0
     args = sys.argv[4:]
     if "--seed" in args:
         i = args.index("--seed"); seed = int(args[i + 1])
     if "--free-vertex" in args:
         free_vertex = True
+    if "--free-vertices" in args:
+        i = args.index("--free-vertices"); n_free_vertices = int(args[i + 1])
 
     d = json.load(open(gpath))
     adj = d["adjacency"]
@@ -67,10 +70,17 @@ def main():
     nonedges = [(i, j) for i in range(n) for j in range(i + 1, n) if not B[i][j]]
     rng = random.Random(seed)
     freed = set()
-    if free_vertex:
-        v = rng.randrange(n)
+    if free_vertex or n_free_vertices > 0:
+        # free EVERY pair incident to a chosen set of vertices: this rewrites a
+        # whole neighbourhood and is a region the scattered-edge ladder does not
+        # cover (the ladder frees individual pairs, spread over the graph).
+        vs = set()
+        if n_free_vertices > 0:
+            vs = set(rng.sample(range(n), min(n_free_vertices, n)))
+        else:
+            vs = {rng.randrange(n)}
         for (i, j) in edges + nonedges:
-            if i == v or j == v:
+            if i in vs or j in vs:
                 freed.add((i, j))
     else:
         # NESTED ladder: shuffle ONCE with the seed and free the first k of each
@@ -98,7 +108,7 @@ def main():
         f.write("\n".join(rows) + "\n")
     print(f"pin written: {out_cnf}.pin  freed={len(freed)} "
           f"(edges {len(edges)} + non-edges {len(nonedges)}), deg0={deg0} "
-          f"mode={'free-vertex' if free_vertex else 'k=%d each way' % k}")
+          f"mode={'free-vertex' if free_vertex else ('free-vertices=%d' % n_free_vertices if n_free_vertices else 'k=%d each way' % k)}")
     return 0
 
 

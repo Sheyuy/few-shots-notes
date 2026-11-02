@@ -33,9 +33,13 @@ on:
         required: false
         default: "7"
       mode:
-        description: "k (default) or free-vertex (rewrite one vertex completely)"
+        description: "k (default) | free-vertex | free-vertices=N (rewrite N vertices completely)"
         required: false
         default: "k"
+      nfree:
+        description: "how many vertices to rewrite when mode=free-vertices"
+        required: false
+        default: "3"
 
 permissions:
   contents: read
@@ -83,6 +87,7 @@ jobs:
               DEG=$(GIDX="$gi" python3 -c 'import json,os; a=json.load(open("/tmp/g35_%s.json"%os.environ["GIDX"]))["adjacency"]; print(sum(int(c) for c in a[0]))')
               EXTRA=""
               if [ "${{ inputs.mode }}" = "free-vertex" ]; then EXTRA="--free-vertex"; fi
+              if [ "${{ inputs.mode }}" = "free-vertices" ]; then EXTRA="--free-vertices ${{ inputs.nfree }}"; fi
               python3 src/mavis/p003/near_sat.py "out/g${gi}_k${k}.cnf" "/tmp/g35_${gi}.json" "$k" \
                       --seed "${{ inputs.seed }}" $EXTRA || continue
               PIN="out/g${gi}_k${k}.cnf.pin" ./sat36 "out/g${gi}_k${k}.cnf" 4 "$DEG" >/dev/null 2>&1 || true
