@@ -1527,3 +1527,50 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 运行期间不要启动另一个大型 SAT 实例。归档结果为 `s UNKNOWN`、486.06 秒、2,417 MB、退出码 0；这不是 UNSAT。
+
+
+### 12.29 四维子空间切割与固定 168 点层精确 177
+
+全局生成器第九个可选参数为 `coordinate_flats4_max_free`。以下模型同时使用三维阈值 26 和四维阈值 48：
+
+```bash
+"$R/gen_global_sat" "$R/global9-no2-no3-flats3max26-flats4max48-control.cnf" \
+  9 -1 1 1 1 1 26 48
+# FLATS4 forms 5670 selected 630 max_free 48 clauses 1317330
+# DONE vars 2696529 clauses 15535191 comparators 1919689 target 9
+# 正对照在 7.84 秒返回 SAT；回读流程同第 12.20 节。
+
+"$R/gen_global_sat" "$R/global513-no2-no3-flats3max26-flats4max48.cnf" \
+  513 -1 1 1 1 1 26 48
+# DONE vars 2696529 clauses 15535192 comparators 1919689 target 513
+test "$(wc -l < "$R/global513-no2-no3-flats3max26-flats4max48.cnf")" -eq 15535193
+gzip -1 -c "$R/global513-no2-no3-flats3max26-flats4max48.cnf" \
+  > "$R/global513-no2-no3-flats3max26-flats4max48.cnf.gz"
+gzip -t "$R/global513-no2-no3-flats3max26-flats4max48.cnf.gz"
+test "$(gzip -dc "$R/global513-no2-no3-flats3max26-flats4max48.cnf.gz" | wc -l)" -eq 15535193
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-no3-flats3max26-flats4max48.cnf.gz" \
+  "$R/20261102-global-no23-flats4max48-seed0-kissat.log" \
+  "$R/20261102-global-no23-flats4max48-seed0.rc" 0 "$KISSAT"
+```
+
+全局主模型 SHA-256 为 `675403dfa164ddede33a44667ef757eecc9d6b6e40791086b5f29117148ec8d7`。四维至多 20 点的独立验证见第 12.27 节。
+
+固定 168 点层只需把第 12.24 节主模型的精确第一自由层参数和文件名中的 176 改为 177：
+
+```bash
+"$R/gen_fixed_layer_sat" "$R/fixed168-exact177-planes-flats3-513.cnf" \
+  data/kimi/p005/baseline512.txt 1 2 513 "$R/fixed168-exact177.map" - 1 177 1 4
+# DONE vars 487984 clauses 8562113 comparators 466942 target 513
+test "$(wc -l < "$R/fixed168-exact177-planes-flats3-513.cnf")" -eq 8562114
+gzip -1 -c "$R/fixed168-exact177-planes-flats3-513.cnf" \
+  > "$R/fixed168-exact177-planes-flats3-513.cnf.gz"
+gzip -t "$R/fixed168-exact177-planes-flats3-513.cnf.gz"
+test "$(gzip -dc "$R/fixed168-exact177-planes-flats3-513.cnf.gz" | wc -l)" -eq 8562114
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/fixed168-exact177-planes-flats3-513.cnf.gz" \
+  "$R/20261102-fixed168-exact177-flats3-seed0-kissat.log" \
+  "$R/20261102-fixed168-exact177-flats3-seed0.rc" 0 "$KISSAT"
+```
+
+固定层主模型 SHA-256 为 `586c70471bdf6973289675787386db7428e307e0c3a34cc099f5984ad3296b10`。SAT 回读使用 `fixed168-exact177.map`、坐标 1、层值 2。
