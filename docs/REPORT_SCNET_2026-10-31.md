@@ -241,6 +241,20 @@ a ∪ b,  a 是 4 点 blocker,  b 是 2/3/4 点 blocker,  |a∩b| ≥ 1,  |a∪b
 “该阶段定义的 6.44 亿个 6-集全部检查过，没有找到改进”，**不能**推广成
 “所有含 rank-4 子集的 6-集都已排除”。
 
+**连通 6-集（2026-11-02 补齐）**：`pairStage(6)` 把 k≤5 的
+`connected_pair_k3..k5` 延伸到 6 —— 从全部 2 点 blocker 出发，逐层与“共享一个点”的
+2 点 blocker 求并。开关是 `--conn6`（并入 k=6 分支）或 `--only-conn6`（只跑这一族，
+内部先重建 k=3..5）。实测（1 线程）：
+
+```
+CONNECTED_PAIR_SETS k=6 generated=111426446 unique=37593864 truncated=0
+STAGE connected_pair_k6 sets_or_anchor_instances=37593864 eligible=10207912 max_pool=22 complete=1 found=0
+COMPLETE exchanges_up_to=6 no_improvement=1
+real 2m26s          # 含 k=3..5 的重建
+```
+
+内存峰值约 3.9 GB。日志 `logs/scnet/p004/sixm3_conn6_2026-11-02.log`。
+
 `anchorStage(3,6)` 没有实现（需要深度 3 的扩展），程序打印 `SKIP` 后正常结束。
 规模可以估出来：抽样 50 个 3 点 blocker，平均每个产出 41 个 4-集、147 个 5-集、
 2,783 个 6-集（按 `incidence` 逐层求并，含跨锚点重复），外推全层约 **27 亿个实例**；

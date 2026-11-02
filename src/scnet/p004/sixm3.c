@@ -6,7 +6,9 @@
 // edges; rank-(k-1) edges plus one connected extension; rank-3 edges plus one/two
 // connected extensions for k=5; and ALL connected pair-graph sets (not just paths
 // and stars). Records/pools are dynamically sized. Timeouts are INCOMPLETE.
-// --deep6 adds the deep k=6 stage over rank-4 anchors; the rank-3 anchor stage is NOT
+// --conn6 adds pairStage(6), the connected 2-blocker chain that closes the k=6
+// stage list (it mirrors connected_pair_k3..k5). --deep6 adds the deep k=6 stage
+// over rank-4 anchors; the rank-3 anchor stage is NOT
 // implemented (it needs a depth-3 extension, extensions() stops at depth 2) and prints
 // SKIP instead of aborting. Without --deep6 the k=6 branch keeps the historical
 // behaviour (natural + rank5 only). --shard i/n
@@ -55,7 +57,7 @@ std::atomic<Q> blockerErrors{0};
 std::chrono::steady_clock::time_point deadline;
 Key witnessD; std::vector<U> witnessA;
 int maxK=5,threads=16,secondsBudget=240;
-int shardIndex=0,shardCount=1;bool deep6=false,onlyDeep6=false;
+int shardIndex=0,shardCount=1;bool deep6=false,onlyDeep6=false,conn6=false,onlyConn6=false;
 inline bool mine(size_t i){return shardCount==1||(i%(size_t)shardCount)==(size_t)shardIndex;}
 
 bool directConflict(U x,U y){
@@ -331,6 +333,8 @@ int main(int argc,char** argv){
             else if(arg=="--seconds"&&i+1<argc)secondsBudget=std::stoi(argv[++i]);
             else if(arg=="--deep6")deep6=true;
             else if(arg=="--only-deep6"){deep6=true;onlyDeep6=true;}
+            else if(arg=="--conn6")conn6=true;
+            else if(arg=="--only-conn6"){conn6=true;onlyConn6=true;}
             else if(arg=="--shard"&&i+1<argc){std::string v=argv[++i];auto pos=v.find('/');require(pos!=std::string::npos,"--shard wants i/n");shardIndex=std::stoi(v.substr(0,pos));shardCount=std::stoi(v.substr(pos+1));require(shardCount>=1&&shardIndex>=0&&shardIndex<shardCount,"bad shard");}
             else throw std::runtime_error("invalid command line");
         }
@@ -340,7 +344,11 @@ int main(int argc,char** argv){
         std::cout<<"SHARD {\"index\":"<<shardIndex<<",\"count\":"<<shardCount<<",\"deep6\":"<<(deep6?1:0)<<"}\n"<<std::flush;
         load(path);collect();deadline=std::chrono::steady_clock::now()+std::chrono::seconds(secondsBudget);
         int completed=0;
-        if(onlyDeep6){
+        if(onlyConn6){
+            require(maxK==6,"--only-conn6 requires --max-k 6");
+            pairStage(3);if(!stopped())pairStage(4);if(!stopped())pairStage(5);if(!stopped())pairStage(6);
+            if(!expired&&!found){completed=6;std::cout<<"COMPLETE exchanges_up_to=6 no_improvement=1\n"<<std::flush;}
+        }else if(onlyDeep6){
             require(maxK==6,"--only-deep6 requires --max-k 6");
             anchorStage(4,6);
             if(!stopped())std::cout<<"SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented\n"<<std::flush;
@@ -356,6 +364,7 @@ int main(int argc,char** argv){
                 if(!deep6)break;
                 anchorStage(4,6);if(stopped())break;
                 std::cout<<"SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented\n"<<std::flush;
+                if(conn6){pairStage(6);if(stopped())break;}
                 if(shardCount==1){completed=k;std::cout<<"COMPLETE exchanges_up_to="<<k<<" no_improvement=1\n"<<std::flush;}
                 else std::cout<<"SHARD_STAGE_DONE k=6 shard="<<shardIndex<<"/"<<shardCount<<"\n"<<std::flush;
                 break;

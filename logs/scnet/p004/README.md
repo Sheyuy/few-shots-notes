@@ -135,3 +135,22 @@ NO_8_EXCHANGE nodes=1272934021 seconds=60426.8
 结论：**R367 的 8 点对称差邻域内没有 368 点独立集**；任何 368 点集至少要换掉 9 个点。
 k=9 按每层约 11 倍增长估计要 10^10 节点、约 9 天，没有跑。
 这不是 `α(C7⁵) = 367` 的证明。节点数在两次独立实现（`xk.cpp` 与 `xk.c`）中完全一致。
+
+## `sixm3_conn6_2026-11-02.log`
+
+`--max-k 6 --only-conn6 --threads 1`，输入论文集。先把 k=3..5 的 `connected_pair`
+链重建，再跑 `pairStage(6)`：
+
+```
+CONNECTED_PAIR_SETS k=3 generated=705413   unique=352504
+CONNECTED_PAIR_SETS k=4 generated=3077517  unique=1343540
+CONNECTED_PAIR_SETS k=5 generated=17040783 unique=6511209
+CONNECTED_PAIR_SETS k=6 generated=111426446 unique=37593864
+STAGE connected_pair_k6 sets_or_anchor_instances=37593864 eligible=10207912 max_pool=22 complete=1 found=0
+COMPLETE exchanges_up_to=6 no_improvement=1
+real 2m26s
+```
+
+`conn6` 是“两个 2 点 blocker 相交、再逐层延伸”的族，和 k≤5 的
+`connected_pair_k3..k5` 同一构造，补齐了 k=6 阶段表里原本缺的一项；
+仍不覆盖“秩恰好为 3”的 6-集。内存峰值约 3.9 GB（3,759 万个 6-集 + 排序缓冲）。

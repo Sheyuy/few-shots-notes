@@ -23,6 +23,7 @@
 | 7b | k=6 深层的 rank-4 锚点扩展：64/64 分片、644,208,231 个实例，全部 `complete=1 found=0` | 该阶段定义族（4 点 blocker ∪ 2/3/4 点 blocker，`\|a∩b\|≥1`、`\|a∪b\|=6`）全覆盖；不是“所有含 4 点 blocker 的 6-集” | `sixm3.c --deep6 --shard i/64` + `logs/scnet/p004/sixm3_rank4_k6_all64.log` | 归档 |
 | 7c | `\|D\|=9`：论文 8 对基座 + 50 个第 9 对候选 × 29 种 `J0`，1,450 个构造中 1,421 个点数恰为 134,770，**全部非独立**（冲突均为行内） | 只限该基座；换基座未试 | `src/scnet/p004/d9_scan.py` + `logs/scnet/p004/d9_scan_2026-11-01.log` | 归档 |
 | 7d | C7⁵：`R367` 的 `k`-交换完备检查，`k ≤ 8` 均不存在 368 点独立集（k=8：12.7 亿节点 / 60,427 秒） | 完备（限 8 点对称差邻域）；非 `α(C7⁵)=367` 的证明 | `src/scnet/p004/xk.c` + `logs/scnet/p004/xk_exchange_2026-11-01.log` | 归档 |
+| 7e | k=6 连通对链：生成 111,426,446、去重 37,593,864，全部 `complete=1 found=0` | 完备（限该族）；`--only-conn6`，2 分 26 秒 | `src/scnet/p004/sixm3.c --conn6` + `logs/scnet/p004/sixm3_conn6_2026-11-02.log` | 归档 |
 | 8 | 平台/中性重排 652,515 步后仍 0 可加点 | 启发式 | `src/scnet/p004/lns4.c` → `cc_10_7_134753_rearranged.txt` | 代码归档 |
 | 9 | 九对族 50 个候选在固定 X 下全部 UNSAT | 精确（限 50 个模型） | `sweep.py`（`optional_test`） | 归档 |
 | 10 | R2:patch 最少 17 空位 → 134,753 点（`1e69296d58d1…`） | 精确（限该模型） | `frontier9.py --variant R2 --x patch` | 归档 |

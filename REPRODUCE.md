@@ -1258,7 +1258,7 @@ g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
 
 `status=completed` 只表示“程序把它为 k=6 设计的两阶段跑完”，**不是** k=6 全覆盖：
 源码在 `k==6` 时跑完 `naturalStage(6)`、`anchorStage(5,6)` 就 `break`，
-`max_k_completed` 因此永远是 5。rank-3 锚点层与连通 6-集没有实现（rank-4 层见下面的 `--deep6`）。
+`max_k_completed` 因此永远是 5。rank-3 锚点层没有实现；连通 6-集用 `--conn6` 打开（见下），rank-4 层见 `--deep6`。
 
 本机没有 libomp，用 `-I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c` 编译出来是**串行**的，
 600 秒刚好跑完上面这些阶段；有 OpenMP 的机器会快很多。日志见
@@ -1299,6 +1299,18 @@ g++ -O2 -std=c++17 src/scnet/p004/xk.c -o xk
 ```bash
 cd src/scnet/p004
 FEW_SHOTS_REPO=../../.. python3 d9_scan.py     # 约 45 秒，输出 SUMMARY ... valid=0
+```
+
+连通 6-集（k≤5 的 `connected_pair_k3..k5` 的延伸）：
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt \
+        --max-k 6 --only-conn6 --threads 1 --seconds 600
+# CONNECTED_PAIR_SETS k=6 generated=111426446 unique=37593864 truncated=0
+# STAGE connected_pair_k6 ... complete=1 found=0
+# 含 k=3..5 的重建，约 2 分 26 秒；内存峰值约 3.9 GB
 ```
 
 rank-3 锚点那一层**没有实现**：它需要深度 3 的扩展，而 `extensions()` 只支持到深度 2。

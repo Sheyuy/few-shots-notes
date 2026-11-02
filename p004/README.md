@@ -113,7 +113,7 @@ RESULT {"status":"completed","max_k_completed":5,"requested_max_k":6,"found":0,"
 `complete=1`，合计 **644,208,231** 个实例，`found=0`（日志
 `logs/scnet/p004/sixm3_rank4_k6_all64.log`）。注意这 6.44 亿个实例是
 **4 点 blocker 与一个 2/3/4 点 blocker 相交得到的 6-集**（`|a∩b| ≥ 1`、`|a∪b| = 6`），
-不是“所有含 4 点 blocker 的 6-集”。rank-3 层与连通 6-集都未实现。
+不是“所有含 4 点 blocker 的 6-集”。连通 6-集已于 2026-11-02 补齐（`--only-conn6`，2 分 26 秒，生成 111,426,446 / 去重 37,593,864，`complete=1 found=0`）；rank-3 层仍未实现。
 正确说法仍是“k ≤ 5 排除；k=6 部分覆盖”。
 
 ## 5. 第二个 134,753 点集（精确，限该点集）
@@ -166,7 +166,7 @@ FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d…"}
 
 - **不能说 134,754 不存在**：只排除了两个点集的 k ≤ 5 邻域与六个九对模型。
 - **不能说 k ≤ 6 排除**：k=6 只覆盖三个明确定义的族（自然 6-集、rank-5 单扩展、
-  4 点 blocker 与另一个 blocker 相交得到的 6-集）；rank-3 层与连通 6-集未覆盖。
+  4 点 blocker 与另一个 blocker 相交得到的 6-集）；连通 6-集（`connected_pair_k6`）已覆盖；rank-3 层未覆盖。
 - **`|D|=9, s=9`**：规模 134,770、容错 16，算术上更宽。本轮扫过论文 8 对基座 +
   50 个第 9 对候选 × 29 种 `J0` 切分 = 1,450 个构造：点数大多恰为 134,770，
   但**全部非独立**（冲突都在同一行内）。见 `src/scnet/p004/d9_scan.py` 与
