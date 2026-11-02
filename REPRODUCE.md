@@ -1291,6 +1291,7 @@ g++ -O2 -std=c++17 src/scnet/p004/xk.c -o xk
 ./xk 5    # NO_5_EXCHANGE nodes=777655
 ./xk 6    # NO_6_EXCHANGE nodes=9540882   (~7 分钟)
 ./xk 7    # NO_7_EXCHANGE nodes=113478118 (~88 分钟)
+./xk 8    # NO_8_EXCHANGE nodes=1272934021 (~17 小时)
 ```
 
 `|D|=9` 的扫描（论文 8 对 + 50 个第 9 对候选 × 29 种 `J0`）：
