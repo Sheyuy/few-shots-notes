@@ -1580,6 +1580,51 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 
 第 12.29 节两条主命令均归档为 `s UNKNOWN`、退出码 0。全局四维切割模型为 396.29 秒、1,621 MB；固定 168 点层精确 177 模型为 397.01 秒、881 MB。二者都是正常超时未判定，不是 SAT 或 UNSAT。
 
+### 12.31 全量三维与四维切割联合模型
+
+以下命令在本地临时文件系统生成 CNF，核对固定宽度头部后再压缩到 `$R`。这也可避开某些持久化挂载无法可靠执行生成器末尾 `fseek` 重写头部的问题。九点正对照沿用原始变量回读器：
+
+```bash
+TMP=$(mktemp -d)
+g++ -O2 -std=c++17 src/kimi/p005/gen_global_sat.cpp -o "$TMP/gen_global_sat"
+
+"$TMP/gen_global_sat" "$TMP/global9-control.cnf" \
+  9 -1 1 1 1 1 27 48
+# FLATS3 forms 13608 selected 12992 max_free 27 clauses 11219264
+# FLATS4 forms 5670 selected 630 max_free 48 clauses 1317330
+# DONE vars 4653393 clauses 21412055 comparators 3117641 target 9
+"$KISSAT" --time=90 --seed=0 --sat "$TMP/global9-control.cnf" \
+  > "$R/global9-no23-flats3max27-flats4max48-control-kissat.log" 2>&1
+# Kissat 的 SAT 退出码为 10；归档运行 9.51 秒。
+python3 src/kimi/p005/extract_sat_cap.py \
+  "$R/global9-no23-flats3max27-flats4max48-control-kissat.log" \
+  "$R/global9-no23-flats3max27-flats4max48-control-recovered.txt" --min-size 9
+# VERIFIED size=9；点集恰为 9 个基点。
+
+"$TMP/gen_global_sat" "$TMP/global513-main.cnf" \
+  513 -1 1 1 1 1 27 48
+# DONE vars 4653393 clauses 21412056 comparators 3117641 target 513
+head -n 1 "$TMP/global513-main.cnf"
+# p cnf 0004653393 00021412056
+test "$(wc -l < "$TMP/global513-main.cnf")" -eq 21412057
+gzip -9 -c "$TMP/global513-main.cnf" \
+  > "$R/global513-no2-no3-flats3max27-flats4max48.cnf.gz"
+gzip -t "$R/global513-no2-no3-flats3max27-flats4max48.cnf.gz"
+test "$(gzip -dc "$R/global513-no2-no3-flats3max27-flats4max48.cnf.gz" | wc -l)" -eq 21412057
+
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-no3-flats3max27-flats4max48.cnf.gz" \
+  "$R/20261103-global-no23-flats3max27-flats4max48-seed0-kissat.log" \
+  "$R/20261103-global-no23-flats3max27-flats4max48-seed0.rc" 0 "$KISSAT"
+```
+
+主模型 SHA-256 为 `708a99d7221150c219b89065aa1a28e18a04fa299930038dcc1e7f0a8b958625`。运行时只启动这一个大型 SAT 实例。若日志出现 SAT，先用第 12.4 节的原始变量流程回读并独立检查，再生成官方证书；不能把辅助排序网络变量当成点变量。
+
+
+### 12.32 第 9.34 节最终状态
+
+第 12.31 节主命令归档为 `s UNKNOWN`、退出码 0，求解时间 535.16 秒、峰值常驻内存 2,470 MB。没有 SAT 候选，因此本轮没有官方 verifier 输入；UNKNOWN 也不是 UNSAT 或 512 的全局最优证明。
+
 ## 11. CodeArts 轮次：p005 后续否证（对称破缺 / 171 分层 / 禁止 baseline / 第 13 壳层）
 
 依赖：`numpy`、`ortools`（x86_64 用最新版即可；aarch64 必须 `ortools==9.11.4210`）。

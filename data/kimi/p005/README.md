@@ -33,6 +33,7 @@ id(p0,...,p7) = 3^7*p0 + 3^6*p1 + ... + p7，pi ∈ {0,1,2}
 - `global9-no2-no3-flats3max26-control-recovered.txt`：把全局三维切割扩大到 6,720 个子空间后的 9 基点正对照回读结果。
 - `global9-no2-no3-flats3max27-control-recovered.txt`：对全部非平凡坐标三维子空间加入切割后的 9 基点正对照回读结果。
 - `global9-no2-no3-flats4max48-control-recovered.txt`：在 6,720 个三维子空间切割之外加入 630 个四维子空间切割后的 9 基点正对照回读结果。
+- `global9-no2-no3-flats3max27-flats4max48-control-recovered.txt`：同时使用全部 12,992 个非平凡三维子空间切割和 630 个四维子空间切割后的 9 基点正对照回读结果。
 - `fixed176-exact168-flats3-control-recovered512.txt`：固定基线第二坐标为 0 的 176 点层、两个自由层各 168 点的 512 点正对照回读结果；点集与原基线一致。
 - `fixed160-exact176-flats3-control-recovered512.txt`：固定基线第四坐标为 0 的 160 点层、两个自由层各 176 点的 512 点正对照回读结果；点集与原基线一致。
 - `fixed168-exact176-flats3-control-recovered512.txt`：固定基线第二坐标为 2 的 168 点层、两个自由层分别为 176／168 点的 512 点正对照回读结果；点集与原基线一致。
