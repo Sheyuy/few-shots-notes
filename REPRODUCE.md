@@ -1515,3 +1515,15 @@ cmp "$R/ag4-normalized-check-ag4-cap20-points.txt" \
 ```
 
 脚本先规范化五个仿射独立点，再依次求解 21、20 点模型。归档求解时间分别为 37.37、0.26 秒。早期未规范化 21 点实例只得到 88.79 秒 `UNKNOWN`，日志单独保留，不能当作上界证明。
+
+
+### 12.28 全量三维模型单实例重试
+
+```bash
+TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
+  "$R/global513-no2-no3-planes-flats3max27.cnf.gz" \
+  "$R/20261102-global-no23-flats3max27-solo-seed1-kissat.log" \
+  "$R/20261102-global-no23-flats3max27-solo-seed1.rc" 1 "$KISSAT"
+```
+
+运行期间不要启动另一个大型 SAT 实例。归档结果为 `s UNKNOWN`、486.06 秒、2,417 MB、退出码 0；这不是 UNSAT。
