@@ -1574,3 +1574,372 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 ```
 
 固定层主模型 SHA-256 为 `586c70471bdf6973289675787386db7428e307e0c3a34cc099f5984ad3296b10`。SAT 回读使用 `fixed168-exact177.map`、坐标 1、层值 2。
+
+## 11. CodeArts 轮次：p005 后续否证（对称破缺 / 171 分层 / 禁止 baseline / 第 13 壳层）
+
+依赖：`numpy`、`ortools`（x86_64 用最新版即可；aarch64 必须 `ortools==9.11.4210`）。
+
+### 11.1 标准点对称破缺
+
+```bash
+# d=6 对照（已知 cap(6)=112）：有破缺 83、无破缺 92，均远低于 112
+python3 src/codearts/p005/symbreak.py 6 600 8
+python3 src/codearts/p005/symbreak.py 6 600 8 nofix
+# d=8：固定 0,e1..e8 后最大化（|C|=6516，候选几乎不缩小）
+python3 src/codearts/p005/symbreak.py 8 21600 64 fix /workspace/p005/results/sym8_max.json
+```
+
+### 11.2 171/171/171 分层
+
+```bash
+python3 src/codearts/p005/fixed_layer21.py 171 1 1800 32
+# 固定层 0 的 171 点子集，优化层 1/2
+# 实测：层 1/2 候选仍 229、精确最大团 160+160，总上限 491，不可能到 513
+```
+
+### 11.3 禁止 baseline 的另盆地搜索
+
+```bash
+python3 src/codearts/p005/diff512.py 1 3600 64
+# 全局 6561 变量 + AddBoolOr（至少一点与 baseline 不同）
+# 3600s / 64 worker -> FEASIBLE 511；解是 baseline 删 1 点（union=512, inter=511）
+```
+
+### 11.4 第 13 壳层（Kimi 未判定窗口）
+
+```bash
+python3 src/codearts/p005/shell_cpsat.py 13 1800 64
+# 池 1216 点、30784 条线约束
+# 本地 300s 与远端 64 worker / 1800s 均 FEASIBLE 512（chosen=512, baseline kept=512）
+# 注意：FEASIBLE 512 不是 UNSAT，第 13 壳层仍属未判定
+```
+
+### 11.5 远端批处理入口
+
+```bash
+bash src/codearts/p005/deploy_symbreak.sh          # 需要 /workspace/p005/ 与 PYTHONPATH 下的 ortools
+bash src/codearts/p005/deploy_layer21.sh 1 2 3 4
+```
+
+所有 `FEASIBLE 512` / `UNKNOWN` / 超时都只记为“未判定”，不得写成 UNSAT。
+
+## 13. SCNet 2026-10-31：p004 深挖与 p005 收尾
+
+本轮代码在 `src/scnet/`，数据在 `data/scnet/p004/`。所有命令都从仓库根目录执行，
+并假设 few-shots 克隆可由 `FEW_SHOTS_REPO` 找到。
+
+### 13.0 环境
+
+```bash
+export FEW_SHOTS_REPO=/abs/path/to/few-shots
+python3 --version            # 需要 >= 3.12（官方 verifier 用 tomllib）
+# OR-Tools 只在 frontier9.py / sweep.py 需要：
+#   pip install ortools==9.15.6755
+# C++ 需要 g++ >= 11 且支持 -fopenmp（Linux）
+```
+
+macOS 没有 libomp 时，可用临时 `omp.h` 桩串行编译，只用于跑自检；性能数字不能这样复现。
+
+### 13.1 p004：论文构造逐字复现（约 1 秒）
+
+```bash
+cd src/scnet/p004
+python3 model.py
+# SELFTEST adjacency=10049 random_2SAT=300 direct_extension_cases=160 PASS
+# CONTROL pairs=8 X=367 active_X=46 contact_signatures=22 variables=352 clauses=916 reconstructed_points=134753
+
+python3 paper_construct.py --compare /path/to/CC_10_7_134753.txt
+# SIZE 134753 B 359 A 20 D 26
+# OFFICIAL_VERIFY {"valid":true,"score":"134753","canonical_hash":"650b0556..."}
+# COMPARE {"reference":134753,"mine":134753,"only_reference":0,"only_mine":0}
+```
+
+反例自检（`J1` 漏掉 pair 7）：
+
+```bash
+python3 - <<'PY'
+import paper_construct as pc, model as m
+pairs=[tuple(map(tuple,p)) for p in m.PAIRS8]
+C,_,_,_=pc.build(J0=(0,5,6,7),pairs=pairs)
+print(len(C), m.is_valid(C))     # 134753 False  -> 构建器拒绝，不会误报成功
+PY
+```
+
+### 13.2 p004：五个归档点集
+
+```bash
+cd "$(git rev-parse --show-toplevel)"   # 仓库根目录
+cd data/scnet/p004
+# 需要 Python 3.11+（官方 verifier 用 tomllib），下面用 python3.13
+python3.13 verify_points.py cc_10_7_134753_paper.txt       # 650b05567deb...
+python3 verify_points.py cc_10_7_134753_rearranged.txt  # fe928a1cb18c...
+python3 verify_points.py cc_10_7_134753_9pair17.txt     # 1e69296d58d1...
+python3 verify_points.py cc_10_7_134753_r1c19.txt       # d2172281e517...
+python3 verify_points.py cc_10_7_134753_r2c3.txt        # 4dda701170fb...
+```
+
+预期五个都是 `{"valid":true,"score":"134753"}`，但 `canonical_hash` 互不相同。
+verifier 只查独立，不查极大；补查 `m0`：
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
+g++ -x c++ -std=c++17 -O3 -I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c -o sixm3
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_r1c19.txt --max-k 1 --threads 1 --seconds 120
+# COUNTS m0=0 ...
+```
+
+五个集合的 `m0` 都是 0（见 `data/scnet/p004/README.md`）。`r1c19`/`r2c3` 可以用
+`emit_class.py` 从检查点重建（CP-SAT 最优解不唯一，重建出的集合哈希可能不同）。
+
+### 13.3 p004：九对族最小删点（OR-Tools）
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
+python3 frontier9.py --variant R2 --x patch --seconds 60
+# FRONTIER9_BOUND {"omissions":17,"proven_optimal":true,"size":134753}
+# FRONTIER9_VERIFY {"valid":true,"score":"134753","canonical_hash":"1e69296d..."}
+
+# 加 --write /tmp/9pair17.txt 可导出点集。最优解不唯一，导出的集合可能与
+# data/scnet/p004/cc_10_7_134753_9pair17.txt 不同，但都应是 17 空位、134,753 点。
+
+python3 frontier9.py --variant R1 --x patch --seconds 60
+# 18 -> 134752
+
+python3 frontier9.py --variant R2 --x x0 --seconds 60
+# 32 -> 134738
+```
+
+`17` 是这六个固定模型的证明最优值；门槛是 16，所以差 1 个槽位。
+`--variant` 与 `--x` 的六种组合见 `src/scnet/p004/README.md` 的表。
+
+### 13.4 p004：交换排除（C++/OpenMP）
+
+```bash
+cd src/scnet/p004
+g++ -x c++ -std=c++17 -O3 -fopenmp sixm3.c -o sixm3
+./sixm3 --self-test
+# SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
+# MASK_SELFTEST random_pairs=100000 PASS baseline=134753
+
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 1 --threads 8 --seconds 300
+# COUNTS m0=0 m1=5178 m2=144861 m3=999144 m4=2131704 m5=2550704 m6=3197204 blocker_mismatches=0 truncations=0
+# COMPLETE exchanges_up_to=1 no_improvement=1
+```
+
+```bash
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --max-k 6 --threads 8 --seconds 600
+# STAGE natural_k1..natural_k5、rank3_k4、rank4/rank3_k5、connected_pair_k3..k5 全部 complete=1 found=0
+# STAGE natural_k6          sets=3,003,919     eligible=387,149   complete=1 found=0
+# STAGE rank5_extensions_k6 instances=41,986,400 eligible=3,593,064 complete=1 found=0
+# RESULT {"status":"completed","max_k_completed":5,"requested_max_k":6,"found":0,"truncations":0}
+```
+
+`status=completed` 只表示“程序把它为 k=6 设计的两阶段跑完”，**不是** k=6 全覆盖：
+源码在 `k==6` 时跑完 `naturalStage(6)`、`anchorStage(5,6)` 就 `break`，
+`max_k_completed` 因此永远是 5。深层各族分别用 `--conn6`、`--deep3`、`--deep6` 打开（见下）。
+
+本机没有 libomp，用 `-I/tmp/ompstub sixm3.c /tmp/ompstub/omp.c` 编译出来是**串行**的，
+600 秒刚好跑完上面这些阶段；有 OpenMP 的机器会快很多。日志见
+`logs/scnet/p004/sixm3_k6_600s.log`。
+
+更深的两层（`anchorStage(4,6)`、`anchorStage(3,6)`）默认不跑。打开方式：
+
+```bash
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt \
+        --max-k 6 --only-deep6 --shard 0/64 --seconds 300
+# STAGE rank4_extensions_k6 sets_or_anchor_instances=10045995 ... complete=1 shard=0/64
+```
+
+`--deep6` 打开 rank-4 锚点这一层；`--only-deep6` 跳过 k≤5（那些阶段已完成）；`--shard i/n`
+把按 head 索引的循环限制到 `i mod n`，用 64 个分片可以分段覆盖。实测
+`rank4_extensions_k6` 的 1/64 需 50.7 秒、1,004 万实例，推算全阶段约 6.4 亿实例、
+单进程约 54 分钟；8 个分片并行**没有收益**（内存带宽受限，总吞吐与串行相当）。
+
+64 个分片串行跑完约 64 分钟，合计 644,208,231 个实例，全部 `complete=1`、`found=0`
+（`logs/scnet/p004/sixm3_rank4_k6_all64.log`）。这一阶段枚举的是
+`a ∪ b`（a 为 4 点 blocker，b 为 2/3/4 点 blocker，`|a∩b| ≥ 1`、`|a∪b| = 6`），
+**不是**“所有含 4 点 blocker 的 6-集”；所以只能说“该阶段定义的 6.44 亿个 6-集没有改进”。
+
+C7⁵ 上的 k-交换完备检查（对 367 点集；删 k 加 k+1）：
+
+```bash
+g++ -O2 -std=c++17 src/scnet/p004/xk.c -o xk
+./xk 3    # NO_3_EXCHANGE nodes=3857
+./xk 4    # NO_4_EXCHANGE nodes=57792
+./xk 5    # NO_5_EXCHANGE nodes=777655
+./xk 6    # NO_6_EXCHANGE nodes=9540882   (~7 分钟)
+./xk 7    # NO_7_EXCHANGE nodes=113478118 (~88 分钟)
+./xk 8    # NO_8_EXCHANGE nodes=1272934021 (~17 小时)
+```
+
+`|D|=9` 的扫描（论文 8 对 + 50 个第 9 对候选 × 29 种 `J0`）：
+
+```bash
+cd src/scnet/p004
+FEW_SHOTS_REPO=../../.. python3 d9_scan.py     # 约 45 秒，输出 SUMMARY ... valid=0
+```
+
+连通 6-集（k≤5 的 `connected_pair_k3..k5` 的延伸）：
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt \
+        --max-k 6 --only-conn6 --threads 1 --seconds 600
+# CONNECTED_PAIR_SETS k=6 generated=111426446 unique=37593864 truncated=0
+# STAGE connected_pair_k6 ... complete=1 found=0
+# 含 k=3..5 的重建，约 2 分 26 秒；内存峰值约 3.9 GB
+```
+
+rank-3 锚点层（任意深度求并）：
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
+./sixm3 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt \
+        --max-k 6 --only-deep3 --shard 0/64 --threads 8 --seconds 600
+# STAGE rank3_extensions_k6 ... complete=1 found=0 shard=0/64
+```
+
+64 个分片合计 1,750,092,909 个实例，全部 `complete=1 found=0`，8 线程约 2.1 小时
+（单线程约 9–10 小时）。日志 `logs/scnet/p004/sixm3_deep3_k6_all64.log`。
+注意早先那个按 4/5 点 blocker 求并的 `--deep3` 原型剪枝前提是错的、已丢弃；
+现在这版只从 3 点 blocker 出发、与 2/3 点 blocker 求并。
+程序会打印 `SKIP rank3_extensions_k6 reason=extension_depth_3_not_implemented` 后正常结束。
+本地试做过一个 `--deep3` 变体，但它的剪枝前提是错的（以为“含 4 点 blocker 的 6-集都被
+rank-4 层覆盖”），会漏集合，所以没有归档。
+
+平台搜索（启发式，需要先按 13.4 的方式拼 `lns4.c`）：
+
+```bash
+sed 's/^int main(int argc,char\*\* argv){/int audited_baseline_main(int argc,char** argv){/' sixm3.c > /tmp/core.cpp
+cat /tmp/core.cpp lns4.c > /tmp/lns4_all.cpp
+g++ -x c++ -std=c++17 -O3 -fopenmp /tmp/lns4_all.cpp -o lns4
+./lns4 --self-test
+./lns4 --input ../../../data/scnet/p004/cc_10_7_134753_paper.txt --chains 8 --seconds 120 --radius 1024
+```
+
+### 13.5 p005：基线与结构
+
+```bash
+cd src/scnet/p005
+python3 analyze.py
+# n = 512 unique = 512
+# hist outside: [(4, 16), (8, 16), (10, 64), (11, 192), (12, 32), (13, 384), (14, 192), (15, 128)] max 256
+# min cnt outside: 4
+# outside cnt<=2: 0
+```
+
+`analyze.py` 会打印集外点的冲突数直方图；基线 0 个可加点、三层切片 192/160/160。
+
+接着看冲突数恰好为 4 的那 16 个点：
+
+```bash
+python3 transversals.py
+# conf4 points: 16
+# number of distinct transversals: 256
+# max frequency: 1
+# transversals unlocking >=2 conf4 points: 0
+# all conf4 pairs disjoint: True
+```
+
+即：这 16 个点各自的 4 个冲突对两两不相交，而 256 种“每对删一端”的横截里没有
+一个能同时解锁 ≥2 个点。所以插入任何集外点至少删 4 点（净 ≤ −3）。
+
+### 13.6 p005：结构化删点（KK = 10）
+
+```bash
+mkdir -p /tmp/p005run && cd /tmp/p005run
+python3 /abs/path/src/scnet/p005/make_baseline_idx.py > baseline.idx
+gcc -O3 -march=native /abs/path/src/scnet/p005/r10.c -o r10
+./r10
+# k10 points 384
+# best 2 x=2472 mask=8160
+# FINAL max addable after 10-removal: 2 (x=2472)
+```
+
+程序语义：对每个集外点取 10 个互不相交的冲突对，枚举 2^10 种“各删一端”，统计
+全局可加点数。`rk.c`/`rk12.c`/`rk13.c` 是同一程序的 KK=11/12/13 版本（打印字符串
+仍写 “10-removal” 是历史遗留）；本轮**只有 KK=10 的运行日志**保留在
+`logs/scnet/p005/rk13.log`，KK=11–13 未跑或未留存，不能写成“r ≤ 13 已穷举”。
+
+### 13.7 p005：CP-SAT（未判定，不是否证）
+
+本节的脚本都需要 OR-Tools（版本见 §13.3 的注释；本地测试用 9.15.6755）。
+
+```bash
+python3 /abs/path/src/scnet/p005/solve513.py
+# 6561 变量；max_time_in_seconds=900；预期 UNKNOWN 或 FEASIBLE 512，绝不是 UNSAT
+```
+
+固定单层的版本是 `two_slice.py`（固定 x0=0 的 192 点，另两层求 ≥321）；
+变体有 `two_slice_f.py`（f=1）、`two_slice_hint.py`（512 hint）、`two_slice_long.py`（长跑）、
+`two_slice_rand.py`（随机层）、`two_slice_remote.py`（远端 64 worker）。
+任何 `UNKNOWN`/`FEASIBLE`/超时/OOM 都只能记为“未判定”。
+
+保留的日志在 `logs/scnet/p005/`：`cp_solve2.log`（全局 7,173,360 条线约束，967 秒 `UNKNOWN`）、
+`cp_alt.log` / `cp_hint.log`（344 秒 `UNKNOWN`）、`two_slice*.log`（611–3,607 秒 `UNKNOWN`）、
+`product.log`（F₃⁶ 子问题只到 85 点）、`rk13.log`（KK=10，最多回填 2）。
+`data/scnet/p005/cap6_best.json` 是那 85 点 F₃⁶ 帽集，可用 6 位三进制展开复核（无三点共线）。
+
+---
+
+## 9. mavis · 2026-11-01 补充（解码 Exoo 35 点图 + 近失解流水线）
+
+```bash
+# 1) 解码 Exoo 的 37 个 35 点图并独立校验 K4 / I6
+python3 src/mavis/p003/decode_g6.py refs/r46_35some.g6
+#   -> 37 行全部 n=35 K4=0 I6=0
+
+# 2) 编译并运行近失解 C 优化器（最小化加一个新顶点后的违规数）
+gcc -O2 -o nearmiss src/mavis/p003/nearmiss.c -lm
+./nearmiss g35.txt nm.json 20000 4
+
+# 3) 迭代流水线：删一个顶点补一个顶点 -> 新的合法 35 点图 -> 再尝试扩到 36
+python3 src/mavis/p003/pipeline.py g35.txt pipeline_out 4
+#   -> 任何 min f == 0 的 36 顶点解都会写成 certificate 并可用官方验证器复核
+```
+
+关键恒等式（加一个新顶点 v、邻域 S）：
+
+```
+violations(B + v) = tri(B[S]) + ind5(B[V(B)\S])
+```
+
+所以 f = 0 ⇔ B+v 是合法的 (m+1) 顶点 (4,6)-图。
+
+---
+
+## 8. mavis · 2026-10-30 补充（p003 对称类 SAT / p004 P-S 复现与联合爬山）
+
+源码在 `src/mavis/`，结果与记录在 `results/mavis/`，完整说明见
+`docs/mavis-2026-10-30/README.md` 与 `docs/mavis-2026-10-30/METHOD-LOG.md`。
+
+### 8.1 p003：对称类 SAT
+```bash
+# 生成某个对称类的 CNF（自带群公理自检：封闭性 / 对合性 / 是置换）
+python3 src/mavis/p003/sym_sat.py inf35_6 6
+# 求解（CryptoMiniSat / minisat 均可）
+cryptominisat --verb 1 cnf/inf35_6.cnf > out.log
+# 提取并独立校验（自己数 4-团与独立 6-集，不依赖求解器）
+grep "^v " out.log > out.sat
+python3 src/mavis/p003/extract.py out
+# 官方验证器
+cp out_graph.json certificate.json && python3 verify.py .
+```
+
+### 8.2 p004：dim-5 集 → dim-10 证书
+```bash
+# P-S 的 367 点集 → ×乘积 → dim-10 证书 → 官方验证器
+python3 src/mavis/p004/harvest_dim5.py src/mavis/p004/R_paper.txt my-id
+# 输出 VERIFIER: {"valid":true,"score":"134689",...}
+```
+
+### 8.3 p004 联合爬山（找 368 点的 dim-5 集）
+```bash
+gcc -O2 -o pipe src/mavis/p004/pipe.c
+./pipe vj 382 1 7 49 343 109 3600 12345 0 40 123 40 123 40 src/mavis/p004/ps_bounds.txt
+# 日志里 "global" 是全局最优；>367 即 368 点（×乘积 135424 > 134753，破纪录）
+```

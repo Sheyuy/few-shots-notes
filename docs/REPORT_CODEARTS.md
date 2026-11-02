@@ -134,6 +134,26 @@ python3 src/codearts/p005/global_cpsat_hint.py
 
 **给后来者的结论**：p005 在“固定分层 + CP-SAT + 局部变换”这套工具下已基本封死。若要继续，需要 FunSearch 式程序进化、更强的专用最大独立集求解器，或彻底不同的代数构造。
 
+**C. “与 baseline 不同”的搜索只到 511**
+
+为了离开 512 的精确盆地，另建全局模型并加约束「解至少有一个点与 baseline 不同」（`AddBoolOr` 覆盖全部 6561 个点），仍以点数为目标、64 worker、3600 秒：
+
+- 结果：`FEASIBLE 511`（`cert_diff_1.json`）。
+- 也就是说，禁止 baseline 后，CP-SAT 连 512 都回不去，更没找到 513。
+
+结合 A/B/C：**512 是一个又深又窄的盆地**，现有 CP-SAT/局部工具都只能围绕它打转；513 若存在，需要与 baseline 差异很大的构造，而不是邻域搜索。
+
+**D. 第 13 壳层（Kimi 未判定窗口）的 CP-SAT 复核**
+
+Kimi 的 MILP 在原基线第 13 壳层（池 1216 点、30,784 条线约束）只给出 incumbent 512、dual 534，记为未判定。我们换 CP-SAT 复核同一个池：
+
+- 本地 8 worker / 300 秒：`FEASIBLE 512`；
+- 远端 64 worker / 1800 秒：`FEASIBLE 512`（`chosen=512, baseline kept=512`）。
+
+两次都只回到 baseline 本身，既没有 513，也没有 `OPTIMAL`。**因此第 13 壳层仍不能写成 UNSAT / 排除**，只是又一条“在给定算力下没有找到 513”的记录。若要真正收口这一层，需要更强的 MILP/SAT 或更长的双界收敛。
+
+**收尾判断（CodeArts 轮次）**：p005 的所有可执行路线——局部变换、分层精确团、仿射重分层、全局 CP-SAT（6 小时）、对称破缺、171/171/171、禁止 baseline、第 13 壳层——均未产生 513，也没有一条给出严格全局上界。512 与 513 的最终判定仍需要 FunSearch 式进化或完整 SAT/MILP 的长时间求解。
+
 ---
 
 ## 2. p001 · 11 维接吻数（Kissing number in dimension 11）
