@@ -1,0 +1,28 @@
+# xk_par.c probes, 2026-11-03, local 10-core mac (8 threads max)
+# correctness: node counts vs serial xk.c (serial counts include the root node)
+
+$ ./xk_par 3 ... -> NO_3_EXCHANGE nodes=3856       (serial 3857)
+$ ./xk_par 4 ... -> NO_4_EXCHANGE nodes=57791      (serial 57792)
+$ ./xk_par 5 ... -> NO_5_EXCHANGE nodes=777654     (serial 777655)
+
+# k=6 full range, identical node count, 1 vs 8 threads
+$ time ./xk_par 6 2000000000000 0 -1 1
+NO_6_EXCHANGE nodes=9540881 seconds=422.1 range=[0,15257)
+real 422.1
+$ time ./xk_par 6 2000000000000 0 -1 8
+NO_6_EXCHANGE nodes=9540881 seconds=72.0 range=[0,15257)
+real 72.0                     # 5.86x on 8 threads
+
+# k=9 probes (L=16438 first-level choices)
+$ ./xk_par 9 ... 0 1 1
+NO_9_EXCHANGE nodes=4635 seconds=0.5 range=[0,1)
+$ ./xk_par 9 ... 4000 4001 1
+NO_9_EXCHANGE nodes=5762024 seconds=289.8 range=[4000,4001)
+$ ./xk_par 9 ... 0 32 8
+NO_9_EXCHANGE nodes=6462565 seconds=97.6 range=[0,32)
+$ ./xk_par 9 ... 8000 8032 8      # killed at 900 s, no RESULT line
+(timeout after 900 s)
+
+# CP-SAT attempt (k=8 sanity check, model should be INFEASIBLE)
+k=8 candidates=16178 maxT=8 vars a=16178 u=367 conflicts=1884179
+status=UNKNOWN wall=120.1s conflicts=2200 branches=399020

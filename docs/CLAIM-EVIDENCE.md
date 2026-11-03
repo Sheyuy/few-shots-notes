@@ -26,6 +26,7 @@
 | 7e | k=6 连通对链：生成 111,426,446、去重 37,593,864，全部 `complete=1 found=0` | 完备（限该族）；`--only-conn6`，2 分 26 秒 | `src/scnet/p004/sixm3.c --conn6` + `logs/scnet/p004/sixm3_conn6_2026-11-02.log` | 归档 |
 | 7f | k=6 rank-3 锚点层：64 分片、合计 1,750,092,909 个实例，全部 `complete=1 found=0` | 完备（限该族）；`--only-deep3`，8 线程约 2.1 小时 | `src/scnet/p004/sixm3.c --deep3` + `logs/scnet/p004/sixm3_deep3_k6_all64.log` | 归档 |
 | 7g | 五个已知 134,753 集（论文/重排/9pair17/r1c19/r2c3）各跑完整 k≤5，全部 `complete=1 found=0` | 完备（限 k≤5、限这五个点集） | `src/scnet/p004/sixm3.c` + `logs/scnet/p004/sixm3_k5_five_sets_2026-11-02.log` | 归档 |
+| 7h | C7⁵ 交换并行化：k=3..6 节点数与串行逐位一致，8 线程 5.86×；k=9 单首点 576 万节点、全量估计 ≥1.6×10^10（未跑完） | k≤6 完备（同 7d）；k=9 只有成本边界 | `src/scnet/p004/xk_par.c` + `logs/scnet/p004/xk_k9_probe_2026-11-03.log` | 归档 |
 | 8 | 平台/中性重排 652,515 步后仍 0 可加点 | 启发式 | `src/scnet/p004/lns4.c` → `cc_10_7_134753_rearranged.txt` | 代码归档 |
 | 9 | 九对族 50 个候选在固定 X 下全部 UNSAT | 精确（限 50 个模型） | `sweep.py`（`optional_test`） | 归档 |
 | 10 | R2:patch 最少 17 空位 → 134,753 点（`1e69296d58d1…`） | 精确（限该模型） | `frontier9.py --variant R2 --x patch` | 归档 |

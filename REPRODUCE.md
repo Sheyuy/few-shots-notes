@@ -1816,6 +1816,7 @@ C7⁵ 上的 k-交换完备检查（对 367 点集；删 k 加 k+1）：
 
 ```bash
 g++ -O2 -std=c++17 src/scnet/p004/xk.c -o xk
+g++ -x c++ -std=c++17 -O3 src/scnet/p004/xk_par.c -o xk_par   # 并行版，无需 OpenMP
 ./xk 3    # NO_3_EXCHANGE nodes=3857
 ./xk 4    # NO_4_EXCHANGE nodes=57792
 ./xk 5    # NO_5_EXCHANGE nodes=777655
