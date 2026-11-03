@@ -35,12 +35,13 @@ K=8  CONNECTED_SETS size=9  union<=8  count=0 seconds=42.3
 K=9  CONNECTED_SETS size=10 union<=9  count=0 seconds=208.4
 K=10 CONNECTED_SETS size=11 union<=10 count=0 seconds=1010.2
 K=11 CONNECTED_SETS size=12 union<=11 count=0 seconds=4420.3   # 73.7 min
+K=12 CONNECTED_SETS size=13 union<=12 count=0 seconds=21724.0  # 6h02m (03:50-04:15 CST)
 
 ## 这些数字证明什么
-- R367 不存在“删 k 加 k+1”的 368 点独立集，k = 0..11。
+- R367 不存在“删 k 加 k+1”的 368 点独立集，k = 0..12。
   k=0 由直接检查给出：16,440 个外部点中 |T| 最小为 1（8 个点），无 |T|=0。
-  k=1..8 由完全版 DFS（xk.c / xk_par.c）穷尽；k=9,10,11 由本程序的连通枚举穷尽。
-- 因此任何 368 点独立集与 R367 的对称差至少 23 点（删 ≥11、加 ≥12）。
+  k=1..8 由完全版 DFS（xk.c / xk_par.c）穷尽；k=9..12 由本程序的连通枚举穷尽。
+- 因此任何 368 点独立集与 R367 的对称差至少 25 点（删 ≥12、加 ≥13）。
   等价地：从 R367 删 ≤11 个点的邻域内没有 368 点集。
 
 ## 这些数字不能证明什么
