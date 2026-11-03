@@ -1,0 +1,51 @@
+# xk7 · 连通 k-交换枚举（C7^5, R367）
+# 2026-11-03
+#
+# 源码: src/scnet/p004/xk7.cpp   md5 c6d9e6f6e5f7a6e1ac8cfd59b7e01ae6
+# 算法: 规范序枚举连通集。每步把当前集合扩展为“仍允许的最小下标邻接点”，
+#       并在该分支内禁掉所有更小的邻接候选 => 每个连通集恰好生成一次。
+#       完备性依赖: 若 |A|=K+1, |T(A)|<=K 的见证 A 不连通, 则其某个连通分量
+#       是 k'<K 的更小改进交换; 因此当所有 k'<K 已被排除时, 任何见证都连通。
+#
+# 机器 A: macOS 本地, Apple clang, 1-8 线程
+# 机器 B: SCNet 容器 ssh.zzai.scnet.cn:12399, Ubuntu 22.04, GCC 11.4.0,
+#         128 逻辑核但 cgroup 配额 15 核 (cpu.max = 1500000 100000), 503 GB RAM
+
+## 自测：暴力 vs 1 线程 vs 4 线程（同一 seed 20261103）
+$ ./xk7 --selftest 3000 7 6 3
+SELFTEST instances=3000 mismatches=0 positive=1842 total_connected_sets=11316 max_per_instance=112
+$ ./xk7 --selftest 2000 8 7 6
+SELFTEST instances=2000 mismatches=0 positive=1122 total_connected_sets=12824 max_per_instance=245
+$ ./xk7 --selftest 300 10 9 7
+SELFTEST instances=300 mismatches=0 positive=197 total_connected_sets=6689 max_per_instance=440
+
+合计 5,300 个随机实例、30,829 个连通集，暴力计数与两种线程数完全一致；
+其中 3,161 个实例计数为正（不是只测了空集）。
+
+## 真实实例 R367（论文集 367 点，n=16807）
+# 机器 A, 1 线程
+K=6 CONNECTED_SETS size=7  union<=6 count=0 seconds=8.4
+K=7 CONNECTED_SETS size=8  union<=7 count=0 seconds=50.3
+K=8 CONNECTED_SETS size=9  union<=8 count=0 seconds=258.6
+K=9 CONNECTED_SETS size=10 union<=9 count=0 seconds=1267.8   # 独立单线程构建 xk6, 交叉验证
+# 机器 A, 8 线程
+K=8 CONNECTED_SETS size=9  union<=8 count=0 seconds=48.4
+# 机器 B, 15 线程
+K=8  CONNECTED_SETS size=9  union<=8  count=0 seconds=42.3
+K=9  CONNECTED_SETS size=10 union<=9  count=0 seconds=208.4
+K=10 CONNECTED_SETS size=11 union<=10 count=0 seconds=1010.2
+
+## 这些数字证明什么
+- R367 不存在“删 k 加 k+1”的 368 点独立集，k = 0..10。
+  k=0 由直接检查给出：16,440 个外部点中 |T| 最小为 1（8 个点），无 |T|=0。
+  k=1..8 由完全版 DFS（xk.c / xk_par.c）穷尽；k=9,10 由本程序的连通枚举穷尽。
+- 因此任何 368 点独立集与 R367 的对称差至少 21 点（删 ≥10、加 ≥11）。
+  等价地：R367 的 10-邻域内没有 368 点集。
+
+## 这些数字不能证明什么
+- 不是 α(C7^5)=367。全局最优需要覆盖所有 367 点集，这里只覆盖 R367 一个。
+- 连通删减的正确性依赖“更小的 k 已排除”。若单独跑 K=9 而不先做 k<=8，
+  结论无效（程序里没有这个检查，需使用者保证）。
+- 自测覆盖的是随机小实例（m<=18, K<=7）；真实数据上找不到正例：R367 删 3 点后
+  完全版 DFS 能找到 4-集，但那是非连通见证（连通枚举给出 0），所以真实实例的
+  正例控制缺失，正确性只能靠随机自测 + 上面的定理。

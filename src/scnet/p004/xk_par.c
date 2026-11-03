@@ -3,7 +3,7 @@
 // first-level choice i0 is an independent subtree, claimed from a shared queue.
 //
 //   g++ -x c++ -std=c++17 -O3 xk_par.c -o xk_par      (no OpenMP needed)
-//   ./xk_par K cap i0lo i0hi [threads]
+//   ./xk_par K cap i0lo i0hi [threads] [R367.txt]
 //
 // Node counts are exactly xk.c's minus the root node; verified for k=3..6.
 #include <cstdio>
@@ -63,7 +63,7 @@ void dfs(St& s,int start){
     }
 }
 int main(int argc,char**argv){
-    const char* path="/Users/shiny/.sclaw/workspace/few-shots-notes/src/scnet/p004/R367.txt";
+    const char* path=argc>6?argv[6]:"R367.txt";   // 6th arg: path to R367.txt
     K=argc>1?atoi(argv[1]):3;
     cap=argc>2?atoll(argv[2]):2000000000000LL;
     int lo=argc>3?atoi(argv[3]):0;

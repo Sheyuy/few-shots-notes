@@ -18,6 +18,7 @@ C7 香农容量：C7<sup>⊠10</sup> 的独立集。本目录是这一轮全部�
 | `root_scan.py` | 50 个“第 9 对候选”逐个建族求根；全部在结构检查处被拒 | OR-Tools |
 | `xk.c` | C7⁵ 上对 367 点集做完备的 k-交换检查（删 k 加 k+1），k ≤ 6 全无 | g++ ≥ 11 |
 | `xk_par.c` | 同上，按首点并行的版本（`std::thread`，无需 OpenMP）；节点数与 `xk.c` 逐位一致 | g++ ≥ 11 |
+| `xk7.cpp` | **连通枚举**：规范序生成每个连通集恰好一次，把 k=9/10 从“≥1.6×10^10 节点”降到分钟级；`--selftest N m0 mrange kmax` 用暴力对拍 | g++ ≥ 11 |
 | `d9_scan.py` | 论文 8 对 + 50 个第 9 对候选 × 29 种 `J0` = 1,450 个 134,770 构造，全部非独立 | 仅标准库 |
 | `emit_class.py` | 把检查点里的某一类还原成显式 134,753 点集并跑官方 verifier | OR-Tools |
 | `sixm3.c` | 审计重写的 k→k+1 交换排除（C++17，OpenMP），自检 + 完备性标志；`--deep6` 打开 rank-4 锚点层，`--deep3` 打开 rank-3 锚点层，`--conn6` 打开连通 6-集，`--shard i/n` 分片覆盖 | g++ ≥ 11 |
@@ -96,12 +97,38 @@ g++ -x c++ -std=c++17 -O3 -fopenmp /tmp/lns4_all.cpp -o lns4
 在 macOS 上没有 libomp 时，可以用一个声明 `omp_*` 的临时桩文件串行编译，用于
 只验证逻辑/自检；性能数字必须在 Linux + `-fopenmp` 上重跑。
 
+## 连通枚举（xk7）
+
+```bash
+g++ -x c++ -std=c++17 -O3 xk7.cpp -o xk7 -pthread
+
+# 暴力 vs 1 线程 vs 4 线程，同一 seed；三个配置合计 5,300 个实例
+./xk7 --selftest 3000 7 6 3
+# SELFTEST instances=3000 mismatches=0 positive=1842 total_connected_sets=11316 max_per_instance=112
+./xk7 --selftest 2000 8 7 6
+# SELFTEST instances=2000 mismatches=0 positive=1122 total_connected_sets=12824 max_per_instance=245
+./xk7 --selftest 300 10 9 7
+# SELFTEST instances=300 mismatches=0 positive=197 total_connected_sets=6689 max_per_instance=440
+
+# 真实实例：需要 R367 为 367 行的 C7^5 点表（5 个 0..6 的十进制数一行）
+./xk7 9 15 R367.txt
+# K=9 m=16377 threads=15 connected=1
+# CONNECTED_SETS size=10 union<=9 count=0 seconds=208.4
+```
+
+`xk7` **不检查**“更小的 k 已排除”。它只枚举连通见证，完备性靠定理：
+若某个见证不连通，它的一个连通分量就是更小的改进交换。所以跑 `K` 之前必须先
+穷尽 `0..K-1`（本项目里 k ≤ 8 由 `xk.c`/`xk_par.c` 给出，k=0 由直接检查给出）。
+
 ## 结论边界
 
 - `sixm3` 的 k ≤ 5 完备性在**两个** 134,753 点集上成立（论文集、rearranged 集），
   都 `found=0`、`truncations=0`。这是“这两个集合没有 k→k+1 交换”，不是全局下界。
-- k=6 跑了自然 6-集、rank-5 单扩展，以及 rank-4 锚点层（64 个分片、6.44 亿实例，
-  全部 `complete=1 found=0`）。**秩恰为 3 的 6-集与连通 6-集未跑**，不能说 k=6 已排除。
+- k=6 跑了自然 6-集、rank-5 单扩展、rank-4 锚点层（64 个分片、6.44 亿实例）、
+  rank-3 锚点层（64 个分片、17.5 亿实例）和连通 6-集（3,759 万个去重集合），
+  全部 `complete=1 found=0`。这五个阶段仍不等于“所有 6-集”，k=6 的覆盖面按阶段陈述。
+- `xk7` 的 k=9/10 完备性只到“R367 的局部邻域”：它给不出 `α(C7⁵)=367`，
+  也不排除其他 367 点集旁边的 368 点集。
 - 旧目录里的 `quad45.c/tri45b.c/five6.c/five6b.c/pair5.c` 有 15 位键打包溢出、
   C 负数取模的邻接错误、候选索引错配、容量静默截断和 P5/K1,4 覆盖缺口。
   它们此前的 k≤5“完备”结论已作废；本目录的 `sixm3.c` 是替代实现。
