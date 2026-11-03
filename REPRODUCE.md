@@ -1843,6 +1843,18 @@ cd src/scnet/p004
 # 含 k=3..5 的重建，约 2 分 26 秒；内存峰值约 3.9 GB
 ```
 
+五个已知 134,753 集的 k≤5 复核（论文集与重排集见上，这里补另外三个）：
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+cd src/scnet/p004
+for f in cc_10_7_134753_9pair17 cc_10_7_134753_r1c19 cc_10_7_134753_r2c3; do
+  ./sixm3 --input ../../../data/scnet/p004/$f.txt --max-k 5 --threads 8 --seconds 600 \
+    | tail -2
+done
+# 各约 380–395 秒：COMPLETE exchanges_up_to=5 no_improvement=1 / RESULT ... "found":0
+```
+
 rank-3 锚点层（任意深度求并）：
 
 ```bash

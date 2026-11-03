@@ -169,3 +169,16 @@ SHARD_STAGE_DONE k=6 shard=0/64
 `found=0`、`rc=0`，无 `ERROR`；每片约 117 秒，全部约 2.1 小时（8 线程）。
 枚举方式：以每个 3 点 blocker 为锚，逐层与共享一个点的 2/3 点 blocker 求并
 （每次至少加 1 点、并集 ≤ 6），按大小 BFS 去重，大小为 6 的直接检查。
+
+## `sixm3_k5_five_sets_2026-11-02.log`
+
+对另外三个已验证的 134,753 集各跑一遍完整 k ≤ 5（`--max-k 5 --threads 8`）：
+
+| 集合 | 用时 | 结果 |
+| --- | --- | --- |
+| `9pair17` | 394.6 s | `complete=1 found=0` |
+| `r1c19` | 380.0 s | `complete=1 found=0` |
+| `r2c3` | 386.0 s | `complete=1 found=0` |
+
+33 个 `complete=1` 阶段、0 个 `complete=0`、0 个 `found=1`，三个 `rc=0`。
+连同论文集与重排集，五个已知 134,753 集在 k ≤ 5 邻域内均无改进。

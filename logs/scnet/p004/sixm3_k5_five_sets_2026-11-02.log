@@ -1,0 +1,115 @@
+===== SET cc_10_7_134753_9pair17
+SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
+SHARD {"index":0,"count":1,"deep6":0}
+MASK_SELFTEST random_pairs=100000 PASS baseline=134753
+COUNTS m0=0 m1=5762 m2=142261 m3=990747 m4=2116319 m5=2530159 m6=3160126 blocker_mismatches=0 truncations=0
+KEYS rank1=5740 rank2=133921 rank3=956498 rank4=2060329 rank5=2456265 rank6=2965693 max_multiplicity=6 linked_records=8945374
+STAGE natural_k1 sets_or_anchor_instances=5740 eligible=22 max_pool=2 complete=1 found=0
+SAMPLE {"label":"natural_k1","removed":[206489948],"pool":[206489905]}
+COMPLETE exchanges_up_to=1 no_improvement=1
+STAGE natural_k2 sets_or_anchor_instances=133921 eligible=2166 max_pool=6 complete=1 found=0
+SAMPLE {"label":"natural_k2","removed":[164858407,164859099],"pool":[164858750]}
+COMPLETE exchanges_up_to=2 no_improvement=1
+STAGE natural_k3 sets_or_anchor_instances=956498 eligible=23102 max_pool=10 complete=1 found=0
+SAMPLE {"label":"natural_k3","removed":[141186415,152816859,153438718],"pool":[146951216]}
+CONNECTED_PAIR_SETS k=3 generated=685083 unique=342276 truncated=0
+STAGE connected_pair_k3 sets_or_anchor_instances=342276 eligible=10527 max_pool=10 complete=1 found=0
+SAMPLE {"label":"connected_pair_k3","removed":[127998321,127998418,127999001],"pool":[127998369,127998663,127998664]}
+COMPLETE exchanges_up_to=3 no_improvement=1
+STAGE natural_k4 sets_or_anchor_instances=2060329 eligible=99641 max_pool=15 complete=1 found=0
+SAMPLE {"label":"natural_k4","removed":[136011501,136013446,136013886,136015910],"pool":[136013495,136013502,136015903,136015952]}
+STAGE rank3_extensions_k4 sets_or_anchor_instances=8828949 eligible=309574 max_pool=15 complete=1 found=0
+CONNECTED_PAIR_SETS k=4 generated=2952169 unique=1288921 truncated=0
+STAGE connected_pair_k4 sets_or_anchor_instances=1288921 eligible=123448 max_pool=14 complete=1 found=0
+SAMPLE {"label":"connected_pair_k4","removed":[125734999,125747004,161970891,161982896],"pool":[125749405,161985297,166912149,166924154,166926555]}
+COMPLETE exchanges_up_to=4 no_improvement=1
+STAGE natural_k5 sets_or_anchor_instances=2456265 eligible=147807 max_pool=20 complete=1 found=0
+SAMPLE {"label":"natural_k5","removed":[99027799,99767307,127986260,135263691,179751820],"pool":[99868149,134440148,134456955,140221756]}
+STAGE rank4_extensions_k5 sets_or_anchor_instances=25354295 eligible=1634667 max_pool=21 complete=1 found=0
+STAGE rank3_extensions_k5 sets_or_anchor_instances=175568747 eligible=7738703 max_pool=21 complete=1 found=0
+CONNECTED_PAIR_SETS k=5 generated=16152423 unique=6176562 truncated=0
+STAGE connected_pair_k5 sets_or_anchor_instances=6176562 eligible=1134359 max_pool=21 complete=1 found=0
+SAMPLE {"label":"connected_pair_k5","removed":[114826571,114836119,114838619,177415839,189046283],"pool":[114838576,114840977,148692676,183180640]}
+COMPLETE exchanges_up_to=5 no_improvement=1
+RESULT {"status":"completed","max_k_completed":5,"requested_max_k":5,"found":0,"truncations":0}
+real 394.63
+user 384.43
+sys 5.93
+DONE cc_10_7_134753_9pair17 rc=0
+===== SET cc_10_7_134753_r1c19
+SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
+SHARD {"index":0,"count":1,"deep6":0}
+MASK_SELFTEST random_pairs=100000 PASS baseline=134753
+COUNTS m0=0 m1=5766 m2=142590 m3=990928 m4=2116750 m5=2530740 m6=3160870 blocker_mismatches=0 truncations=0
+KEYS rank1=5749 rank2=134213 rank3=956622 rank4=2060495 rank5=2456449 rank6=2965955 max_multiplicity=6 linked_records=8947644
+STAGE natural_k1 sets_or_anchor_instances=5749 eligible=17 max_pool=2 complete=1 found=0
+SAMPLE {"label":"natural_k1","removed":[240810908],"pool":[206339751]}
+COMPLETE exchanges_up_to=1 no_improvement=1
+STAGE natural_k2 sets_or_anchor_instances=134213 eligible=2190 max_pool=6 complete=1 found=0
+SAMPLE {"label":"natural_k2","removed":[125735567,161971459],"pool":[166912717]}
+COMPLETE exchanges_up_to=2 no_improvement=1
+STAGE natural_k3 sets_or_anchor_instances=956622 eligible=23085 max_pool=10 complete=1 found=0
+SAMPLE {"label":"natural_k3","removed":[141927481,146045196,153440276],"pool":[146868739]}
+CONNECTED_PAIR_SETS k=3 generated=689280 unique=344379 truncated=0
+STAGE connected_pair_k3 sets_or_anchor_instances=344379 eligible=10600 max_pool=10 complete=1 found=0
+SAMPLE {"label":"connected_pair_k3","removed":[130922352,130922704,130922739],"pool":[130922703,130922738]}
+COMPLETE exchanges_up_to=3 no_improvement=1
+STAGE natural_k4 sets_or_anchor_instances=2060495 eligible=100063 max_pool=15 complete=1 found=0
+SAMPLE {"label":"natural_k4","removed":[136010644,136010688,136011373,136013446],"pool":[136011030,136011037,136013439]}
+STAGE rank3_extensions_k4 sets_or_anchor_instances=8844977 eligible=308542 max_pool=15 complete=1 found=0
+CONNECTED_PAIR_SETS k=4 generated=2986550 unique=1303592 truncated=0
+STAGE connected_pair_k4 sets_or_anchor_instances=1303592 eligible=125183 max_pool=14 complete=1 found=0
+SAMPLE {"label":"connected_pair_k4","removed":[125733390,125749567,160103075,161969282],"pool":[125631918,125749910,160220724,166910540]}
+COMPLETE exchanges_up_to=4 no_improvement=1
+STAGE natural_k5 sets_or_anchor_instances=2456449 eligible=148166 max_pool=20 complete=1 found=0
+SAMPLE {"label":"natural_k5","removed":[86589118,94690092,139178221,167901384,175414113],"pool":[134236963]}
+STAGE rank4_extensions_k5 sets_or_anchor_instances=25385546 eligible=1639811 max_pool=21 complete=1 found=0
+STAGE rank3_extensions_k5 sets_or_anchor_instances=176139305 eligible=7718223 max_pool=21 complete=1 found=0
+CONNECTED_PAIR_SETS k=5 generated=16431718 unique=6278936 truncated=0
+STAGE connected_pair_k5 sets_or_anchor_instances=6278936 eligible=1153715 max_pool=21 complete=1 found=0
+SAMPLE {"label":"connected_pair_k5","removed":[108421016,144644896,144656908,188189545,188203845],"pool":[109244559,144642495,147850238,149598166,188203895]}
+COMPLETE exchanges_up_to=5 no_improvement=1
+RESULT {"status":"completed","max_k_completed":5,"requested_max_k":5,"found":0,"truncations":0}
+real 380.03
+user 371.84
+sys 5.16
+DONE cc_10_7_134753_r1c19 rc=0
+===== SET cc_10_7_134753_r2c3
+SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
+SHARD {"index":0,"count":1,"deep6":0}
+MASK_SELFTEST random_pairs=100000 PASS baseline=134753
+COUNTS m0=0 m1=5747 m2=142454 m3=990874 m4=2116614 m5=2530587 m6=3160763 blocker_mismatches=0 truncations=0
+KEYS rank1=5737 rank2=134085 rank3=956588 rank4=2060398 rank5=2456345 rank6=2965970 max_multiplicity=6 linked_records=8947039
+STAGE natural_k1 sets_or_anchor_instances=5737 eligible=10 max_pool=2 complete=1 found=0
+SAMPLE {"label":"natural_k1","removed":[207675893],"pool":[207673786]}
+COMPLETE exchanges_up_to=1 no_improvement=1
+STAGE natural_k2 sets_or_anchor_instances=134085 eligible=2098 max_pool=6 complete=1 found=0
+SAMPLE {"label":"natural_k2","removed":[164849888,164854304],"pool":[164851903]}
+COMPLETE exchanges_up_to=2 no_improvement=1
+STAGE natural_k3 sets_or_anchor_instances=956588 eligible=22979 max_pool=10 complete=1 found=0
+SAMPLE {"label":"natural_k3","removed":[141180156,152810600,153432459],"pool":[146944957]}
+CONNECTED_PAIR_SETS k=3 generated=687138 unique=343311 truncated=0
+STAGE connected_pair_k3 sets_or_anchor_instances=343311 eligible=9954 max_pool=10 complete=1 found=0
+SAMPLE {"label":"connected_pair_k3","removed":[127996194,127998286,127998971],"pool":[127998588,127998628,127998629]}
+COMPLETE exchanges_up_to=3 no_improvement=1
+STAGE natural_k4 sets_or_anchor_instances=2060398 eligible=99824 max_pool=15 complete=1 found=0
+SAMPLE {"label":"natural_k4","removed":[136009940,136010380,136012096,136012404],"pool":[136012397]}
+STAGE rank3_extensions_k4 sets_or_anchor_instances=8838954 eligible=305721 max_pool=15 complete=1 found=0
+CONNECTED_PAIR_SETS k=4 generated=2968414 unique=1296313 truncated=0
+STAGE connected_pair_k4 sets_or_anchor_instances=1296313 eligible=120037 max_pool=14 complete=1 found=0
+SAMPLE {"label":"connected_pair_k4","removed":[125734904,160088412,161970796,196324304],"pool":[125617255,160206061,166912054,196441953]}
+COMPLETE exchanges_up_to=4 no_improvement=1
+STAGE natural_k5 sets_or_anchor_instances=2456345 eligible=148160 max_pool=20 complete=1 found=0
+SAMPLE {"label":"natural_k5","removed":[99036293,99775801,127994754,135272185,179760314],"pool":[99876643,134448642,134465449,140230250]}
+STAGE rank4_extensions_k5 sets_or_anchor_instances=25375174 eligible=1632404 max_pool=21 complete=1 found=0
+STAGE rank3_extensions_k5 sets_or_anchor_instances=175941722 eligible=7637301 max_pool=21 complete=1 found=0
+CONNECTED_PAIR_SETS k=5 generated=16303131 unique=6235937 truncated=0
+STAGE connected_pair_k5 sets_or_anchor_instances=6235937 eligible=1120156 max_pool=21 complete=1 found=0
+SAMPLE {"label":"connected_pair_k5","removed":[114826990,114836313,114838953,114838997,114841467],"pool":[114838659,114839003,114841354,114841396,114841460]}
+COMPLETE exchanges_up_to=5 no_improvement=1
+RESULT {"status":"completed","max_k_completed":5,"requested_max_k":5,"found":0,"truncations":0}
+real 385.98
+user 377.89
+sys 5.07
+DONE cc_10_7_134753_r2c3 rc=0
+ALL_DONE
