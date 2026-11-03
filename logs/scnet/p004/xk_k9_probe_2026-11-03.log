@@ -26,3 +26,14 @@ $ ./xk_par 9 ... 8000 8032 8      # killed at 900 s, no RESULT line
 # CP-SAT attempt (k=8 sanity check, model should be INFEASIBLE)
 k=8 candidates=16178 maxT=8 vars a=16178 u=367 conflicts=1884179
 status=UNKNOWN wall=120.1s conflicts=2200 branches=399020
+
+# connectivity statistic (xk4.cpp, instrumented copy of xk_par.c)
+$ ./xk4 6 ... -> NO_6_EXCHANGE nodes=9540881 seconds=71.4
+NODESTAT nodes=9540881 connected=97026        # 1.02% of visited partial sets have a
+                                              # connected (A, T(A)) bipartite graph
+# Any *minimal* improving exchange must be connected (a disconnected one splits into
+# two exchanges, one of them improving with smaller k; k<=8 is already excluded).
+# So a correct connected-set enumeration could cut the k=9 tree by ~2 orders of
+# magnitude.  Two ESU-style prototypes were written and both FAILED the brute-force
+# self-test on random small instances (e.g. 34 vs 19, 46 vs 37), so nothing of that
+# kind is archived or used for any claim.
