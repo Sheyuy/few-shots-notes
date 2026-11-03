@@ -761,7 +761,7 @@ python3 src/kimi/p005/extract_sat_cap.py \
 
 ### 12.5 坐标平面加强和无二支撑第三分区
 
-生成器第四个可选参数 `coordinate_planes` 控制是否加入全部 20,412 个坐标平面；第五个参数 `forbid_support2` 控制是否禁用全部支撑 2 点。不需要额外固定点时将第三个参数写为 `-1`。
+生成器第三个可选参数（`argv[4]`）`coordinate_planes` 控制是否加入全部 20,412 个坐标平面；第四个可选参数（`argv[5]`）`forbid_support2` 控制是否禁用全部支撑 2 点。不需要额外固定点时将第二个可选参数（`argv[3]`）写为 `-1`。
 
 ```bash
 # 重放无二支撑基点的确定性随机搜索；NumPy 即可，使用单线程 BLAS。
@@ -1292,7 +1292,7 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 
 ### 12.20 全局三维排序网络与固定 176 点层分支
 
-全局生成器第八个可选参数为 `coordinate_flats3_max_free`。无二、三支撑分区取阈值 20，对 2,240 个含 20 个自由点的坐标三维子空间加入至多 9 点排序网络。正对照、回读和主模型如下：
+全局生成器第七个可选参数（`argv[8]`）为 `coordinate_flats3_max_free`。无二、三支撑分区取阈值 20，对 2,240 个含 20 个自由点的坐标三维子空间加入至多 9 点排序网络。正对照、回读和主模型如下：
 
 ```bash
 "$R/gen_global_sat" "$R/global9-no2-no3-planes-flats3-control.cnf" \
@@ -1531,7 +1531,7 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 
 ### 12.29 四维子空间切割与固定 168 点层精确 177
 
-全局生成器第九个可选参数为 `coordinate_flats4_max_free`。以下模型同时使用三维阈值 26 和四维阈值 48：
+全局生成器第八个可选参数（`argv[9]`）为 `coordinate_flats4_max_free`。以下模型同时使用三维阈值 26 和四维阈值 48：
 
 ```bash
 "$R/gen_global_sat" "$R/global9-no2-no3-flats3max26-flats4max48-control.cnf" \
