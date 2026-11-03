@@ -22099,3 +22099,1148 @@ c [distill-long-irred] budget(M): 1.92 used(M): 2.14 T: 0.18 T-out: Y T-r: -11.9
 c [reduce] 1038 confl: 22279998 red: 145828->113515 cands: 43085 rem: 32313 next: +32218 T: 0.03
 c [reduce]   rem t1/t2/t3: 0/648/31665 live t1/t2/t3: 34151/16442/95235 tiers: 2/6
 c [reduce]   kept-used: 102675 kept-keep: 0 locked: 68 likely-kept lim glue/size: 3/10
+c [sls] 1472794 cls, minimum 1010 T: 0.86
+c rst   foc    W  vmt 533427 22288K   12957 1459K 13434   13.81   13.71  122K     0     0   968   41.38   41.07
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.27%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.09%
+c [distill] watch-based irred-- cl tried     2277 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2246 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 282/8982 cl-rem: 17 cl-sh: 4 lit-rem: 4 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.00 used(M): 9.09 T: 0.10 T-out: Y T-r: -1.07%
+c [distill-long-irred] cls tried: 16/2103 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.10 used(M): 2.23 T: 0.17 T-out: Y T-r: -6.08%
+c [distill-long-irred] cls tried: 12/1753 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.75 used(M): 2.12 T: 0.16 T-out: Y T-r: -21.25%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.25
+c [intree] Set 0 vars hyper-added: 4847 trans-irred: 0 trans-red: 357 budget(M): 488.95 used(M): 251.91 T: 0.65 T-out: N T-r: 48.48%
+c [distill-long-red0] cls tried: 495/19958 cl-rem: 42 cl-sh: 17 lit-rem: 31 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.32 used(M): 27.47 T: 0.31 T-out: Y T-r: -0.64%
+c [distill-long-irred] cls tried: 49/6387 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.39 used(M): 6.68 T: 0.22 T-out: Y T-r: -4.56%
+c [distill-long-irred] cls tried: 40/5323 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.32 used(M): 5.70 T: 0.21 T-out: Y T-r: -7.06%
+c [reduce] 1039 confl: 22312217 red: 145674->113626 cands: 42731 rem: 32048 next: +32233 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/420/31628 live t1/t2/t3: 34291/16158/95225 tiers: 2/6
+c [reduce]   kept-used: 102878 kept-keep: 0 locked: 65 likely-kept lim glue/size: 3/10
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.32%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.16%
+c [distill] watch-based irred-- cl tried     2306 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2530 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [hyper-bin-clean] removed: 4490 of: 12636 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 322/11073 cl-rem: 22 cl-sh: 11 lit-rem: 23 0-depth-ass: 0
+c [distill-long-red0] budget(M): 11.10 used(M): 11.24 T: 0.10 T-out: Y T-r: -1.38%
+c [distill-long-irred] cls tried: 16/2593 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.59 used(M): 2.78 T: 0.16 T-out: Y T-r: -7.21%
+c [distill-long-irred] cls tried: 10/2161 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.16 used(M): 2.44 T: 0.15 T-out: Y T-r: -12.71%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-long-red0] cls tried: 306/9609 cl-rem: 12 cl-sh: 7 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.62 used(M): 9.77 T: 0.11 T-out: Y T-r: -1.70%
+c [distill-long-irred] cls tried: 13/2249 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.25 used(M): 2.78 T: 0.17 T-out: Y T-r: -23.72%
+c [distill-long-irred] cls tried: 15/1874 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.87 used(M): 2.21 T: 0.17 T-out: Y T-r: -17.81%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.21%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.03%
+c [distill] watch-based irred-- cl tried     2259 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     1826 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1040 confl: 22344452 red: 145823->113873 cands: 42600 rem: 31950 next: +32249 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/308/31642 live t1/t2/t3: 34413/16168/95242 tiers: 2/6
+c [reduce]   kept-used: 103157 kept-keep: 0 locked: 66 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 293/9815 cl-rem: 23 cl-sh: 4 lit-rem: 5 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.84 used(M): 10.04 T: 0.10 T-out: Y T-r: -2.11%
+c [distill-long-irred] cls tried: 13/2300 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.30 used(M): 2.53 T: 0.19 T-out: Y T-r: -10.23%
+c [distill-long-irred] cls tried: 12/1916 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.92 used(M): 2.14 T: 0.19 T-out: Y T-r: -11.58%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.13%
+c [distill] watch-based irred-- cl tried     2347 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2026 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.25
+c [intree] Set 0 vars hyper-added: 4810 trans-irred: 0 trans-red: 362 budget(M): 489.24 used(M): 245.41 T: 0.56 T-out: N T-r: 49.84%
+c [distill-long-red0] cls tried: 442/19950 cl-rem: 50 cl-sh: 10 lit-rem: 10 0-depth-ass: 0
+c [distill-long-red0] budget(M): 26.51 used(M): 26.74 T: 0.30 T-out: Y T-r: -0.95%
+c [distill-long-irred] cls tried: 47/6197 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.20 used(M): 6.40 T: 0.23 T-out: Y T-r: -3.26%
+c [distill-long-irred] cls tried: 40/5164 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.16 used(M): 5.30 T: 0.19 T-out: Y T-r: -2.61%
+c [reduce] 1041 confl: 22376703 red: 146048->114002 cands: 42728 rem: 32046 next: +32264 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/405/31641 live t1/t2/t3: 34528/16216/95304 tiers: 2/6
+c [reduce]   kept-used: 103262 kept-keep: 0 locked: 58 likely-kept lim glue/size: 3/10
+c [hyper-bin-clean] removed: 4448 of: 12482 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 295/10715 cl-rem: 29 cl-sh: 4 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.74 used(M): 10.92 T: 0.11 T-out: Y T-r: -1.75%
+c [distill-long-irred] cls tried: 18/2511 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.51 used(M): 2.63 T: 0.15 T-out: Y T-r: -4.90%
+c [distill-long-irred] cls tried: 16/2093 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.09 used(M): 2.38 T: 0.15 T-out: Y T-r: -13.99%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.21%
+c [distill] watch-based irred-- cl tried     2302 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2078 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 254/9541 cl-rem: 17 cl-sh: 5 lit-rem: 10 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.56 used(M): 9.83 T: 0.14 T-out: Y T-r: -2.94%
+c [distill-long-irred] cls tried: 15/2234 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.23 used(M): 2.32 T: 0.18 T-out: Y T-r: -3.77%
+c [distill-long-irred] cls tried: 12/1861 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.86 used(M): 2.04 T: 0.16 T-out: Y T-r: -9.83%
+c [reduce] 1042 confl: 22408967 red: 146219->114581 cands: 42185 rem: 31638 next: +32280 T: 0.04
+c [reduce]   rem t1/t2/t3: 0/0/31638 live t1/t2/t3: 34661/16166/95392 tiers: 2/6
+c [reduce]   kept-used: 103992 kept-keep: 0 locked: 42 likely-kept lim glue/size: 7/17
+c [distill-long-red0] cls tried: 275/9109 cl-rem: 22 cl-sh: 5 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.13 used(M): 9.18 T: 0.11 T-out: Y T-r: -0.60%
+c [distill-long-irred] cls tried: 11/2134 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.13 used(M): 2.54 T: 0.19 T-out: Y T-r: -19.18%
+c [distill-long-irred] cls tried: 12/1778 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.78 used(M): 2.04 T: 0.18 T-out: Y T-r: -14.56%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.16%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.01%
+c [distill] watch-based irred-- cl tried     2285 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2267 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 291/8857 cl-rem: 19 cl-sh: 3 lit-rem: 3 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.88 used(M): 8.93 T: 0.11 T-out: Y T-r: -0.67%
+c [distill-long-irred] cls tried: 12/2075 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.08 used(M): 2.49 T: 0.19 T-out: Y T-r: -19.81%
+c [distill-long-irred] cls tried: 12/1729 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.73 used(M): 1.89 T: 0.17 T-out: Y T-r: -9.62%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.24
+c [intree] Set 0 vars hyper-added: 4796 trans-irred: 0 trans-red: 289 budget(M): 481.81 used(M): 257.07 T: 0.64 T-out: N T-r: 46.64%
+c [reduce] 1043 confl: 22441249 red: 146822->114765 cands: 42743 rem: 32057 next: +32295 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/264/31793 live t1/t2/t3: 34775/16542/95505 tiers: 2/6
+c [reduce]   kept-used: 104030 kept-keep: 0 locked: 49 likely-kept lim glue/size: 4/10
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.31%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.11%
+c [distill] watch-based irred-- cl tried     2276 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2841 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 508/19921 cl-rem: 79 cl-sh: 26 lit-rem: 30 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.18 used(M): 27.18 T: 0.25 T-out: Y T-r: -0.10%
+c [distill-long-irred] cls tried: 34/6353 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.35 used(M): 6.59 T: 0.23 T-out: Y T-r: -3.72%
+c [distill-long-irred] cls tried: 40/5294 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.29 used(M): 5.44 T: 0.21 T-out: Y T-r: -2.75%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.60% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [hyper-bin-clean] removed: 4507 of: 12376 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 313/10942 cl-rem: 13 cl-sh: 5 lit-rem: 8 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.96 used(M): 11.22 T: 0.12 T-out: Y T-r: -2.53%
+c [distill-long-irred] cls tried: 16/2560 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.56 used(M): 2.80 T: 0.17 T-out: Y T-r: -9.30%
+c [distill-long-irred] cls tried: 13/2134 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.13 used(M): 2.29 T: 0.16 T-out: Y T-r: -7.24%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.13%
+c [distill] watch-based irred-- cl tried     2137 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2112 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 292/9338 cl-rem: 5 cl-sh: 8 lit-rem: 17 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.34 used(M): 9.44 T: 0.13 T-out: Y T-r: -1.11%
+c [distill-long-irred] cls tried: 15/2184 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.18 used(M): 2.30 T: 0.19 T-out: Y T-r: -5.26%
+c [distill-long-irred] cls tried: 12/1820 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.82 used(M): 1.98 T: 0.16 T-out: Y T-r: -8.96%
+c [reduce] 1044 confl: 22473545 red: 146963->114928 cands: 42714 rem: 32035 next: +32310 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/299/31736 live t1/t2/t3: 34902/16665/95396 tiers: 2/6
+c [reduce]   kept-used: 104190 kept-keep: 0 locked: 59 likely-kept lim glue/size: 4/10
+c [distill-long-red0] cls tried: 276/9066 cl-rem: 16 cl-sh: 4 lit-rem: 6 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.08 used(M): 9.20 T: 0.10 T-out: Y T-r: -1.44%
+c [distill-long-irred] cls tried: 12/2123 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.12 used(M): 2.30 T: 0.16 T-out: Y T-r: -8.59%
+c [distill-long-irred] cls tried: 8/1769 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.77 used(M): 1.99 T: 0.15 T-out: Y T-r: -12.24%
+c rst   foc    F  vmt 542788 22489K   12957 1459K 13434   13.81   13.71  130K     0     0   968   42.32   42.02
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.01%
+c [distill] watch-based irred-- cl tried     2292 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2125 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.27
+c [intree] Set 0 vars hyper-added: 4830 trans-irred: 0 trans-red: 355 budget(M): 467.62 used(M): 265.67 T: 0.69 T-out: N T-r: 43.19%
+c [distill-long-red0] cls tried: 509/19953 cl-rem: 47 cl-sh: 16 lit-rem: 18 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.62 used(M): 27.87 T: 0.33 T-out: Y T-r: -0.97%
+c [distill-long-irred] cls tried: 39/6457 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.46 used(M): 6.75 T: 0.24 T-out: Y T-r: -4.62%
+c [distill-long-irred] cls tried: 31/5381 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.38 used(M): 5.77 T: 0.21 T-out: Y T-r: -7.30%
+c [reduce] 1045 confl: 22505858 red: 147177->114809 cands: 43158 rem: 32368 next: +32326 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/705/31663 live t1/t2/t3: 35052/16728/95397 tiers: 2/6
+c [reduce]   kept-used: 103989 kept-keep: 0 locked: 30 likely-kept lim glue/size: 3/10
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.60% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [hyper-bin-clean] removed: 4475 of: 12523 red-bins now: 968 T: 0.00
+c recursive minimization cost OK: 11979K cost/(% lits removed)
+c [distill-bin] useful/checked/potential: 0/6904/13434 lits-rem: 0 cl-rem: 0 0-depth-assigns: 0 T: 0.89 T-out: Y
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.13%
+c [distill] watch-based irred-- cl tried     2272 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2328 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 350/16726 cl-rem: 28 cl-sh: 7 lit-rem: 10 0-depth-ass: 0
+c [distill-long-red0] budget(M): 16.75 used(M): 16.90 T: 0.20 T-out: Y T-r: -0.97%
+c [distill-long-irred] cls tried: 20/3916 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 3.92 used(M): 4.27 T: 0.20 T-out: Y T-r: -8.96%
+c [distill-long-irred] cls tried: 23/3263 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 3.26 used(M): 3.36 T: 0.17 T-out: Y T-r: -3.06%
+c [distill-long-red0] cls tried: 299/10296 cl-rem: 7 cl-sh: 5 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.30 used(M): 10.48 T: 0.13 T-out: Y T-r: -1.80%
+c [distill-long-irred] cls tried: 12/2408 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.41 used(M): 2.94 T: 0.20 T-out: Y T-r: -22.26%
+c [distill-long-irred] cls tried: 11/2007 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.01 used(M): 2.26 T: 0.18 T-out: Y T-r: -12.53%
+c [reduce] 1046 confl: 22538187 red: 147102->115347 cands: 42341 rem: 31755 next: +32341 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/54/31701 live t1/t2/t3: 35155/16403/95544 tiers: 2/6
+c [reduce]   kept-used: 104705 kept-keep: 0 locked: 56 likely-kept lim glue/size: 5/16
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.12%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.34%
+c [distill] watch-based irred-- cl tried     2274 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2865 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 280/8928 cl-rem: 20 cl-sh: 10 lit-rem: 15 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.95 used(M): 9.15 T: 0.13 T-out: Y T-r: -2.41%
+c [distill-long-irred] cls tried: 10/2091 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.09 used(M): 2.32 T: 0.20 T-out: Y T-r: -10.97%
+c [distill-long-irred] cls tried: 10/1743 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.74 used(M): 2.08 T: 0.18 T-out: Y T-r: -19.64%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.24
+c [intree] Set 0 vars hyper-added: 4798 trans-irred: 0 trans-red: 341 budget(M): 551.10 used(M): 262.76 T: 0.69 T-out: N T-r: 52.32%
+c [distill-long-red0] cls tried: 480/19955 cl-rem: 45 cl-sh: 9 lit-rem: 11 0-depth-ass: 0
+c [distill-long-red0] budget(M): 28.02 used(M): 28.14 T: 0.33 T-out: Y T-r: -0.50%
+c [distill-long-irred] cls tried: 46/6550 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.55 used(M): 6.64 T: 0.23 T-out: Y T-r: -1.42%
+c [distill-long-irred] cls tried: 41/5459 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.46 used(M): 5.51 T: 0.22 T-out: Y T-r: -0.99%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.60% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.21%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.18%
+c [distill] watch-based irred-- cl tried     2231 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     1953 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1047 confl: 22570530 red: 147625->115254 cands: 43162 rem: 32371 next: +32357 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/623/31748 live t1/t2/t3: 35286/16752/95587 tiers: 2/6
+c [reduce]   kept-used: 104388 kept-keep: 0 locked: 75 likely-kept lim glue/size: 3/10
+c [hyper-bin-clean] removed: 4457 of: 12534 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 331/11270 cl-rem: 16 cl-sh: 5 lit-rem: 6 0-depth-ass: 0
+c [distill-long-red0] budget(M): 11.29 used(M): 11.58 T: 0.12 T-out: Y T-r: -2.74%
+c [distill-long-irred] cls tried: 15/2638 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.64 used(M): 3.10 T: 0.19 T-out: Y T-r: -17.65%
+c [distill-long-irred] cls tried: 14/2198 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.20 used(M): 2.54 T: 0.17 T-out: Y T-r: -15.60%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.05%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.07%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.08%
+c [distill] watch-based irred-- cl tried     2192 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     1989 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 285/9502 cl-rem: 17 cl-sh: 7 lit-rem: 9 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.52 used(M): 9.81 T: 0.14 T-out: Y T-r: -3.18%
+c [distill-long-irred] cls tried: 13/2225 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.23 used(M): 2.61 T: 0.22 T-out: Y T-r: -17.49%
+c [distill-long-irred] cls tried: 16/1854 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.85 used(M): 2.24 T: 0.18 T-out: Y T-r: -20.74%
+c [reduce] 1048 confl: 22602888 red: 147576->115271 cands: 43074 rem: 32305 next: +32372 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/516/31789 live t1/t2/t3: 35399/16527/95650 tiers: 2/6
+c [reduce]   kept-used: 104439 kept-keep: 0 locked: 63 likely-kept lim glue/size: 3/15
+c [distill-long-red0] cls tried: 312/9404 cl-rem: 32 cl-sh: 8 lit-rem: 11 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.44 used(M): 9.69 T: 0.10 T-out: Y T-r: -2.85%
+c [distill-long-irred] cls tried: 17/2205 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.21 used(M): 2.41 T: 0.17 T-out: Y T-r: -9.38%
+c [distill-long-irred] cls tried: 10/1838 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.84 used(M): 2.34 T: 0.16 T-out: Y T-r: -27.14%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.05%
+c [distill] watch-based irred-- cl tried     2218 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2208 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 275/9157 cl-rem: 13 cl-sh: 1 lit-rem: 1 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.17 used(M): 9.37 T: 0.11 T-out: Y T-r: -2.26%
+c [distill-long-irred] cls tried: 14/2143 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.14 used(M): 2.28 T: 0.17 T-out: Y T-r: -6.50%
+c [distill-long-irred] cls tried: 8/1786 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.79 used(M): 2.26 T: 0.15 T-out: Y T-r: -26.33%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.24
+c [intree] Set 0 vars hyper-added: 4836 trans-irred: 0 trans-red: 355 budget(M): 490.03 used(M): 252.15 T: 0.57 T-out: N T-r: 48.54%
+c [reduce] 1049 confl: 22635262 red: 147599->115001 cands: 43464 rem: 32598 next: +32388 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/821/31777 live t1/t2/t3: 35523/16371/95705 tiers: 2/6
+c [reduce]   kept-used: 104079 kept-keep: 0 locked: 56 likely-kept lim glue/size: 3/15
+c [distill-long-red0] cls tried: 462/19953 cl-rem: 47 cl-sh: 12 lit-rem: 12 0-depth-ass: 0
+c [distill-long-red0] budget(M): 26.59 used(M): 26.64 T: 0.24 T-out: Y T-r: -0.27%
+c [distill-long-irred] cls tried: 45/6216 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.22 used(M): 6.41 T: 0.20 T-out: Y T-r: -3.10%
+c [distill-long-irred] cls tried: 36/5180 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.18 used(M): 5.42 T: 0.19 T-out: Y T-r: -4.69%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.35%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.05%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.20%
+c [distill] watch-based irred-- cl tried     2315 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2510 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [hyper-bin-clean] removed: 4481 of: 12533 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 321/10625 cl-rem: 21 cl-sh: 3 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.65 used(M): 10.89 T: 0.16 T-out: Y T-r: -2.37%
+c [distill-long-irred] cls tried: 14/2488 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.49 used(M): 2.83 T: 0.20 T-out: Y T-r: -13.63%
+c [distill-long-irred] cls tried: 13/2074 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.07 used(M): 2.54 T: 0.19 T-out: Y T-r: -22.48%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.13%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.15%
+c [distill] watch-based irred-- cl tried     2214 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2033 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1050 confl: 22667650 red: 147320->115205 cands: 42820 rem: 32115 next: +32403 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/317/31798 live t1/t2/t3: 35651/15955/95714 tiers: 2/6
+c [reduce]   kept-used: 104458 kept-keep: 0 locked: 42 likely-kept lim glue/size: 3/15
+c [distill-long-red0] cls tried: 289/9753 cl-rem: 19 cl-sh: 10 lit-rem: 11 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.77 used(M): 9.89 T: 0.11 T-out: Y T-r: -1.36%
+c [distill-long-irred] cls tried: 11/2284 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.28 used(M): 2.75 T: 0.19 T-out: Y T-r: -20.41%
+c [distill-long-irred] cls tried: 9/1903 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.90 used(M): 2.24 T: 0.16 T-out: Y T-r: -17.60%
+c [distill-long-red0] cls tried: 297/9122 cl-rem: 16 cl-sh: 11 lit-rem: 14 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.14 used(M): 9.17 T: 0.12 T-out: Y T-r: -0.44%
+c [distill-long-irred] cls tried: 14/2136 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.14 used(M): 2.45 T: 0.19 T-out: Y T-r: -14.76%
+c [distill-long-irred] cls tried: 9/1780 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.78 used(M): 2.12 T: 0.18 T-out: Y T-r: -18.90%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c rst   foc    B  vmt 552266 22691K   12957 1459K 13434   13.81   13.71  138K     0     0   968   43.46   43.17
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.10%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.61%
+c [distill] watch-based irred-- cl tried     2200 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     1950 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.26
+c [intree] Set 0 vars hyper-added: 4817 trans-irred: 0 trans-red: 341 budget(M): 472.81 used(M): 257.10 T: 0.66 T-out: N T-r: 45.62%
+c [distill-long-red0] cls tried: 464/19963 cl-rem: 37 cl-sh: 6 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.50 used(M): 27.80 T: 0.32 T-out: Y T-r: -1.20%
+c [distill-long-irred] cls tried: 46/6427 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.43 used(M): 6.58 T: 0.25 T-out: Y T-r: -2.39%
+c [distill-long-irred] cls tried: 35/5356 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.36 used(M): 5.54 T: 0.22 T-out: Y T-r: -3.55%
+c [reduce] 1051 confl: 22700055 red: 147535->115238 cands: 43063 rem: 32297 next: +32419 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/498/31799 live t1/t2/t3: 35772/16017/95746 tiers: 2/6
+c [reduce]   kept-used: 104416 kept-keep: 0 locked: 56 likely-kept lim glue/size: 3/15
+c [hyper-bin-clean] removed: 4476 of: 12425 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 328/11430 cl-rem: 15 cl-sh: 9 lit-rem: 13 0-depth-ass: 0
+c [distill-long-red0] budget(M): 11.45 used(M): 11.67 T: 0.14 T-out: Y T-r: -2.08%
+c [distill-long-irred] cls tried: 16/2675 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.68 used(M): 3.00 T: 0.19 T-out: Y T-r: -12.28%
+c [distill-long-irred] cls tried: 13/2229 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.23 used(M): 2.57 T: 0.18 T-out: Y T-r: -15.20%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.24%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.07%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.15%
+c [distill] watch-based irred-- cl tried     2233 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2112 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 289/9060 cl-rem: 11 cl-sh: 5 lit-rem: 5 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.07 used(M): 9.40 T: 0.11 T-out: Y T-r: -3.72%
+c [distill-long-irred] cls tried: 14/2120 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.12 used(M): 2.46 T: 0.16 T-out: Y T-r: -16.12%
+c [distill-long-irred] cls tried: 11/1767 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.77 used(M): 1.99 T: 0.15 T-out: Y T-r: -12.65%
+c [reduce] 1052 confl: 22732475 red: 147631->115435 cands: 42928 rem: 32196 next: +32434 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/361/31835 live t1/t2/t3: 35904/15917/95810 tiers: 2/6
+c [reduce]   kept-used: 104645 kept-keep: 0 locked: 58 likely-kept lim glue/size: 3/15
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.05%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.12%
+c [distill] watch-based irred-- cl tried     2207 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2548 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 276/8838 cl-rem: 21 cl-sh: 2 lit-rem: 3 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.86 used(M): 9.08 T: 0.12 T-out: Y T-r: -2.61%
+c [distill-long-irred] cls tried: 8/2071 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.07 used(M): 2.42 T: 0.19 T-out: Y T-r: -16.76%
+c [distill-long-irred] cls tried: 11/1725 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.73 used(M): 1.95 T: 0.15 T-out: Y T-r: -13.15%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.22
+c [intree] Set 0 vars hyper-added: 4799 trans-irred: 0 trans-red: 332 budget(M): 471.64 used(M): 260.80 T: 0.61 T-out: N T-r: 44.70%
+c [distill-long-red0] cls tried: 482/19953 cl-rem: 47 cl-sh: 8 lit-rem: 8 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.12 used(M): 27.32 T: 0.32 T-out: Y T-r: -0.82%
+c [distill-long-irred] cls tried: 42/6339 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.34 used(M): 6.71 T: 0.24 T-out: Y T-r: -5.89%
+c [distill-long-irred] cls tried: 41/5282 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.28 used(M): 5.50 T: 0.21 T-out: Y T-r: -4.21%
+c [reduce] 1053 confl: 22764911 red: 147803->115597 cands: 42942 rem: 32206 next: +32449 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/340/31866 live t1/t2/t3: 36004/15973/95826 tiers: 2/6
+c [reduce]   kept-used: 104823 kept-keep: 0 locked: 38 likely-kept lim glue/size: 3/10
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 1
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.28%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.13%
+c [distill] watch-based irred-- cl tried     2223 cl-sh     0 cl-rem    1 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2877 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [hyper-bin-clean] removed: 4467 of: 12386 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 305/11043 cl-rem: 23 cl-sh: 4 lit-rem: 9 0-depth-ass: 0
+c [distill-long-red0] budget(M): 11.07 used(M): 11.26 T: 0.12 T-out: Y T-r: -1.83%
+c [distill-long-irred] cls tried: 15/2587 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.59 used(M): 2.78 T: 0.17 T-out: Y T-r: -7.52%
+c [distill-long-irred] cls tried: 16/2155 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.16 used(M): 2.36 T: 0.15 T-out: Y T-r: -9.64%
+c [distill-long-red0] cls tried: 305/9404 cl-rem: 13 cl-sh: 3 lit-rem: 4 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.42 used(M): 9.61 T: 0.13 T-out: Y T-r: -2.11%
+c [distill-long-irred] cls tried: 11/2201 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.20 used(M): 2.74 T: 0.19 T-out: Y T-r: -24.40%
+c [distill-long-irred] cls tried: 12/1834 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.83 used(M): 2.06 T: 0.18 T-out: Y T-r: -12.57%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.67%
+c [distill] watch-based irred-- cl tried     2232 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2107 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1054 confl: 22797360 red: 148009->115816 cands: 42924 rem: 32193 next: +32465 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/364/31829 live t1/t2/t3: 36101/16064/95844 tiers: 2/6
+c [reduce]   kept-used: 105038 kept-keep: 0 locked: 47 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 273/9349 cl-rem: 37 cl-sh: 3 lit-rem: 3 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.39 used(M): 9.70 T: 0.10 T-out: Y T-r: -3.41%
+c [distill-long-irred] cls tried: 9/2194 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.19 used(M): 2.63 T: 0.17 T-out: Y T-r: -19.89%
+c [distill-long-irred] cls tried: 10/1828 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.83 used(M): 2.30 T: 0.15 T-out: Y T-r: -26.01%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.10%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.07%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.17%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.15%
+c [distill] watch-based irred-- cl tried     2277 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2223 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 272/9155 cl-rem: 17 cl-sh: 4 lit-rem: 6 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.17 used(M): 9.25 T: 0.14 T-out: Y T-r: -0.93%
+c [distill-long-irred] cls tried: 12/2144 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.14 used(M): 2.48 T: 0.21 T-out: Y T-r: -15.79%
+c [distill-long-irred] cls tried: 10/1786 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.79 used(M): 2.12 T: 0.19 T-out: Y T-r: -18.60%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.27
+c [intree] Set 0 vars hyper-added: 4856 trans-irred: 0 trans-red: 379 budget(M): 489.51 used(M): 250.22 T: 0.68 T-out: N T-r: 48.88%
+c [reduce] 1055 confl: 22829825 red: 148224->116047 cands: 42903 rem: 32177 next: +32480 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/283/31894 live t1/t2/t3: 36206/16072/95946 tiers: 2/6
+c [reduce]   kept-used: 105229 kept-keep: 0 locked: 92 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 456/19932 cl-rem: 68 cl-sh: 13 lit-rem: 13 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.05 used(M): 27.27 T: 0.37 T-out: Y T-r: -0.89%
+c [distill-long-irred] cls tried: 40/6324 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.32 used(M): 6.64 T: 0.26 T-out: Y T-r: -5.07%
+c [distill-long-irred] cls tried: 32/5270 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.27 used(M): 5.44 T: 0.24 T-out: Y T-r: -3.19%
+c [distill-bin] useful/checked/potential: 0/7413/13434 lits-rem: 0 cl-rem: 0 0-depth-assigns: 0 T: 0.95 T-out: Y
+c [hyper-bin-clean] removed: 4477 of: 12536 red-bins now: 968 T: 0.00
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.30%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.19%
+c [distill] watch-based irred-- cl tried     2210 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2545 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 379/16806 cl-rem: 20 cl-sh: 5 lit-rem: 8 0-depth-ass: 0
+c [distill-long-red0] budget(M): 16.83 used(M): 16.90 T: 0.19 T-out: Y T-r: -0.51%
+c [distill-long-irred] cls tried: 26/3933 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 3.93 used(M): 4.11 T: 0.21 T-out: Y T-r: -4.52%
+c [distill-long-irred] cls tried: 28/3277 cl-rem: 0 cl-sh: 1 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 3.28 used(M): 3.42 T: 0.19 T-out: Y T-r: -4.45%
+c [reduce] 1056 confl: 22862305 red: 148438->116344 cands: 42792 rem: 32094 next: +32496 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/240/31854 live t1/t2/t3: 36320/16213/95905 tiers: 2/6
+c [reduce]   kept-used: 105566 kept-keep: 0 locked: 80 likely-kept lim glue/size: 4/10
+c [distill-long-red0] cls tried: 296/9859 cl-rem: 24 cl-sh: 2 lit-rem: 3 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.88 used(M): 10.15 T: 0.14 T-out: Y T-r: -2.83%
+c [distill-long-irred] cls tried: 14/2310 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.31 used(M): 2.66 T: 0.21 T-out: Y T-r: -15.16%
+c [distill-long-irred] cls tried: 13/1925 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.93 used(M): 2.31 T: 0.20 T-out: Y T-r: -19.83%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.18%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.17%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.21%
+c [distill] watch-based irred-- cl tried     2194 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2714 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 279/9379 cl-rem: 10 cl-sh: 4 lit-rem: 4 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.39 used(M): 9.52 T: 0.14 T-out: Y T-r: -1.55%
+c [distill-long-irred] cls tried: 14/2194 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.19 used(M): 2.39 T: 0.20 T-out: Y T-r: -9.14%
+c [distill-long-irred] cls tried: 12/1829 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.83 used(M): 2.02 T: 0.19 T-out: Y T-r: -10.40%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.27
+c [intree] Set 0 vars hyper-added: 4872 trans-irred: 0 trans-red: 401 budget(M): 550.06 used(M): 253.60 T: 0.68 T-out: N T-r: 53.89%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.17%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill] watch-based irred-- cl tried     2220 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2006 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [sls] 1472793 cls, minimum 1006 T: 0.93
+c rst   foc    W  vmt 561818 22894K   12957 1459K 13434   13.81   13.71  148K     0     0  5439   44.73   43.22
+c [distill-long-red0] cls tried: 460/19953 cl-rem: 47 cl-sh: 16 lit-rem: 19 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.22 used(M): 27.29 T: 0.34 T-out: Y T-r: -0.33%
+c [distill-long-irred] cls tried: 36/6362 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.36 used(M): 6.62 T: 0.26 T-out: Y T-r: -4.10%
+c [distill-long-irred] cls tried: 39/5302 cl-rem: 0 cl-sh: 1 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.30 used(M): 5.39 T: 0.23 T-out: Y T-r: -1.69%
+c [reduce] 1057 confl: 22894801 red: 148757->116253 cands: 43339 rem: 32504 next: +32511 T: 0.04
+c [reduce]   rem t1/t2/t3: 0/626/31878 live t1/t2/t3: 36438/16357/95962 tiers: 2/6
+c [reduce]   kept-used: 105380 kept-keep: 0 locked: 38 likely-kept lim glue/size: 3/10
+c [hyper-bin-clean] removed: 4471 of: 12565 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 311/11021 cl-rem: 15 cl-sh: 6 lit-rem: 13 0-depth-ass: 0
+c [distill-long-red0] budget(M): 11.04 used(M): 11.13 T: 0.12 T-out: Y T-r: -0.91%
+c [distill-long-irred] cls tried: 12/2580 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.58 used(M): 2.89 T: 0.18 T-out: Y T-r: -12.06%
+c [distill-long-irred] cls tried: 11/2150 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.15 used(M): 2.28 T: 0.16 T-out: Y T-r: -6.00%
+c recursive minimization cost OK: 12296K cost/(% lits removed)
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.12%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.13%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.31%
+c [distill] watch-based irred-- cl tried     2204 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2067 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 294/9483 cl-rem: 25 cl-sh: 10 lit-rem: 26 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.51 used(M): 9.57 T: 0.13 T-out: Y T-r: -0.71%
+c [distill-long-irred] cls tried: 12/2222 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.22 used(M): 2.54 T: 0.20 T-out: Y T-r: -14.50%
+c [distill-long-irred] cls tried: 9/1852 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.85 used(M): 2.11 T: 0.18 T-out: Y T-r: -14.14%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [reduce] 1058 confl: 22927313 red: 148723->115816 cands: 43877 rem: 32907 next: +32526 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/1024/31883 live t1/t2/t3: 36568/16131/96024 tiers: 2/6
+c [reduce]   kept-used: 104788 kept-keep: 0 locked: 58 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 279/8717 cl-rem: 18 cl-sh: 5 lit-rem: 11 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.74 used(M): 8.97 T: 0.12 T-out: Y T-r: -2.77%
+c [distill-long-irred] cls tried: 12/2042 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.04 used(M): 2.46 T: 0.19 T-out: Y T-r: -20.72%
+c [distill-long-irred] cls tried: 8/1701 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.70 used(M): 2.00 T: 0.17 T-out: Y T-r: -17.33%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.10%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.14%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill] watch-based irred-- cl tried     2224 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2316 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.26
+c [intree] Set 0 vars hyper-added: 4808 trans-irred: 0 trans-red: 331 budget(M): 466.01 used(M): 255.94 T: 0.63 T-out: N T-r: 45.08%
+c [distill-long-red0] cls tried: 460/19959 cl-rem: 41 cl-sh: 12 lit-rem: 12 0-depth-ass: 0
+c [distill-long-red0] budget(M): 26.55 used(M): 26.76 T: 0.32 T-out: Y T-r: -0.89%
+c [distill-long-irred] cls tried: 42/6206 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.21 used(M): 6.38 T: 0.23 T-out: Y T-r: -2.87%
+c [distill-long-irred] cls tried: 32/5171 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.17 used(M): 5.42 T: 0.22 T-out: Y T-r: -4.84%
+c [reduce] 1059 confl: 22959839 red: 148279->116029 cands: 43001 rem: 32250 next: +32542 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/293/31957 live t1/t2/t3: 36666/15494/96119 tiers: 2/6
+c [reduce]   kept-used: 105261 kept-keep: 0 locked: 17 likely-kept lim glue/size: 3/10
+c [hyper-bin-clean] removed: 4477 of: 12448 red-bins now: 968 T: 0.00
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.33%
+c [distill] watch-based irred-- cl tried     2283 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2513 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 302/10609 cl-rem: 17 cl-sh: 9 lit-rem: 11 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.63 used(M): 10.96 T: 0.12 T-out: Y T-r: -3.25%
+c [distill-long-irred] cls tried: 17/2484 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.48 used(M): 2.71 T: 0.17 T-out: Y T-r: -9.30%
+c [distill-long-irred] cls tried: 12/2070 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.07 used(M): 2.19 T: 0.15 T-out: Y T-r: -5.96%
+c [distill-long-red0] cls tried: 273/9232 cl-rem: 15 cl-sh: 5 lit-rem: 5 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.25 used(M): 9.45 T: 0.12 T-out: Y T-r: -2.33%
+c [distill-long-irred] cls tried: 11/2161 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.16 used(M): 2.57 T: 0.18 T-out: Y T-r: -19.01%
+c [distill-long-irred] cls tried: 9/1801 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.80 used(M): 2.00 T: 0.17 T-out: Y T-r: -10.78%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.19%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.19%
+c [distill] watch-based irred-- cl tried     2258 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     1967 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1060 confl: 22992381 red: 148539->115964 cands: 43434 rem: 32575 next: +32557 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/686/31889 live t1/t2/t3: 36778/15584/96177 tiers: 2/6
+c [reduce]   kept-used: 105039 kept-keep: 0 locked: 66 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 299/9302 cl-rem: 22 cl-sh: 9 lit-rem: 14 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.32 used(M): 9.44 T: 0.12 T-out: Y T-r: -1.32%
+c [distill-long-irred] cls tried: 12/2179 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.18 used(M): 2.41 T: 0.20 T-out: Y T-r: -10.81%
+c [distill-long-irred] cls tried: 12/1816 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.82 used(M): 1.94 T: 0.18 T-out: Y T-r: -7.03%
+c [distill-long-red0] cls tried: 280/9127 cl-rem: 20 cl-sh: 3 lit-rem: 3 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.15 used(M): 9.30 T: 0.10 T-out: Y T-r: -1.81%
+c [distill-long-irred] cls tried: 13/2138 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.14 used(M): 2.34 T: 0.17 T-out: Y T-r: -9.45%
+c [distill-long-irred] cls tried: 11/1782 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.78 used(M): 2.17 T: 0.17 T-out: Y T-r: -22.02%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.24
+c [intree] Set 0 vars hyper-added: 4809 trans-irred: 0 trans-red: 336 budget(M): 479.73 used(M): 249.49 T: 0.61 T-out: N T-r: 47.99%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.07%
+c [distill] watch-based irred-- cl tried     2184 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     1805 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1061 confl: 23024939 red: 148478->116328 cands: 42867 rem: 32150 next: +32572 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/134/32016 live t1/t2/t3: 36908/15279/96291 tiers: 2/6
+c [reduce]   kept-used: 105544 kept-keep: 0 locked: 67 likely-kept lim glue/size: 4/10
+c [distill-long-red0] cls tried: 461/19948 cl-rem: 52 cl-sh: 5 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 26.14 used(M): 26.25 T: 0.25 T-out: Y T-r: -0.50%
+c [distill-long-irred] cls tried: 45/6110 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.11 used(M): 6.31 T: 0.22 T-out: Y T-r: -3.33%
+c [distill-long-irred] cls tried: 40/5092 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.09 used(M): 5.25 T: 0.20 T-out: Y T-r: -3.08%
+c [hyper-bin-clean] removed: 4473 of: 12448 red-bins now: 968 T: 0.00
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.17%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill] watch-based irred-- cl tried     2272 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2154 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 286/10603 cl-rem: 19 cl-sh: 5 lit-rem: 13 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.62 used(M): 10.70 T: 0.13 T-out: Y T-r: -0.79%
+c [distill-long-irred] cls tried: 17/2483 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.48 used(M): 2.70 T: 0.19 T-out: Y T-r: -8.80%
+c [distill-long-irred] cls tried: 12/2069 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.07 used(M): 2.41 T: 0.18 T-out: Y T-r: -16.42%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [reduce] 1062 confl: 23057512 red: 148828->116296 cands: 43376 rem: 32532 next: +32588 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/525/32007 live t1/t2/t3: 37047/15497/96284 tiers: 2/6
+c [reduce]   kept-used: 105404 kept-keep: 0 locked: 48 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 292/9260 cl-rem: 22 cl-sh: 7 lit-rem: 7 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.28 used(M): 9.52 T: 0.11 T-out: Y T-r: -2.71%
+c [distill-long-irred] cls tried: 12/2170 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.17 used(M): 2.44 T: 0.19 T-out: Y T-r: -12.34%
+c [distill-long-irred] cls tried: 13/1808 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.81 used(M): 2.02 T: 0.18 T-out: Y T-r: -11.68%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.17%
+c [distill] watch-based irred-- cl tried     2210 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2470 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 261/8859 cl-rem: 19 cl-sh: 2 lit-rem: 3 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.88 used(M): 9.06 T: 0.12 T-out: Y T-r: -2.15%
+c [distill-long-irred] cls tried: 12/2075 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.08 used(M): 2.22 T: 0.19 T-out: Y T-r: -7.16%
+c [distill-long-irred] cls tried: 8/1729 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.73 used(M): 2.04 T: 0.19 T-out: Y T-r: -18.18%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.25
+c [intree] Set 0 vars hyper-added: 4818 trans-irred: 0 trans-red: 347 budget(M): 461.96 used(M): 246.55 T: 0.59 T-out: N T-r: 46.63%
+c [distill-long-red0] cls tried: 465/19959 cl-rem: 41 cl-sh: 8 lit-rem: 11 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.21 used(M): 27.39 T: 0.36 T-out: Y T-r: -0.75%
+c [distill-long-irred] cls tried: 41/6360 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.36 used(M): 6.57 T: 0.26 T-out: Y T-r: -3.30%
+c [distill-long-irred] cls tried: 35/5300 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.30 used(M): 5.45 T: 0.23 T-out: Y T-r: -2.94%
+c [reduce] 1063 confl: 23090104 red: 148802->116437 cands: 43154 rem: 32365 next: +32603 T: 0.04
+c [reduce]   rem t1/t2/t3: 0/424/31941 live t1/t2/t3: 37163/15350/96289 tiers: 2/6
+c [reduce]   kept-used: 105615 kept-keep: 0 locked: 33 likely-kept lim glue/size: 3/10
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 1
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.23%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill] watch-based irred-- cl tried     2271 cl-sh     0 cl-rem    1 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2859 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [hyper-bin-clean] removed: 4471 of: 12541 red-bins now: 968 T: 0.01
+c rst   foc    #  vmt 571289 23098K   12957 1459K 13434   13.81   13.71  124K     0     0   968   40.77   40.47
+c [distill-long-red0] cls tried: 285/10722 cl-rem: 13 cl-sh: 10 lit-rem: 12 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.74 used(M): 10.96 T: 0.12 T-out: Y T-r: -2.21%
+c [distill-long-irred] cls tried: 16/2509 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.51 used(M): 2.60 T: 0.20 T-out: Y T-r: -3.84%
+c [distill-long-irred] cls tried: 14/2091 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.09 used(M): 2.19 T: 0.16 T-out: Y T-r: -4.88%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.39%
+c [distill] watch-based irred-- cl tried     2198 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2010 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 300/9091 cl-rem: 14 cl-sh: 6 lit-rem: 15 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.11 used(M): 9.26 T: 0.12 T-out: Y T-r: -1.84%
+c [distill-long-irred] cls tried: 12/2128 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.13 used(M): 2.28 T: 0.20 T-out: Y T-r: -6.94%
+c [distill-long-irred] cls tried: 11/1773 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.77 used(M): 2.27 T: 0.18 T-out: Y T-r: -28.07%
+c [reduce] 1064 confl: 23122707 red: 149011->116517 cands: 43326 rem: 32494 next: +32619 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/441/32053 live t1/t2/t3: 37294/15285/96432 tiers: 2/6
+c [reduce]   kept-used: 105635 kept-keep: 0 locked: 50 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 282/9272 cl-rem: 29 cl-sh: 1 lit-rem: 1 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.30 used(M): 9.38 T: 0.11 T-out: Y T-r: -0.93%
+c [distill-long-irred] cls tried: 18/2174 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.17 used(M): 2.67 T: 0.18 T-out: Y T-r: -22.80%
+c [distill-long-irred] cls tried: 12/1812 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.81 used(M): 2.05 T: 0.17 T-out: Y T-r: -13.41%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.15%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.00%
+c [distill] watch-based irred-- cl tried     2241 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2061 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.25
+c [intree] Set 0 vars hyper-added: 4829 trans-irred: 0 trans-red: 381 budget(M): 476.89 used(M): 258.92 T: 0.59 T-out: N T-r: 45.71%
+c [distill-long-red0] cls tried: 507/19955 cl-rem: 45 cl-sh: 9 lit-rem: 10 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.49 used(M): 27.83 T: 0.34 T-out: Y T-r: -1.31%
+c [distill-long-irred] cls tried: 32/6426 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.43 used(M): 6.69 T: 0.23 T-out: Y T-r: -4.07%
+c [distill-long-irred] cls tried: 39/5355 cl-rem: 0 cl-sh: 1 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.36 used(M): 5.57 T: 0.21 T-out: Y T-r: -4.06%
+c [distill-bin] useful/checked/potential: 0/6790/13434 lits-rem: 0 cl-rem: 0 0-depth-assigns: 0 T: 0.89 T-out: Y
+c [reduce] 1065 confl: 23155326 red: 149061->116594 cands: 43290 rem: 32467 next: +32634 T: 0.04
+c [reduce]   rem t1/t2/t3: 0/430/32037 live t1/t2/t3: 37405/15282/96374 tiers: 2/6
+c [reduce]   kept-used: 105718 kept-keep: 0 locked: 53 likely-kept lim glue/size: 3/10
+c [hyper-bin-clean] removed: 4448 of: 12628 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 362/16771 cl-rem: 21 cl-sh: 5 lit-rem: 6 0-depth-ass: 0
+c [distill-long-red0] budget(M): 16.79 used(M): 17.01 T: 0.19 T-out: Y T-r: -1.42%
+c [distill-long-irred] cls tried: 28/3925 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 3.93 used(M): 4.16 T: 0.19 T-out: Y T-r: -6.07%
+c [distill-long-irred] cls tried: 20/3271 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 3.27 used(M): 3.60 T: 0.19 T-out: Y T-r: -10.19%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.12%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.14%
+c [distill] watch-based irred-- cl tried     2260 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2303 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 283/10247 cl-rem: 18 cl-sh: 2 lit-rem: 4 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.27 used(M): 10.47 T: 0.14 T-out: Y T-r: -2.11%
+c [distill-long-irred] cls tried: 15/2399 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.40 used(M): 2.54 T: 0.19 T-out: Y T-r: -5.97%
+c [distill-long-irred] cls tried: 13/1999 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.00 used(M): 2.24 T: 0.17 T-out: Y T-r: -12.02%
+c [reduce] 1066 confl: 23187960 red: 149183->116822 cands: 43149 rem: 32361 next: +32649 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/300/32061 live t1/t2/t3: 37510/15250/96423 tiers: 2/6
+c [reduce]   kept-used: 105955 kept-keep: 0 locked: 79 likely-kept lim glue/size: 4/10
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.10%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.05%
+c [distill] watch-based irred-- cl tried     2252 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2611 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 276/9449 cl-rem: 23 cl-sh: 5 lit-rem: 9 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.47 used(M): 9.75 T: 0.13 T-out: Y T-r: -3.05%
+c [distill-long-irred] cls tried: 14/2214 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.21 used(M): 2.36 T: 0.20 T-out: Y T-r: -6.48%
+c [distill-long-irred] cls tried: 13/1845 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.85 used(M): 2.11 T: 0.17 T-out: Y T-r: -14.15%
+c [distill-long-red0] cls tried: 297/9446 cl-rem: 13 cl-sh: 5 lit-rem: 5 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.46 used(M): 9.51 T: 0.12 T-out: Y T-r: -0.69%
+c [distill-long-irred] cls tried: 14/2211 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.21 used(M): 2.73 T: 0.19 T-out: Y T-r: -23.30%
+c [distill-long-irred] cls tried: 13/1842 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.84 used(M): 2.20 T: 0.18 T-out: Y T-r: -19.55%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.26
+c [intree] Set 0 vars hyper-added: 4782 trans-irred: 0 trans-red: 314 budget(M): 567.91 used(M): 238.96 T: 0.62 T-out: N T-r: 57.92%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.05 T-out: Y T-r: -0.11%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.30%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.09%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.26%
+c [distill] watch-based irred-- cl tried     2238 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2005 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1067 confl: 23220609 red: 149433->116243 cands: 44254 rem: 33190 next: +32664 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/1212/31978 live t1/t2/t3: 37617/15357/96459 tiers: 2/6
+c [reduce]   kept-used: 105124 kept-keep: 0 locked: 55 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 442/19945 cl-rem: 55 cl-sh: 6 lit-rem: 6 0-depth-ass: 0
+c [distill-long-red0] budget(M): 26.01 used(M): 26.06 T: 0.27 T-out: Y T-r: -0.30%
+c [distill-long-irred] cls tried: 39/6079 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.08 used(M): 6.35 T: 0.23 T-out: Y T-r: -4.55%
+c [distill-long-irred] cls tried: 36/5066 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.07 used(M): 5.14 T: 0.22 T-out: Y T-r: -1.43%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.60% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [hyper-bin-clean] removed: 4468 of: 12383 red-bins now: 968 T: 0.00
+c [distill-long-red0] cls tried: 311/10720 cl-rem: 16 cl-sh: 14 lit-rem: 32 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.74 used(M): 10.84 T: 0.12 T-out: Y T-r: -1.08%
+c [distill-long-irred] cls tried: 19/2509 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.51 used(M): 2.74 T: 0.18 T-out: Y T-r: -9.39%
+c [distill-long-irred] cls tried: 9/2091 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.09 used(M): 2.37 T: 0.16 T-out: Y T-r: -13.24%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.16%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.22%
+c [distill] watch-based irred-- cl tried     2240 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2168 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1068 confl: 23253275 red: 148835->116170 cands: 43554 rem: 32665 next: +32680 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/592/32073 live t1/t2/t3: 37732/14545/96558 tiers: 2/6
+c [reduce]   kept-used: 105241 kept-keep: 0 locked: 40 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 280/9129 cl-rem: 16 cl-sh: 2 lit-rem: 2 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.15 used(M): 9.20 T: 0.11 T-out: Y T-r: -0.76%
+c [distill-long-irred] cls tried: 15/2137 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.14 used(M): 2.31 T: 0.20 T-out: Y T-r: -8.07%
+c [distill-long-irred] cls tried: 13/1781 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.78 used(M): 1.97 T: 0.17 T-out: Y T-r: -10.57%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.02%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.07%
+c [distill] watch-based irred-- cl tried     2167 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2264 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 288/9375 cl-rem: 20 cl-sh: 11 lit-rem: 22 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.40 used(M): 9.60 T: 0.12 T-out: Y T-r: -2.33%
+c [distill-long-irred] cls tried: 12/2196 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.20 used(M): 2.30 T: 0.19 T-out: Y T-r: -4.67%
+c [distill-long-irred] cls tried: 10/1830 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.83 used(M): 2.05 T: 0.16 T-out: Y T-r: -12.15%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.24
+c [intree] Set 0 vars hyper-added: 4768 trans-irred: 0 trans-red: 280 budget(M): 472.13 used(M): 234.64 T: 0.57 T-out: N T-r: 50.30%
+c [distill-long-red0] cls tried: 460/19972 cl-rem: 28 cl-sh: 8 lit-rem: 9 0-depth-ass: 0
+c [distill-long-red0] budget(M): 25.76 used(M): 25.87 T: 0.28 T-out: Y T-r: -0.53%
+c [distill-long-irred] cls tried: 39/6020 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.02 used(M): 6.26 T: 0.22 T-out: Y T-r: -3.96%
+c [distill-long-irred] cls tried: 37/5017 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.02 used(M): 5.23 T: 0.22 T-out: Y T-r: -4.23%
+c [reduce] 1069 confl: 23285955 red: 148782->115929 cands: 43804 rem: 32853 next: +32695 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/761/32092 live t1/t2/t3: 37833/14372/96577 tiers: 2/6
+c [reduce]   kept-used: 104932 kept-keep: 0 locked: 46 likely-kept lim glue/size: 3/10
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.60% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [hyper-bin-clean] removed: 4488 of: 12222 red-bins now: 968 T: 0.01
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.08%
+c [distill] watch-based irred-- cl tried     2217 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2573 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 288/10673 cl-rem: 27 cl-sh: 5 lit-rem: 9 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.70 used(M): 10.89 T: 0.13 T-out: Y T-r: -1.91%
+c [distill-long-irred] cls tried: 18/2501 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.50 used(M): 2.84 T: 0.19 T-out: Y T-r: -13.77%
+c [distill-long-irred] cls tried: 12/2084 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.08 used(M): 2.45 T: 0.17 T-out: Y T-r: -17.34%
+c rst   foc    B  vmt 580834 23303K   12957 1459K 13434   13.81   13.71  133K     0     0   968   42.78   42.49
+c recursive minimization cost OK: 12177K cost/(% lits removed)
+c [distill-long-red0] cls tried: 301/9282 cl-rem: 17 cl-sh: 7 lit-rem: 19 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.30 used(M): 9.54 T: 0.12 T-out: Y T-r: -2.74%
+c [distill-long-irred] cls tried: 17/2173 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.17 used(M): 2.41 T: 0.18 T-out: Y T-r: -10.79%
+c [distill-long-irred] cls tried: 9/1811 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.81 used(M): 2.03 T: 0.16 T-out: Y T-r: -12.15%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.01%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.19%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.26%
+c [distill] watch-based irred-- cl tried     2197 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2002 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [reduce] 1070 confl: 23318650 red: 148579->116111 cands: 43291 rem: 32468 next: +32710 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/344/32124 live t1/t2/t3: 37944/13989/96646 tiers: 2/6
+c [reduce]   kept-used: 105196 kept-keep: 0 locked: 92 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 285/8642 cl-rem: 7 cl-sh: 3 lit-rem: 3 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.65 used(M): 8.72 T: 0.11 T-out: Y T-r: -0.89%
+c [distill-long-irred] cls tried: 10/2022 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.02 used(M): 2.51 T: 0.19 T-out: Y T-r: -24.01%
+c [distill-long-irred] cls tried: 8/1685 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.69 used(M): 1.96 T: 0.17 T-out: Y T-r: -16.34%
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.24
+c [intree] Set 0 vars hyper-added: 4834 trans-irred: 0 trans-red: 365 budget(M): 461.94 used(M): 256.25 T: 0.67 T-out: N T-r: 44.53%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.05%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.05%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.09%
+c [distill] watch-based irred-- cl tried     2216 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     1845 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 483/19950 cl-rem: 50 cl-sh: 13 lit-rem: 15 0-depth-ass: 0
+c [distill-long-red0] budget(M): 27.00 used(M): 27.25 T: 0.30 T-out: Y T-r: -1.02%
+c [distill-long-irred] cls tried: 43/6310 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.31 used(M): 6.58 T: 0.24 T-out: Y T-r: -4.24%
+c [distill-long-irred] cls tried: 36/5259 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.26 used(M): 5.60 T: 0.22 T-out: Y T-r: -6.62%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.60% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [reduce] 1071 confl: 23351360 red: 148762->115698 cands: 44086 rem: 33064 next: +32726 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/957/32107 live t1/t2/t3: 38066/14024/96672 tiers: 2/6
+c [reduce]   kept-used: 104629 kept-keep: 0 locked: 47 likely-kept lim glue/size: 3/10
+c [hyper-bin-clean] removed: 4469 of: 12565 red-bins now: 968 T: 0.01
+c [distill-long-red0] cls tried: 275/10966 cl-rem: 15 cl-sh: 1 lit-rem: 2 0-depth-ass: 0
+c [distill-long-red0] budget(M): 10.98 used(M): 11.07 T: 0.13 T-out: Y T-r: -0.92%
+c [distill-long-irred] cls tried: 15/2567 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.57 used(M): 2.78 T: 0.18 T-out: Y T-r: -8.38%
+c [distill-long-irred] cls tried: 15/2139 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.14 used(M): 2.56 T: 0.18 T-out: Y T-r: -19.66%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.00%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.06%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.12%
+c [distill] watch-based irred-- cl tried     2221 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.06 T-out: Y
+c [distill] watch-based   red-- cl tried     2143 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 295/9232 cl-rem: 15 cl-sh: 8 lit-rem: 16 0-depth-ass: 0
+c [distill-long-red0] budget(M): 9.25 used(M): 9.31 T: 0.12 T-out: Y T-r: -0.78%
+c [distill-long-irred] cls tried: 12/2161 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.16 used(M): 2.39 T: 0.20 T-out: Y T-r: -10.51%
+c [distill-long-irred] cls tried: 8/1801 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.80 used(M): 2.13 T: 0.17 T-out: Y T-r: -18.47%
+c [reduce] 1072 confl: 23384086 red: 148391->115483 cands: 43878 rem: 32908 next: +32741 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/785/32123 live t1/t2/t3: 38165/13475/96751 tiers: 2/6
+c [reduce]   kept-used: 104453 kept-keep: 0 locked: 60 likely-kept lim glue/size: 3/10
+c [distill-long-red0] cls tried: 299/8732 cl-rem: 22 cl-sh: 3 lit-rem: 4 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.75 used(M): 8.84 T: 0.11 T-out: Y T-r: -1.05%
+c [distill-long-irred] cls tried: 14/2046 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.05 used(M): 2.24 T: 0.19 T-out: Y T-r: -9.62%
+c [distill-long-irred] cls tried: 11/1705 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.71 used(M): 1.87 T: 0.17 T-out: Y T-r: -9.88%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.08%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.05%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.37%
+c [distill] watch-based irred-- cl tried     2243 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2388 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 276/8969 cl-rem: 11 cl-sh: 1 lit-rem: 1 0-depth-ass: 0
+c [distill-long-red0] budget(M): 8.98 used(M): 9.06 T: 0.12 T-out: Y T-r: -0.99%
+c [distill-long-irred] cls tried: 12/2099 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 2.10 used(M): 2.39 T: 0.20 T-out: Y T-r: -13.72%
+c [distill-long-irred] cls tried: 13/1749 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 1.75 used(M): 1.98 T: 0.17 T-out: Y T-r: -13.19%
+c [impl-str] lit bin: 0 set-var: 0 T: 0.01 T-out: N T-r: 99.61% w-visit: 27442
+c [impl-sub] bin: 0 T: 0.02 T-out: N w-visit: 27442
+c [scc] new: 0 BP 0M T: 0.01
+c [vrep] vars 0 lits 0 rem-bin-cls 0 rem-long-cls 0 BP 4M T: 0.26
+c [intree] Set 0 vars hyper-added: 4811 trans-irred: 0 trans-red: 326 budget(M): 475.79 used(M): 238.17 T: 0.63 T-out: N T-r: 49.94%
+c [reduce] 1073 confl: 23416830 red: 148193->114422 cands: 45028 rem: 33771 next: +32756 T: 0.03
+c [reduce]   rem t1/t2/t3: 0/1626/32145 live t1/t2/t3: 38289/13094/96810 tiers: 2/6
+c [reduce]   kept-used: 103098 kept-keep: 0 locked: 67 likely-kept lim glue/size: 3/10
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.04 T-out: Y T-r: -0.03%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.03 T-out: Y T-r: -0.04%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.21%
+c [distill-with-bin-ext] bin-based lit-rem: 0 cl-sub: 0
+c [distill-with-bin-ext] T: 0.02 T-out: Y T-r: -0.12%
+c [distill] watch-based irred-- cl tried     2228 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.07 T-out: Y
+c [distill] watch-based   red-- cl tried     2678 cl-sh     0 cl-rem    0 lit-rem      0 T: 0.05 T-out: Y
+c [distill-long-red0] cls tried: 464/19943 cl-rem: 57 cl-sh: 14 lit-rem: 21 0-depth-ass: 0
+c [distill-long-red0] budget(M): 25.78 used(M): 25.84 T: 0.31 T-out: Y T-r: -0.32%
+c [distill-long-irred] cls tried: 41/6026 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 6.03 used(M): 6.36 T: 0.24 T-out: Y T-r: -5.61%
+c [distill-long-irred] cls tried: 33/5022 cl-rem: 0 cl-sh: 0 lit-rem: 0 0-depth-ass: 0
+c [distill-long-irred] budget(M): 5.02 used(M): 5.12 T: 0.22 T-out: Y T-r: -2.08%
+c [hyper-bin-clean] removed: 4485 of: 12520 red-bins now: 968 T: 0.00
