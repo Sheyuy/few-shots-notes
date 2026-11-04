@@ -63,8 +63,8 @@ jobs:
             --seed "${{ inputs.seed }}" \
             --linlevel "${{ inputs.linlevel }}" \
             --disjunctive "${{ inputs.disjunctive }}" \
-            --out out/certificate.json --log out/cpsat.log || true
-          grep -E "^status=" out/cpsat.log | tail -1 || tail -3 out/cpsat.log
+            --out out/certificate.json --log out/cpsat.log || echo "SOLVE STEP FAILED (see traceback above)"
+          grep -E "^status=" out/cpsat.log | tail -1 || tail -5 out/cpsat.log
 
       - name: validate independently
         run: |

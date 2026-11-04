@@ -86,7 +86,9 @@ def main():
     solver.parameters.num_search_workers = args.workers
     solver.parameters.random_seed = args.seed
     solver.parameters.linearization_level = args.linlevel
-    solver.parameters.use_disjunctive_constraint = bool(args.disjunctive)
+    # not every ortools version has this knob -- set it only if it exists
+    if hasattr(solver.parameters, "use_disjunctive_constraint"):
+        solver.parameters.use_disjunctive_constraint = bool(args.disjunctive)
     solver.parameters.log_search_progress = bool(args.log)
     if args.log:
         solver.log_callback = lambda s: print(s, flush=True)
