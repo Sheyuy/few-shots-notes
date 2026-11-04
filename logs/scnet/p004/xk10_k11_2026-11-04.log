@@ -1,0 +1,42 @@
+# xk10 : incremental-counter enumerator + why k=13 is out of reach
+# 2026-11-04, container 15-core cgroup quota / macOS single thread
+
+## 0. a structural idea that does NOT work
+Candidate sets A have |A| = k+1 and |T(A)| <= k, so the incidence bipartite graph
+A -- T(A) has 13 left and <=12 right vertices (k=12).  A connected bipartite graph
+with n+m-1 edges is a tree, so one might hope A must be a tree.  Measured: the 16,440
+candidates have mean |T| = 5.40 (distribution |T|=1:8, 2:254, 3:1505, 4:3039, 5:3712,
+6:3897, 7:2842, 8:921, 9:199, 10:61, 11:2), so a 14-point set carries ~75 edges, not
+26.  The incidence graph is dense and full of cycles.  Tree enumeration is invalid.
+
+## 1. where the time actually goes (xk9c instrumentation)
+k=9, single thread: nodes 55,912,968 ; scans 92,724,938,135 (1658 scans/node) ; 324.9 s
+=> the cost is the per-node scan over "active" candidates, ~3.5 ns per scan,
+   not the |A| conflict tests.
+
+## 2. xk10 : maintain the candidate set as a bitset instead of scanning
+  conflictCnt[v] = #{a in A : a adjacent v}      (candidate-graph CSR, 1,944,833 edges)
+  touchCnt[v]    = |T(v) ∩ T(A)|                 (distinct blockers, updated on 0<->1 only)
+  freeB          = bitset { v : touchCnt>0 && conflictCnt==0 && !inA }
+  union size     = popU + |T(v)| - touchCnt[v]   (O(1))
+Self-test totals identical to xk7/xk8/xk9 on all four harnesses (macOS):
+  3000 7 6 3 -> 0 / 1842 / 11316 ; 2000 8 7 6 -> 0 / 1122 / 12824
+  300 10 9 7 -> 0 / 197 / 6689    ; 300 7 6 3  -> 0 / 186 / 1125
+(glibc rand() differs from macOS, so container totals differ but mismatches=0.)
+
+## 3. measured speed-ups
+k=6 : xk7 8.4 s   xk10 0.6 s
+k=9 : xk7 1267.8 s  xk9 287.9 s  xk10 204.1 s   (6.2x vs xk7; 54.3e9 scans, 971/node)
+k=11: xk7 4420 s    xk10 2495.6 s (1.8x)        (container, 15 threads)
+      K=11 n=367 m=16440 count=0
+      STATS nodes=2,587,155,629 scans=3,004,071,210,541 (1161.1 scans/node)
+
+## 4. why k=13 is not reachable in this quota
+node growth per k (k=9 -> k=11): (2.587e9 / 5.591e7)^(1/2) = 6.80x
+  k=12 ~ 1.76e10 nodes, ~2.3e13 scans -> ~5.3 h
+  k=13 ~ 1.20e11 nodes, ~1.7e14 scans -> ~39 h   (at the measured 1.2e9 scans/s)
+Remaining quota at the time of writing: ~28 h.  k=13 does not fit, and k=12 has
+already been confirmed twice (xk7 21724 s, xk9 22475 s).
+
+=> Constant-factor work is exhausted.  Beating this needs a mathematical reduction
+   (fewer nodes), not a faster inner loop.
