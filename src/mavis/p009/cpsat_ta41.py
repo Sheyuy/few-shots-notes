@@ -104,34 +104,41 @@ def main():
                 for pos, j in enumerate(seq):
                     k = routes[j].index(m)
                     st[(j, k)] = pos
-            # compute the schedule: op (j,k) starts after its job predecessor and
-            # its machine predecessor
+            # compute the schedule in a proper topological order: an op is
+            # ready when both its job predecessor and its machine predecessor
+            # have been scheduled (the earlier version indexed end[] before
+            # the predecessor existed -> KeyError -> the hint was silently
+            # dropped and the job ran without it)
             start = {}
             end = {}
-            done = set()
-            while len(done) < nops:
-                prog = False
-                for j in range(nj):
-                    ks = routes[j]
-                    for k, m in enumerate(ks):
-                        if (j, k) in done:
-                            continue
-                        ok = True
-                        t0 = 0
-                        if k > 0:
-                            t0 = end[(j, k - 1)]
-                        # machine predecessor
-                        pos = st[(j, k)]
-                        if pos > 0:
-                            pm = mach[m][pos - 1]
-                            pk = routes[pm].index(m)
+            pending = {(j, k): routes[j][k] for j in range(nj) for k in range(len(routes[j]))}
+            while pending:
+                progressed = False
+                for key, m in list(pending.items()):
+                    j, k = key
+                    t0 = 0
+                    ok = True
+                    if k > 0:
+                        if (j, k - 1) not in end:
+                            ok = False
+                        else:
+                            t0 = max(t0, end[(j, k - 1)])
+                    pos = st[key]
+                    if pos > 0:
+                        pm = mach[m][pos - 1]
+                        pk = routes[pm].index(m)
+                        if (pm, pk) not in end:
+                            ok = False
+                        else:
                             t0 = max(t0, end[(pm, pk)])
-                        start[(j, k)] = t0
-                        end[(j, k)] = t0 + durations[j][k]
-                        done.add((j, k))
-                        prog = True
-                if not prog:
-                    break
+                    if not ok:
+                        continue
+                    start[key] = t0
+                    end[key] = t0 + durations[j][k]
+                    del pending[key]
+                    progressed = True
+                if not progressed:
+                    raise RuntimeError("hint: the incumbent schedule has a cycle")
             hint_starts = []
             for (j, k), v in start.items():
                 hint_starts.append(starts[(j, k)])
@@ -139,7 +146,7 @@ def main():
             model.AddHint(cmax, max(end.values()))
             print(f"hint: incumbent makespan {max(end.values())} over {len(start)} ops", flush=True)
         except Exception as e:
-            print("hint failed:", e, flush=True)
+            print("!! HINT FAILED (running without it):", repr(e), flush=True)
 
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = args.time
