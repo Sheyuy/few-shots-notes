@@ -1,0 +1,34 @@
+# xk8 / xk9 : optimised connected-set enumerators — validation and k=12 re-run
+# container: crdnotebook-2117576787076075521-ac5su0sz0r-69729, 15-core cgroup quota
+# local: macOS, 10 cores, Apple clang
+
+## what changed vs xk7
+xk8: T(v) as a bitset over the 367 blockers; candidate adjacency as a bitset; only
+     "active" candidates (those sharing a blocker with the current set) are scanned.
+xk9: additionally maintains touchCnt[v] = |T(v) ∩ U| and popU = |U|, so the touch test
+     and the union-size bound are O(1) instead of O(words).
+
+## self-test (identical totals to xk7 => same enumeration)
+xk8 --selftest 300  7 6 3   -> mismatches=0 positive=186  total=1125  max=44
+xk8 --selftest 2000 8 7 6   -> mismatches=0 positive=1122 total=12824 max=245
+xk8 --selftest 300  10 9 7  -> mismatches=0 positive=197  total=6689  max=440
+xk9 --selftest 2000 8 7 6   -> mismatches=0 positive=1122 total=12824 max=245
+xk9 --selftest 300  10 9 7  -> mismatches=0 positive=197  total=6689  max=440
+
+## timings, R367 (local, single thread unless stated)
+k=6   xk7 8.4 s      xk8 1.1 s     xk9 0.8 s
+k=9   xk7 1267.8 s   xk8 595.8 s   xk9 287.9 s      (4.4x vs xk7)
+k=9   xk8 15 threads (container) 139.5 s  (xk7 was 208.4 s)
+
+## k=12 re-run with xk9 (container, 15 threads)
+K=12 n=367 m=16440 threads=15 connected=1 fast=1
+ADJ built in 0.4 s
+CONNECTED_SETS size=13 union<=12 count=0 seconds=22475.0
+EXIT=0 ELAPSED=22475s
+
+==> 22475 s vs 21724 s for xk7: NO speed-up at k=12 (3% slower).
+    Reason: at depth almost every candidate is "active" (shares a blocker with U), so the
+    frontier trick degenerates and the cost per node is dominated by the |A| conflict
+    checks. The optimisation pays off only for k <= 9.
+    The k=12 result is nevertheless an independent re-derivation (different data
+    structures, same canonical order): count=0 confirmed twice.
