@@ -1,0 +1,99 @@
+name: p014-golomb
+# CP-SAT search for a 29-mark Golomb ruler shorter than the board record 623.
+#
+# The model is small (29 mark variables + 406 difference variables + one
+# AllDifferent), which is exactly what CP-SAT's dedicated AllDifferent
+# propagator is good at.
+#
+#   --target 622 : pure feasibility ("is there a 622-ruler?")  -> a hit is a
+#                  board record; INFEASIBLE would prove 623 optimal
+#   --target 0   : minimise the length -> CP-SAT may prove the optimum
+#
+#   gh workflow run p014-golomb.yml -f target=622 -f minutes=300
+
+on:
+  workflow_dispatch:
+    inputs:
+      n:
+        description: "number of marks"
+        required: true
+        default: "29"
+      target:
+        description: "required length (0 = minimise)"
+        required: true
+        default: "622"
+      minutes:
+        description: "CP-SAT wall limit in minutes"
+        required: true
+        default: "300"
+      workers:
+        description: "CP-SAT search workers"
+        required: true
+        default: "2"
+      seed:
+        description: "random seed"
+        required: true
+        default: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  solve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install ortools
+        run: |
+          set -e
+          python3 -m pip install --quiet ortools
+          python3 -c "from ortools.sat.python import cp_model; print('ortools ready')"
+
+      - name: solve
+        run: |
+          set -e
+          mkdir -p out
+          python3 src/mavis/p014/cpsat_golomb.py \
+            --n "${{ inputs.n }}" \
+            --target "${{ inputs.target }}" \
+            --time "$(( ${{ inputs.minutes }} * 60 ))" \
+            --workers "${{ inputs.workers }}" \
+            --seed "${{ inputs.seed }}" \
+            --out out/certificate.json | tee out/solve.log || echo "SOLVE STEP FAILED"
+
+      - name: validate independently
+        run: |
+          set -e
+          if [ -s out/certificate.json ]; then
+            python3 - <<'PY'
+          import json, sys
+          sys.path.insert(0, "src/mavis/p014")
+          from cpsat_golomb import check_ruler
+          marks = json.load(open("out/certificate.json"))["marks"]
+          print("marks:", marks)
+          print("length:", marks[-1] - marks[0])
+          assert check_ruler(marks), "not a Golomb ruler"
+          PY
+          else
+            echo "no certificate produced"
+          fi
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p014-golomb-${{ inputs.target }}-${{ github.run_id }}
+          path: |
+            out/certificate.json
+            out/solve.log
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p014 Golomb ruler n=${{ inputs.n }} target=${{ inputs.target }}"
+            head -3 out/solve.log 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
