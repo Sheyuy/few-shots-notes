@@ -37,6 +37,10 @@ def main():
     ap.add_argument("--log", default=None)
     ap.add_argument("--linlevel", type=int, default=0, help="CP-SAT linearization_level")
     ap.add_argument("--disjunctive", type=int, default=0, help="CP-SAT use_disjunctive_constraint")
+    ap.add_argument("--cmax-cap", type=int, default=0,
+                    help="upper bound on the makespan (0 = no cap).  Capping it at the "
+                         "known best (2006) shrinks the search space enormously and "
+                         "turns the question into 'is anything <= cap-1 feasible?'")
     args = ap.parse_args()
 
     inst = json.load(open(args.instance))
@@ -79,6 +83,11 @@ def main():
     cmax = model.NewIntVar(0, horizon, "cmax")
     for key, e in ends.items():
         model.Add(cmax >= e)
+    if args.cmax_cap > 0:
+        # cap the horizon as well: a tight domain makes the propagation strong
+        model.Add(cmax <= args.cmax_cap)
+        for key, s_ in starts.items():
+            model.Add(s_ <= args.cmax_cap)
     model.Minimize(cmax)
 
     solver = cp_model.CpSolver()
