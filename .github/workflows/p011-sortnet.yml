@@ -1,0 +1,109 @@
+name: p011-sortnet
+# Stochastic search for a sorting network on 17 channels with <= 70 comparators
+# (the board baseline has 71).
+#
+# Fitness = how many of the 2^17 binary inputs the network sorts (0-1 principle).
+# The evaluator is bit-sliced (64 inputs at a time), so a full evaluation costs
+# ~1.2 ms and the search can make millions of moves per job.
+#
+#   gh workflow run p011-sortnet.yml -f minutes=300 -f procs=2 -f seed=1
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "search time per process in minutes"
+        required: true
+        default: "300"
+      procs:
+        description: "parallel processes"
+        required: true
+        default: "2"
+      seed:
+        description: "base RNG seed"
+        required: true
+        default: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o sortnet src/mavis/p011/sortnet.c -lm
+          ./sortnet src/mavis/p011/baseline.json 2 1 /tmp/probe.json 2>&1 | head -3
+
+      - name: search
+        run: |
+          set -e
+          mkdir -p out
+          SECS="$(( ${{ inputs.minutes }} * 60 ))"
+          for i in $(seq 1 "${{ inputs.procs }}"); do
+            SEED=$(( ${{ inputs.seed }} * 1000 + i ))
+            ./sortnet src/mavis/p011/baseline.json "$SECS" "$SEED" "out/net_$i.json" \
+                > "out/log_$i.txt" 2>&1 &
+          done
+          wait
+          cat out/log_*.txt | grep -E "comparators that sort everything|best:" || true
+
+      - name: pick the shortest and validate
+        run: |
+          set -e
+          python3 - <<'PY'
+          import glob, json, itertools, sys
+          best = None
+          for f in glob.glob("out/net_*.json"):
+              try:
+                  d = json.load(open(f))
+              except Exception:
+                  continue
+              comps = d.get("comparators", [])
+              if best is None or len(comps) < len(best):
+                  best = comps
+          if not best:
+              print("no candidate"); sys.exit(0)
+          # 0-1 principle check, exactly what the official verifier does
+          n = 17
+          bad = 0
+          for p in range(1 << n):
+              w = [(p >> i) & 1 for i in range(n)]
+              for a, b in best:
+                  if w[a] > w[b]:
+                      w[a], w[b] = w[b], w[a]
+              if any(w[i] > w[i + 1] for i in range(n - 1)):
+                  bad += 1
+                  if bad > 3:
+                      break
+          print("comparators:", len(best), "| unsorted inputs:", bad)
+          if bad == 0:
+              json.dump({"comparators": best}, open("out/certificate.json", "w"))
+              print("CERTIFICATE WRITTEN")
+          else:
+              print("candidate does not sort everything -- not submitted")
+          PY
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p011-sortnet-${{ inputs.seed }}-${{ github.run_id }}
+          path: |
+            out/certificate.json
+            out/net_*.json
+            out/log_*.txt
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p011 sorting network search (17 channels)"
+            grep -hE "comparators that sort everything|best:" out/log_*.txt 2>/dev/null | tail -5 || true
+          } >> "$GITHUB_STEP_SUMMARY"
