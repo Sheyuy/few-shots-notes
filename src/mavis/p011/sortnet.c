@@ -189,7 +189,10 @@ int main(int argc, char **argv)
         while (wall() - t0 < limit && stall < STALL_LIMIT && steps < ATTEMPT_LIMIT) {
             steps++;
             Net cand = cur;
-            if (rnd(2)) mut_replace(&cand); else mut_swap(&cand);
+            int r = rnd(3);
+            if (r == 0) mut_replace(&cand);
+            else if (r == 1) mut_swap(&cand);
+            else mut_insert(&cand);      /* a repair may need a comparator elsewhere */
             long f = evaluate(&cand);
             evals++;
             if (f >= curfit) {          /* accept improvements and plateaus */
