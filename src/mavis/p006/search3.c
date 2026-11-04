@@ -651,6 +651,49 @@ int main(int argc, char **argv) {
         if (swap_on) { int q = 0; while (swap_polish() && q < 20) q++; }
         if (lns_m > 0) lns_slide(lns_m, lns_rounds);
         report_if_better();
+    } else if (!strcmp(mode, "walk")) {
+        /* Self-avoiding-walk style search.
+         *
+         * Why: our ILS / memetic runs always converge back to the SAME 578
+         * sequence (verified: 12 independent jobs produced byte-identical
+         * sequences).  That is an attractor created by the "always return to
+         * the incumbent" rule.  A pure random walk never returns to the
+         * incumbent, so it can leave the basin.  The best-ever state is kept
+         * separately and written out whenever it improves.
+         */
+        /* Threshold Accepting: accept a move if it is not worse than
+         * Ecur + T, with T decaying from tmax down to 0.  A pure random walk
+         * just drifts to E~1800; TA descends but can climb out of the 578
+         * attractor, which is exactly what the ILS/MTS runs could not do. */
+        long steps = 0, acc = 0;
+        int since = 0;
+        int restart_len = chunk > 0 ? chunk : 1000;
+        double tstart = now_sec();
+        double tend = (double)limit;
+        int T = tmax > 0 ? tmax : 20;
+        while (now_sec() - t_start < limit) {
+            double frac = (now_sec() - tstart) / (tend > 0 ? tend : 1.0);
+            if (frac > 1.0) frac = 1.0;
+            int thr = (int)(T * (1.0 - frac));
+            int e0 = Ecur;
+            int nf = 1 + rndint(2);
+            int moved[2];
+            for (int q = 0; q < nf; q++) { moved[q] = rndint(N); apply_flip(moved[q]); }
+            steps++;
+            if (Ecur <= e0 + thr) acc++;
+            else {
+                /* reject the move: flip exactly the same bits back */
+                for (int q = 0; q < nf; q++) apply_flip(moved[q]);
+            }
+            since++;
+            if (Ecur < gbestE) report_if_better();
+            if (since > restart_len) {
+                for (int k = 0; k < N; k++) s[k] = (rndint(2)) ? 1 : -1;
+                recompute_all();
+                since = 0;
+            }
+        }
+        fprintf(stdout, "walk steps=%ld accepted=%ld best=%d\n", steps, acc, gbestE);
     } else if (!strcmp(mode, "mem")) {
         /* memetic algorithm: population + 1-point crossover + seam repair */
         static int pop[MAXPOP][N];

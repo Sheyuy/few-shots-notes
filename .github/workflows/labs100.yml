@@ -37,6 +37,14 @@ on:
         description: "path (in the repo) of a warm-start certificate to start from"
         required: false
         default: ""
+      searchmode:
+        description: "ils | mem | walk (walk = Threshold Accepting, never returns to the incumbent)"
+        required: false
+        default: "ils"
+      tmaxwalk:
+        description: "initial threshold for the walk mode"
+        required: false
+        default: "20"
 
 permissions:
   contents: read
@@ -78,6 +86,12 @@ jobs:
             if [ "$MODE" = "mem" ]; then
               ./search3 --mode mem --pop "$POP" --xover-m 14 --rng $((SEED * 1000 + i)) \
                         --chunk "$CH" --tmin 5 --tmax 15 --lns-m 10 --op tabu $WARM \
+                        --time "$SECS" --out "out/s$i.txt" > "out/s$i.out" 2>&1 &
+            elif [ "$MODE" = "walk" ]; then
+              # Threshold Accepting: never returns to the incumbent, so it can
+              # leave the 578 attractor that all ILS/MTS runs fall back into
+              ./search3 --mode walk --rng $((SEED * 1000 + i)) \
+                        --chunk "$CH" --tmax "${{ inputs.tmaxwalk }}" \
                         --time "$SECS" --out "out/s$i.txt" > "out/s$i.out" 2>&1 &
             else
               ./search3 --mode ils --op tabu --rng $((SEED * 1000 + i)) --chunk "$CH" \
