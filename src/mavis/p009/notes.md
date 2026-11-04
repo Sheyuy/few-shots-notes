@@ -352,3 +352,26 @@ if (nbhd & 16) { /* 协同关键块移动 */ }
 远程 8 个 job（N5/N6/N8/N1+N8 + 不同 burst/bridge/seed）⇒ 独立复算全部 2006 ✅❌。
 ⇒ 「禁忌 + 路径重链接」这条路已充分探索 ✅；
 要破 2005 需要更强的邻域（N6/N8 的 O(1) 估计）或 Carlier 移位瓶颈重优化 ❓。
+
+---
+
+## 2026-11-04 14:45：换一条完全不同的算法路线 —— **OR-Tools CP-SAT**
+
+**为什么换** ✅：我们的「禁忌搜索 + 路径重链接」在 ta41 上已经跑了 **80+ 进程·小时**，
+五种邻域全部卡在 2006 ✅❌；而 **CP-SAT 有专门为车间调度设计的引擎**
+（区间变量 + no-overlap + 工序前序 + portfolio 搜索 ✅），
+**和我们用过的任何算法都不一样** ✅。codearts 在 p005 上用 CP-SAT 跑过 **717 万约束** ⇒ 规模上没问题 ✅。
+
+**模型**（标准 job-shop 形式 ✅）：
+* 每个工序一个区间变量，size = 加工时间 ✅；
+* 同工件：工序 k+1 的开始 ≥ 工序 k 的结束 ✅；
+* 同机器：区间两两不重叠 ✅；
+* 目标 = min makespan（所有工序结束的最大值）✅。
+
+新工具 **`cpsat_ta41.py`** ✅：读 `instance.json` 的 routes+durations ✅ ⇒ 建模型 ⇒ 求解 ⇒
+把解按机器上的开始时间排序，导出成官方验证器要的证书格式 `{"machines": [[job ids …], …]}` ✅，
+并用 `pick_best.py` 的**独立复算**交叉验证 ✅（官方验证器再验一遍 ✅）。
+
+**踩到的坑** ✅：`solver.parameters.use_disjunctive_constraint` **不是所有 ortools 版本都有** ⇒
+第一轮 4 个 job 全部秒挂在 AttributeError ✅❌；而且我用 `|| true` 把错误吞了 ✅❌
+⇒ 已加 `hasattr` 保护 + 不再吞错误 ✅ ⇒ 第二轮 3 个 job 正常在跑 ✅（seed 11/12/13，linearization_level 0/1/2 各一 ✅）。
