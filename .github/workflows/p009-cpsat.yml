@@ -68,7 +68,8 @@ jobs:
             --linlevel "${{ inputs.linlevel }}" \
             --disjunctive "${{ inputs.disjunctive }}" \
             --cmax-cap "${{ inputs.cmaxcap }}" \
-            --out out/certificate.json --log out/cpsat.log || echo "SOLVE STEP FAILED (see traceback above)"
+            --hint src/mavis/p009/best.json \
+            --out out/certificate.json 2>&1 | tee out/cpsat.log || echo "SOLVE STEP FAILED (see traceback above)"
           grep -E "^status=" out/cpsat.log | tail -1 || tail -5 out/cpsat.log
 
       - name: validate independently

@@ -37,6 +37,9 @@ def main():
     ap.add_argument("--log", default=None)
     ap.add_argument("--linlevel", type=int, default=0, help="CP-SAT linearization_level")
     ap.add_argument("--disjunctive", type=int, default=0, help="CP-SAT use_disjunctive_constraint")
+    ap.add_argument("--hint", default=None,
+                    help="certificate with an incumbent schedule; CP-SAT then starts "
+                         "from a known-feasible solution and its LNS works on top of it")
     ap.add_argument("--cmax-cap", type=int, default=0,
                     help="upper bound on the makespan (0 = no cap).  Capping it at the "
                          "known best (2006) shrinks the search space enormously and "
@@ -90,10 +93,61 @@ def main():
             model.Add(s_ <= args.cmax_cap)
     model.Minimize(cmax)
 
+    # ---- optional hint: start from a known-feasible schedule -------------
+    if args.hint:
+        try:
+            hint = json.load(open(args.hint))
+            mach = hint["machines"]
+            # earliest start times of the incumbent (longest path)
+            st = {}
+            for m, seq in enumerate(mach):
+                for pos, j in enumerate(seq):
+                    k = routes[j].index(m)
+                    st[(j, k)] = pos
+            # compute the schedule: op (j,k) starts after its job predecessor and
+            # its machine predecessor
+            start = {}
+            end = {}
+            done = set()
+            while len(done) < nops:
+                prog = False
+                for j in range(nj):
+                    ks = routes[j]
+                    for k, m in enumerate(ks):
+                        if (j, k) in done:
+                            continue
+                        ok = True
+                        t0 = 0
+                        if k > 0:
+                            t0 = end[(j, k - 1)]
+                        # machine predecessor
+                        pos = st[(j, k)]
+                        if pos > 0:
+                            pm = mach[m][pos - 1]
+                            pk = routes[pm].index(m)
+                            t0 = max(t0, end[(pm, pk)])
+                        start[(j, k)] = t0
+                        end[(j, k)] = t0 + durations[j][k]
+                        done.add((j, k))
+                        prog = True
+                if not prog:
+                    break
+            hint_starts = []
+            for (j, k), v in start.items():
+                hint_starts.append(starts[(j, k)])
+                model.AddHint(starts[(j, k)], v)
+            model.AddHint(cmax, max(end.values()))
+            print(f"hint: incumbent makespan {max(end.values())} over {len(start)} ops", flush=True)
+        except Exception as e:
+            print("hint failed:", e, flush=True)
+
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = args.time
     solver.parameters.num_search_workers = args.workers
     solver.parameters.random_seed = args.seed
+    if args.hint:
+        # LNS is what turns a feasible incumbent into an improved one
+        solver.parameters.interleave_search = True
     solver.parameters.linearization_level = args.linlevel
     # not every ortools version has this knob -- set it only if it exists
     if hasattr(solver.parameters, "use_disjunctive_constraint"):
