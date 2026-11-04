@@ -33,3 +33,30 @@ that the finite-geometry constructions give the best known rulers for every n > 
 i.e. no heuristic has beaten 623 for 29 marks either.
 A serious attempt would need a dedicated solver (difference-triangle tabu with
 +-1 shift moves and plateau handling, or a CP/SAT model with propagation), not this.
+
+## second round — two stronger methods, same verdict
+
+### CP-SAT (OR-Tools 9.15, `src/scnet/p014/cpsat_probe.py`)
+model: p_0=0 < p_1 < ... < p_28=L, AllDifferent over all 406 differences.
+  L=623 **with** the baseline as hint : 0.1 s, trivially reproduces it (hint = solution).
+  L=623 **without** hint, 8 workers    : UNKNOWN after 60 s — it cannot even find a
+                                          ruler that is known to exist.
+=> all-different propagation on 406 differences is far too weak; CP-SAT is not the tool.
+
+### +-1 tabu with plateau moves (`src/scnet/p014/golomb2.c`)
+cost as before; each iteration takes the best of all 2*27 single-step shifts
+(+1/-1 on one mark), plateau moves allowed.
+  L=623 seeded with the baseline : cost 0 immediately (control).
+  L=622 seeded with the compressed baseline : 16,729,446 iterations in 60 s,
+      cost stays EXACTLY 14 the whole time, best never improves.
+=> the compressed ruler is also a strict local minimum in the +-1 neighbourhood, and
+   plateau walking does not escape it.
+
+### combined reading (three independent methods)
+generic SA, CP-SAT, and +-1 tabu all fail on the same instance. The warm start at
+L=622 has 14 colliding difference pairs and nothing moves it. The problem statement
+adds that a reviewer already scanned every unit and every window of the Singer and
+Bose constructions for q=29,31,32 and found nothing shorter than 623.
+This is consistent with Rokicki-Dogon's Hypothesis A (for n>16 the finite-geometry
+constructions are optimal). It is still not a proof that 622 is impossible, but the
+probability that 20 h of SCNet quota finds one is very low.
