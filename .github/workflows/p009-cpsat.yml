@@ -1,0 +1,104 @@
+name: p009-cpsat
+# CP-SAT (OR-Tools) job-shop model for ta41.
+#
+# New line of attack: our tabu + path-relinking search has been stuck on
+# makespan 2006 for 80+ process-hours, while OR-Tools CP-SAT has a
+# purpose-built job-shop scheduling engine (interval variables, no-overlap,
+# precedence, portfolio search) -- a completely different algorithm.
+#
+# The certificate format is the one the official verifier expects:
+#   {"machines": [[job ids on machine 0 in order], ...]}
+#
+#   gh workflow run p009-cpsat.yml -f minutes=300 -f workers=2 -f seed=1
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "CP-SAT wall limit in minutes"
+        required: true
+        default: "300"
+      workers:
+        description: "CP-SAT search workers"
+        required: true
+        default: "2"
+      seed:
+        description: "random seed"
+        required: true
+        default: "1"
+      linlevel:
+        description: "CP-SAT linearization_level (0,1,2)"
+        required: false
+        default: "0"
+      disjunctive:
+        description: "use_disjunctive_constraint (0/1)"
+        required: false
+        default: "0"
+
+permissions:
+  contents: read
+
+jobs:
+  solve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install ortools
+        run: |
+          set -e
+          python3 -m pip install --quiet --upgrade pip
+          python3 -m pip install --quiet ortools
+          python3 -c "from ortools.sat.python import cp_model; print('ortools ready')"
+
+      - name: solve
+        run: |
+          set -e
+          mkdir -p out
+          python3 src/mavis/p009/cpsat_ta41.py \
+            --instance src/mavis/p009/instance.json \
+            --time "$(( ${{ inputs.minutes }} * 60 ))" \
+            --workers "${{ inputs.workers }}" \
+            --seed "${{ inputs.seed }}" \
+            --linlevel "${{ inputs.linlevel }}" \
+            --disjunctive "${{ inputs.disjunctive }}" \
+            --out out/certificate.json --log out/cpsat.log || true
+          grep -E "^status=" out/cpsat.log | tail -1 || tail -3 out/cpsat.log
+
+      - name: validate independently
+        run: |
+          set -e
+          if [ -f out/certificate.json ]; then
+            python3 - <<'PY'
+          import json, sys
+          sys.path.insert(0, "src/mavis/p009")
+          from pick_best import makespan
+          inst = json.load(open("src/mavis/p009/instance.json"))
+          d = json.load(open("out/certificate.json"))
+          ms = makespan(d["machines"], inst["routes"], inst["durations"])
+          print("independent makespan =", ms)
+          assert ms is not None and ms <= 2006, ms
+          PY
+          else
+            echo "no certificate produced"
+          fi
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p009-cpsat-${{ inputs.seed }}-${{ github.run_id }}
+          path: |
+            out/certificate.json
+            out/cpsat.log
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### ta41 CP-SAT seed=${{ inputs.seed }} workers=${{ inputs.workers }}"
+            grep -E "^status=" out/cpsat.log 2>/dev/null | tail -1 || true
+            tail -3 out/cpsat.log 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
