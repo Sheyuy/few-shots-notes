@@ -1,0 +1,97 @@
+name: p004-dim5-cpsat
+# CP-SAT model for "is there an independent set of size N in C7^5?".
+#
+# If N = 368 has a solution, its square (368 x 368 = 135424 points) beats the
+# p004 board record 134753 on its own.  If CP-SAT proves infeasibility for
+# N = 368, then alpha(C7^5) <= 367, which closes the "find another base code"
+# branch of p004 for good.
+#
+# The model: one boolean per vertex (16807), a not-both clause for every
+# adjacent pair (~2M clauses), and a cardinality constraint.
+#
+#   gh workflow run p004-dim5-cpsat.yml -f target=368 -f minutes=300
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "required independent set size in C7^5"
+        required: true
+        default: "368"
+      minutes:
+        description: "CP-SAT wall limit in minutes"
+        required: true
+        default: "300"
+      workers:
+        description: "CP-SAT search workers"
+        required: true
+        default: "2"
+      seed:
+        description: "random seed"
+        required: true
+        default: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  solve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install ortools
+        run: |
+          set -e
+          python3 -m pip install --quiet ortools
+          python3 -c "from ortools.sat.python import cp_model; print('ortools ready')"
+
+      - name: solve
+        run: |
+          set -e
+          mkdir -p out
+          python3 src/mavis/p004/cpsat_dim5.py \
+            --target "${{ inputs.target }}" \
+            --time "$(( ${{ inputs.minutes }} * 60 ))" \
+            --workers "${{ inputs.workers }}" \
+            --seed "${{ inputs.seed }}" \
+            --out out/set.txt || echo "SOLVE STEP FAILED (see traceback above)"
+          tail -3 out/solve.log 2>/dev/null || true
+
+      - name: validate independently
+        run: |
+          set -e
+          if [ -s out/set.txt ]; then
+            python3 - <<'PY'
+          import sys
+          sys.path.insert(0, "src/mavis/p004")
+          from cpsat_dim5 import check_independent
+          pts = [l.strip() for l in open("out/set.txt") if l.strip()]
+          print("points:", len(pts))
+          ok, why = check_independent(pts)
+          print("independent:", ok, why)
+          assert ok, why
+          PY
+          else
+            echo "no set produced"
+          fi
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p004-dim5-${{ inputs.target }}-${{ github.run_id }}
+          path: |
+            out/set.txt
+            out/solve.log
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p004 dim-5 CP-SAT target=${{ inputs.target }}"
+            tail -3 out/solve.log 2>/dev/null || true
+            wc -l out/set.txt 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
