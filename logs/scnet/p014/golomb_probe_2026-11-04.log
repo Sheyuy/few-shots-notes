@@ -1,0 +1,35 @@
+# p014 (29-mark Golomb ruler, baseline 623) — feasibility probe, 2026-11-04
+# local macOS, single thread, gcc -O3
+
+## tool
+src/scnet/p014/golomb.c — simulated annealing on a fixed length L.
+  marks m[0]=0 < ... < m[28]=L, cost = number of COLLIDING DIFFERENCE PAIRS
+  (cost 0 <=> valid ruler). Move = relocate one mark to any free position;
+  delta is exact (remove all old differences, then add all new, then undo) and was
+  verified against full recomputation on 2,000 random states ("DELTA_OK").
+
+## control: the baseline ruler itself
+L=623, seeded with the Singer ruler -> cost 0 immediately (sanity check passes).
+
+## warm start: L=622, the baseline compressed to [0,622]
+start cost = 14 (marks 0 2 27 32 40 94 155 157 192 206 232 251 266 337 338 354
+                    393 402 420 472 478 501 522 569 579 591 611 615 622)
+T = 0.2 : 4,030 accepted moves in 25 s, best stays 14
+T = 0.5 : 5,122 accepted moves in 25 s, best stays 14
+T = 1.0 : 2.0e6 moves, cost wanders 60-80, best stays 14
+T = 2.0 : 4.0e6 moves, cost wanders 70-90, best stays 14
+T = 3.0 : 8.0e6 moves, cost wanders 70-105, best stays 14
+=> the compressed ruler is a deep local minimum at L=622; no sampled move improves it.
+
+## how strong is the solver at all?
+random start, L=623 (a ruler provably exists): 133 -> 31 in 60 s
+random start, L=622:                          178 -> 30 in 30 s
+=> even where a solution exists, this annealer is far from reaching cost 0.
+
+## reading
+The probe does not show that 622 is impossible; it shows that a generic annealer is
+one to two orders of magnitude too weak to attack this instance. Rokicki-Dogon report
+that the finite-geometry constructions give the best known rulers for every n > 16,
+i.e. no heuristic has beaten 623 for 29 marks either.
+A serious attempt would need a dedicated solver (difference-triangle tabu with
++-1 shift moves and plateau handling, or a CP/SAT model with propagation), not this.
