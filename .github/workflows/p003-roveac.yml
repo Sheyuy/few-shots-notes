@@ -34,6 +34,9 @@ jobs:
           set -e
           python3 -m pip install --upgrade pip > /dev/null
           python3 -m pip install networkx > /dev/null
+          # the runner's Python 3.14 has no numpy; our script does not need it,
+          # but install it anyway so that any numpy-based networkx path works.
+          python3 -m pip install numpy > /dev/null || echo "(numpy unavailable - the script does not need it)"
           git clone --depth 1 https://github.com/aLehav/ramsey-ove-and-check.git roveac_src
           python3 -m pip install ./roveac_src > /dev/null
           python3 -c "import roveac, networkx; print('roveac', getattr(roveac,'__version__','?'), '| networkx', networkx.__version__)"

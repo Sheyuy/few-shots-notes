@@ -30,7 +30,6 @@ import sys
 import time
 
 import networkx as nx
-import numpy as np
 
 from roveac import Extender
 from roveac.decrementor import Decrementor
@@ -51,9 +50,14 @@ def load_adj(fn):
 
 
 def to_nx(A):
-    # networkx.from_numpy_array insists on a bool dtype (an int array raises
-    # a TypeError about the dtype) -- that killed the first remote run.
-    return nx.from_numpy_array(np.array(A, dtype=bool))
+    # Build the graph with plain networkx: the runner's Python 3.14 has no
+    # numpy, and nx.from_numpy_array needs numpy *and* a bool dtype.  Two
+    # separate remote runs died on that; this needs neither.
+    n = len(A)
+    g = nx.Graph()
+    g.add_nodes_from(range(n))
+    g.add_edges_from((i, j) for i in range(n) for j in range(i + 1, n) if A[i][j])
+    return g
 
 
 def wl_key(A, iters=4):
