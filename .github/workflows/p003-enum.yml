@@ -75,11 +75,17 @@ jobs:
           import json, sys
           sys.path.insert(0, "src/mavis/p003")
           from enum35 import build_ext_cnf
-          A = json.load(open("sanity/known.json"))["adjacency"]
+          raw = json.load(open("sanity/known.json"))["adjacency"]
+          A = [[int(c) for c in row] for row in raw]   # rows may be strings
           n, ind5 = build_ext_cnf(n=len(A), A=A, path="sanity/ext.cnf")
           print("extension CNF clauses =", n, "independent-5-sets =", ind5)
+          # a valid 35-graph has independent 5-sets; if this prints 0 the
+          # adjacency was mis-parsed (that bug cost us one round).
+          assert ind5 > 0, "no independent 5-sets found -- adjacency parsing is wrong"
           EOF
           ./kissat-4.0.4-linux-amd64 --time=120 sanity/ext.cnf | tail -3
+          echo "--- the 35-vertex instance itself must be SATISFIABLE ---"
+          ./kissat-4.0.4-linux-amd64 --time=120 base35.cnf | tail -3
 
       - name: enumerate and test extensions
         run: |

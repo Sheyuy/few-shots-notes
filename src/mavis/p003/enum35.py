@@ -41,8 +41,12 @@ import time
 def run_solver(cnf, secs, solver):
     """Run the SAT solver on cnf; return ('SAT', assignment) | ('UNSAT', None)
     | ('UNKNOWN', None).  assignment maps var -> bool for the edge variables."""
-    # NOTE: kissat's --time is in SECONDS (float), not milliseconds.
-    cmd = solver + ["--time=%.3f" % secs, cnf]
+    # NOTE 1: kissat's --time is in SECONDS, and it only parses INTEGERS --
+    # "--time=120.000" makes it print a usage error and exit 1 (which we used
+    # to misread as UNKNOWN).
+    # NOTE 2: the adjacency matrix may arrive as strings ("0101...") or bools,
+    # so coerce it before any truthiness test.
+    cmd = solver + ["--time=%d" % int(secs), cnf]
     try:
         p = subprocess.run(cmd, capture_output=True, text=True, timeout=secs + 30)
     except subprocess.TimeoutExpired:
@@ -96,6 +100,8 @@ def to_graph(n, vals):
 def build_ext_cnf(n, A, path):
     """CNF for: does there exist S = N(v) with B[S] triangle-free and
     B[V \\ S] free of independent 5-sets?  Variables x_i = [i in S]."""
+    # normalise: rows may be strings ("0101") or bools
+    A = [[(1 if c in (1, True, "1") else 0) for c in row] for row in A]
     clauses = []
     # 1. every triangle {a,b,c} of B forbids S containing all three
     for a in range(n):
