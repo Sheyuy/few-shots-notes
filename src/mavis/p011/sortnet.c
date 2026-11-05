@@ -203,7 +203,11 @@ int main(int argc, char **argv)
             } else {
                 stall++;
             }
-            if (curfit == TOTAL) {
+            /* only a STRICTLY SHORTER network counts as an improvement: with the
+             * insert mutation the repair can produce a longer (but still sorting)
+             * network, and taking that as "best" made the counter explode while
+             * the network actually got worse (71 -> 254 comparators). */
+            if (curfit == TOTAL && cur.n < best.n) {
                 best = cur;
                 found++;
                 fprintf(stderr, "\n*** %d comparators that sort everything (eval #%ld)\n",
