@@ -1,0 +1,35 @@
+# p004 — 15-way LNS lottery on the 10-dimensional record set (2026-11-04/05)
+# container, 15-core cgroup quota, 10 h wall-clock cap
+
+## setup
+data   : data/scnet/p004/cc_10_7_134753_paper.txt (134,753 points, 10-digit base-7 strings)
+         md5 fcfd024dfe284a23589b4c339eb7766b  (identical on both machines)
+tool   : src/scnet/p004/lnsd.cpp, extended with a seed argument (argv[7]); without it every
+         copy would run the identical RNG stream (it was hard-coded to 12345).
+         usage: ./lnsd 10 c10.txt <kmin> <kmax> <iters> <target> <seed>
+runs   : 15 processes, seeds 1001..1015, target 134754, iters 1e9, timeout 36000 s each
+         (kmin,kmax) = (4,12) (6,16) (8,20) (10,24) (6,20) (5,14) (7,18) (9,22) (12,26)
+                       (4,10) (6,14) (8,16) (10,20) (5,12) (7,16)
+resources: 15 x ~1.9 GB RSS (~30 GB), 1497% CPU sustained
+
+## result
+started  2026-11-04 ~02:14 CST (container clock), finished 2026-11-05 12:14:25 CST
+ALL 15 logs contain exactly four lines and nothing else:
+
+    D=10 U=282475249 set=134753 k=<...> iters=1000000000
+    BUILD cnt in 284.0 s        (287.6 s for the last seed)
+    MAXCOUNT 121
+    FREE0 0
+
+i.e. **zero improvements in ten hours of 15-way search**: no BEST line, no FOUND line,
+every run stayed at 134,753 points.
+
+## what it does establish
+FREE0 = 0 reproduced fifteen times on the paper set: no single point of C7^10 can be added
+to this 134,753-point set. (Same statement as the earlier m0 = 0 computation.)
+
+## reading
+The ruin-and-recreate operator used here cannot exceed 134,753 on this instance, in
+agreement with the 1.6e8-chain lns6 result in C7^5. p004 stays at 134,753.
+A positive result would need a different operator (min-conflicts repair with eviction) or a
+structural construction, not more of the same search.
