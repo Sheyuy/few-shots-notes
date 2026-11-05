@@ -1,0 +1,109 @@
+name: p003-roveac
+# Run Lehavi's ROVEaC (arXiv:2411.04267) one-vertex-extension on our own base
+# set of (4,6,35) counterexamples.
+#
+#   A) the standard 37 (Exoo 2012)  -- must reproduce his "empty" result
+#   B) our 62 (the 37 + 25 new ones we found) -- strictly stronger coverage
+#   C) his decrement-and-reconstruct route (section 5.3)
+#
+# Any non-empty result in B or C is a 36-vertex (4,6)-graph: the board record
+# for p003 is 35 vertices, so that would be a world record.
+#
+#   gh workflow run p003-roveac.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "hard wall-clock cap for the extension step (minutes)"
+        required: true
+        default: "300"
+
+permissions:
+  contents: read
+
+jobs:
+  extend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install roveac and networkx
+        run: |
+          set -e
+          python3 -m pip install --upgrade pip > /dev/null
+          python3 -m pip install networkx > /dev/null
+          git clone --depth 1 https://github.com/aLehav/ramsey-ove-and-check.git roveac_src
+          python3 -m pip install ./roveac_src > /dev/null
+          python3 -c "import roveac, networkx; print('roveac', getattr(roveac,'__version__','?'), '| networkx', networkx.__version__)"
+
+      - name: sanity: our base graphs must all be valid (4,6)-graphs
+        run: |
+          set -e
+          python3 - <<'EOF'
+          import json, itertools
+          def load(fn):
+              d=json.load(open(fn)); gs=d if isinstance(d,list) else list(d.values())
+              return [[[int(c) for c in row] for row in g['adjacency']] for g in gs]
+          def valid(A):
+              n=len(A); adj=[0]*n
+              for i in range(n):
+                  for j in range(n):
+                      if A[i][j]: adj[i]|=1<<j
+              bad6=0
+              for combo in itertools.combinations(range(n),5):
+                  ok=True
+                  for a in range(5):
+                      for b in range(a+1,5):
+                          if A[combo[a]][combo[b]]: ok=False;break
+                      if not ok: break
+                  if not ok: continue
+                  m=0
+                  for x in combo: m|=1<<x
+                  for v in range(n):
+                      if (m>>v)&1: continue
+                      if (adj[v]&m)==0: bad6+=1; break
+              k4=0
+              for i in range(n):
+                  nb=[j for j in range(n) if A[i][j]]
+                  for a in range(len(nb)):
+                      for b in range(a+1,len(nb)):
+                          for c in range(b+1,len(nb)):
+                              if A[nb[a]][nb[b]] and A[nb[a]][nb[c]] and A[nb[b]][nb[c]]: k4+=1
+              return k4,bad6
+          bad=0
+          for fn in ("src/mavis/p003/exoo35_graphs.json","src/mavis/p003/pool35_graphs.json"):
+              for A in load(fn):
+                  k,i=valid(A)
+                  if k or i: bad+=1
+          print("invalid base graphs:", bad)
+          assert bad==0, "a base graph is not a valid (4,6)-graph"
+          EOF
+
+      - name: run the extension
+        run: |
+          set -e
+          timeout $(( ${{ inputs.minutes }} * 60 )) python3 src/mavis/p003/roveac_run.py \
+            src/mavis/p003/exoo35_graphs.json src/mavis/p003/pool35_graphs.json \
+            | tee roveac.log || echo "(extension step hit the time cap)"
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-roveac-${{ github.run_id }}
+          path: |
+            roveac.log
+            ROVEAC_SUMMARY.json
+            FOUND_*.json
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 ROVEaC one-vertex extension"
+            cat ROVEAC_SUMMARY.json 2>/dev/null || echo "(no summary)"
+            tail -20 roveac.log 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
