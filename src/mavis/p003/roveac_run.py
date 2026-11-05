@@ -30,6 +30,7 @@ import sys
 import time
 
 import networkx as nx
+import numpy as np
 
 from roveac import Extender
 from roveac.decrementor import Decrementor
@@ -50,7 +51,9 @@ def load_adj(fn):
 
 
 def to_nx(A):
-    return nx.from_numpy_array(A)
+    # networkx.from_numpy_array insists on a bool dtype (an int array raises
+    # a TypeError about the dtype) -- that killed the first remote run.
+    return nx.from_numpy_array(np.array(A, dtype=bool))
 
 
 def wl_key(A, iters=4):
