@@ -1,0 +1,91 @@
+name: p003-pool
+# How big is the pool of valid 35-vertex (4,6)-graphs?
+#
+# Our near-SAT results say: "no 36-vertex graph exists within k <= 256 edits of
+# any of our 88 base graphs".  Since deleting a vertex from any 36-vertex graph
+# yields a valid 35-vertex graph, a 36-vertex graph can only exist if the pool
+# of 35-vertex graphs is bigger than what we know.
+#
+# This workflow runs the tabu search from MANY random starts at n = 35 and
+# n = 36 and reports the distribution of the best violation counts.  If random
+# starts never even reach 0 violations, the landscape is rugged and isolated and
+# the known graphs look like rare, special objects -- which is exactly what
+# "R(4,6) = 36" would look like.
+#
+#   gh workflow run p003-pool.yml -f secs=300 -f procs=2 -f seeds=40
+
+on:
+  workflow_dispatch:
+    inputs:
+      secs:
+        description: "tabu seconds per run"
+        required: true
+        default: "300"
+      procs:
+        description: "parallel processes"
+        required: true
+        default: "2"
+      seeds:
+        description: "how many random seeds to try"
+        required: true
+        default: "40"
+      n:
+        description: "vertex count (35 or 36)"
+        required: true
+        default: "35"
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o p003r src/mavis/p003/p003r.c -lm
+          echo built
+
+      - name: random-start sweep
+        run: |
+          set -e
+          mkdir -p out
+          SECS="$(( ${{ inputs.secs }} * 60 ))"
+          N="${{ inputs.n }}"
+          SEEDS="${{ inputs.seeds }}"
+          i=0
+          while [ $i -lt "$SEEDS" ]; do
+            for j in $(seq 1 "${{ inputs.procs }}"); do
+              ./p003r tabu random "$SECS" $(( i * 100 + j )) "out/g_${i}_${j}.json" "$N" \
+                  > "out/g_${i}_${j}.log" 2>&1 &
+            done
+            wait
+            i=$(( i + 1 ))
+          done
+          grep -h "TABU best" out/*.log | sed 's/.*viol=//' | sort -n | uniq -c | head -20
+          echo "--- the best runs ---"
+          grep -l "TABU best viol=0 " out/*.log 2>/dev/null | head -20 || true
+          grep -h "TABU best" out/*.log | sort -t= -k2 -n | head -10
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-pool-${{ inputs.n }}-${{ github.run_id }}
+          path: |
+            out/*.json
+            out/*.log
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 random-start sweep n=${{ inputs.n }}"
+            grep -h "TABU best" out/*.log 2>/dev/null | sed 's/.*viol=//' | sort -n | uniq -c | head -20
+            echo "runs with viol=0: $(grep -l 'TABU best viol=0 ' out/*.log 2>/dev/null | wc -l)"
+          } >> "$GITHUB_STEP_SUMMARY"
