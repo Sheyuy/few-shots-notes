@@ -116,7 +116,28 @@ def main():
         ndec = -1
         print("[C_decrement] failed: %r" % (e,), flush=True)
 
+    # D) the strongest one-vertex-extension attack available: extend the UNION
+    #    of our 62 bases and the 933 decremented R(4,6,34) graphs.
+    #    Why this is sound: by Lehavi's Algorithm 1, if a 36-vertex
+    #    counterexample exists then every one of its 35-vertex subgraphs is a
+    #    counterexample, and every 34-vertex subgraph is in R(4,6,34).
+    #    So a much larger base set can only help.
+    nunion = -1
+    try:
+        t0 = time.time()
+        dec62 = Decrementor.decrement({to_nx(A) for A in exoo + new}, method="triangle")
+        print("[D_decrement62] decremented set size: %d (%.1f s)"
+              % (len(dec62), time.time() - t0), flush=True)
+        union = {to_nx(A) for A in exoo + new} | set(dec62)
+        print("[E_union] extending over %d base graphs" % len(union), flush=True)
+        t0 = time.time()
+        runion = Extender.extend(union, s=4, t=6, **OPTS)
+        nunion = report("E_union", runion, t0)
+    except Exception as e:
+        print("[D/E] failed: %r" % (e,), flush=True)
+
     summary = {"A_standard37": n37, "B_ours62": n62, "C_decrement": ndec,
+               "E_union": nunion,
                "extra_bases": len(new), "total_bases": len(exoo) + len(new)}
     json.dump(summary, open("ROVEAC_SUMMARY.json", "w"), indent=1)
     print("SUMMARY " + json.dumps(summary), flush=True)
