@@ -74,12 +74,14 @@ def wl_key(A, iters=4):
 def report(tag, res, t0):
     print("[%s] %d graph(s) found in %.1f s" % (tag, len(res), time.time() - t0),
           flush=True)
-    for g in res:
+    for i, g in enumerate(res):
         A = nx.to_numpy_array(g)
-        print("   candidate: n=%d  edges=%d" % (A.shape[0], int(A.sum() // 2)),
+        print("   candidate %d: n=%d  edges=%d" % (i, A.shape[0], int(A.sum() // 2)),
               flush=True)
+        # keep EVERY candidate: the previous version overwrote one file and we
+        # lost the whole set except the last one.
         json.dump({"adjacency": [[int(x) for x in row] for row in A]},
-                  open("FOUND_%s.json" % tag, "w"))
+                  open("FOUND_%s_%03d.json" % (tag, i), "w"))
     return len(res)
 
 
