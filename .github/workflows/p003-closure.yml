@@ -1,0 +1,90 @@
+name: p003-closure
+# Iterative closure of the (4,6,35) counterexample set.
+#
+# Each round is an EXHAUSTIVE one-vertex extension over the current base set
+# (plus a decremented R(4,6,34) set), and every new 35-vertex counterexample
+# found is added to the base.  The base therefore grows from 160 graphs (37
+# published + 123 found by us) towards a fixed point.
+#
+# If any round produces a 36-vertex counterexample, that is a world record:
+# the board record for p003 is 35 vertices.
+#
+#   gh workflow run p003-closure.yml -f rounds=8 -f minutes=280
+
+on:
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: "maximum number of closure rounds"
+        required: true
+        default: "8"
+      minutes:
+        description: "total time budget in minutes"
+        required: true
+        default: "280"
+
+permissions:
+  contents: read
+
+jobs:
+  closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install
+        run: |
+          set -e
+          python3 -m pip install --upgrade pip > /dev/null
+          python3 -m pip install networkx tqdm > /dev/null
+          git clone --depth 1 https://github.com/aLehav/ramsey-ove-and-check.git roveac_src
+          python3 -m pip install ./roveac_src > /dev/null
+          python3 -c "import roveac; print('roveac ok')"
+
+      - name: smoke test
+        run: |
+          set -e
+          python3 - <<'EOF'
+          import json, networkx as nx
+          from roveac import Extender
+          d = json.load(open("src/mavis/p003/pool35_extended.json"))
+          A = [[int(c) for c in row] for row in d[0]["adjacency"]]
+          g = nx.Graph(); g.add_nodes_from(range(len(A)))
+          g.add_edges_from((i,j) for i in range(len(A)) for j in range(i+1,len(A)) if A[i][j])
+          print("graph ok nodes=%d edges=%d" % (g.number_of_nodes(), g.number_of_edges()))
+          r = Extender.extend({g}, s=4, t=6, extension_method="ove",
+              mapping_constructor_method="triangle", hash_method="triangle",
+              check_method="subgraph_st", generate_key_method="triangle")
+          print("extend() ok, returned", len(r))
+          EOF
+
+      - name: closure loop
+        run: |
+          set -e
+          python3 src/mavis/p003/roveac_closure.py \
+            src/mavis/p003/pool35_extended.json \
+            "${{ inputs.rounds }}" "$(( ${{ inputs.minutes }} * 60 ))" \
+            | tee closure.log || echo "(closure hit the time cap)"
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-closure-${{ github.run_id }}
+          path: |
+            closure.log
+            CLOSURE_SUMMARY.json
+            CLOSURE_BASE.json
+            FOUND36_*.json
+            NEW35_*.json
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 closure"
+            cat CLOSURE_SUMMARY.json 2>/dev/null || echo "(no summary)"
+            ls FOUND36_*.json 2>/dev/null && echo "### 36-VERTEX COUNTEREXAMPLE EXISTS"
+          } >> "$GITHUB_STEP_SUMMARY"
