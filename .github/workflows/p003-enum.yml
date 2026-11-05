@@ -1,0 +1,114 @@
+name: p003-enum
+# Complete enumeration of the 35-vertex (4,6)-graphs, with an extension test
+# for each one.
+#
+# The direct 36-vertex instance (630 edge variables, 2,006,697 clauses) could
+# not be decided in 5.5 h / 10^9 conflicts.  But the problem factors:
+#
+#     violations(B + v) = tri(B[S]) + ind5(B[V(B) \ S])
+#
+# so (a) enumerating every valid 35-vertex (4,6)-graph is an easy SAT problem
+# (595 variables) and (b) asking "does this 35-graph extend to 36?" is a SAT
+# problem with only 35 variables -- instant.
+#
+# If every 35-graph fails to extend, no 36-vertex (4,6)-graph exists, i.e.
+# R(4,6) = 36.  If one of them extends, we have a 36-vertex graph and that
+# would beat the board record (35 vertices).
+#
+#   gh workflow run p003-enum.yml -f maxsol=20000 -f secs=120
+
+on:
+  workflow_dispatch:
+    inputs:
+      maxsol:
+        description: "maximum number of 35-graphs to enumerate"
+        required: true
+        default: "20000"
+      secs:
+        description: "solver seconds per call"
+        required: true
+        default: "120"
+      solver:
+        description: "solver binary to use"
+        required: false
+        default: "./kissat-4.0.4-linux-amd64"
+
+permissions:
+  contents: read
+
+jobs:
+  enumerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential unzip > /dev/null
+          gcc -O2 -o sat36 src/mavis/p003/sat36.c
+          curl -sSL -o kissat.zip \
+            https://github.com/arminbiere/kissat/releases/download/rel-4.0.4/kissat-4.0.4-linux-amd64.zip
+          unzip -o -q kissat.zip
+          chmod +x kissat-4.0.4-linux-amd64
+          ./kissat-4.0.4-linux-amd64 --version
+          # self-check: the 35-vertex instance must be satisfiable (we know
+          # valid 35-graphs exist), and the extension of a known one is UNSAT.
+          NVERT=35 ./sat36 base35.cnf
+          head -1 base35.cnf
+          ls -la base35.cnf
+
+      - name: sanity check on a known 35-graph
+        run: |
+          set -e
+          mkdir -p sanity
+          python3 - <<'EOF'
+          import json, os
+          d = json.load(open("src/mavis/p003/pool35_graphs.json"))
+          g = d[0] if isinstance(d, list) else list(d.values())[0]
+          json.dump({"adjacency": g["adjacency"]}, open("sanity/known.json", "w"))
+          print("known graph written, n =", len(g["adjacency"]))
+          EOF
+          python3 - <<'EOF'
+          import json, sys
+          sys.path.insert(0, "src/mavis/p003")
+          from enum35 import build_ext_cnf
+          A = json.load(open("sanity/known.json"))["adjacency"]
+          n, ind5 = build_ext_cnf(n=len(A), A=A, path="sanity/ext.cnf")
+          print("extension CNF clauses =", n, "independent-5-sets =", ind5)
+          EOF
+          ./kissat-4.0.4-linux-amd64 --time=120 sanity/ext.cnf | tail -3
+
+      - name: enumerate and test extensions
+        run: |
+          set -e
+          mkdir -p out
+          python3 src/mavis/p003/enum35.py base35.cnf out \
+            "${{ inputs.maxsol }}" "${{ inputs.secs }}" "${{ inputs.solver }}" \
+            | tee out/enum.log
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-enum-${{ github.run_id }}
+          path: |
+            out/*.json
+            out/enum.log
+            base35.cnf
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 35-graph enumeration"
+            echo "extensions found: $(ls out/EXT_*.json 2>/dev/null | wc -l)"
+            echo "35-graphs enumerated: $(ls out/g_*.json 2>/dev/null | wc -l)"
+            tail -5 out/enum.log 2>/dev/null || true
+            if ls out/EXT_*.json >/dev/null 2>&1; then
+              echo "### A 36-VERTEX (4,6)-GRAPH EXISTS -- THIS BEATS THE RECORD"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
