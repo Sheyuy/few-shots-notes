@@ -38,7 +38,7 @@ jobs:
           python3 -m pip install ./roveac_src > /dev/null
           python3 -c "import roveac, networkx; print('roveac', getattr(roveac,'__version__','?'), '| networkx', networkx.__version__)"
 
-      - name: sanity: our base graphs must all be valid (4,6)-graphs
+      - name: "sanity: our base graphs must all be valid (4,6)-graphs"
         run: |
           set -e
           python3 - <<'EOF'
