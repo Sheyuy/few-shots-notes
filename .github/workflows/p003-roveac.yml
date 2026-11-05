@@ -84,6 +84,24 @@ jobs:
           assert bad==0, "a base graph is not a valid (4,6)-graph"
           EOF
 
+      - name: smoke test the roveac API
+        run: |
+          set -e
+          python3 - <<'EOF'
+          import json, networkx as nx
+          from roveac import Extender
+          d = json.load(open("src/mavis/p003/exoo35_graphs.json"))
+          A = [[int(c) for c in row] for row in d[0]["adjacency"]]
+          g = nx.Graph()
+          g.add_nodes_from(range(len(A)))
+          g.add_edges_from((i, j) for i in range(len(A)) for j in range(i + 1, len(A)) if A[i][j])
+          print("graph ok: nodes=%d edges=%d" % (g.number_of_nodes(), g.number_of_edges()))
+          r = Extender.extend({g}, s=4, t=6, extension_method="ove",
+                              mapping_constructor_method="triangle", hash_method="triangle",
+                              check_method="subgraph_st", generate_key_method="triangle")
+          print("extend() signature ok, returned", len(r))
+          EOF
+
       - name: run the extension
         run: |
           set -e
