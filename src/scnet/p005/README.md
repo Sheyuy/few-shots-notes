@@ -74,3 +74,12 @@ gcc -O3 -march=native /path/to/src/scnet/p005/r10.c -o r10 && ./r10
 
 因此 p005 的状态是：**512 仍是最好的可验证值，513 需要新数学构造。**
 运行日志见 [`logs/scnet/p005/`](../../../logs/scnet/p005/)。
+
+## 补遗（2026-11-06 归档）
+
+| 文件 | 作用 |
+| --- | --- |
+| `build_test.py` | CP-SAT 建模的最小烟测（`third()` 三元组、规模） |
+| `model_test.py` | 同上，变量/约束计数核对 |
+| `covers.py` | 基线点的覆盖统计（每个点覆盖多少条线） |
+| `anneal_s.c` | 模拟退火的串行版本（无 OpenMP） |

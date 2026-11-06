@@ -1,0 +1,127 @@
+// Parallel complete k-exchange check on R367 (C7^5).
+// Each first-level choice i0 is an independent subtree; OpenMP spreads them.
+// Usage: xk3 K cap i0lo i0hi [threads]
+#include <cstdio>
+#include <cstdint>
+#include <cstdlib>
+#include <vector>
+#include <algorithm>
+#include <chrono>
+#include <atomic>
+#include <thread>
+using namespace std;
+static const int N5=16807;
+int dig[N5][5];
+static inline bool adj(int a,int b){
+    bool any=false;
+    for(int i=0;i<5;i++){int d=dig[a][i]-dig[b][i];if(d<0)d=-d;if(d==6)d=1;if(d>1)return false;if(d==1)any=true;}
+    return any;
+}
+static inline int enc(const int v[5]){int x=0;for(int i=4;i>=0;i--)x=x*7+v[i];return x;}
+int K,m;
+struct Ent{int v;int n;int t[16];};
+vector<Ent> L;
+std::atomic<long long> totalNodes(0), leaves(0), connLeaves(0), connNodes(0);
+std::atomic<bool> found(false);
+bool capHit=false; long long cap=0;
+struct St{int cur[16];int curN=0;int curT[16];int curTn=0;long long nodes=0;};
+static inline int unionN(const int*c,int nc,const int*t,int nt,int*out){
+    int i=0,j=0,n=0;
+    while(i<nc||j<nt){
+        int v;
+        if(j>=nt||(i<nc&&c[i]<t[j]))v=c[i++];
+        else if(i>=nc||t[j]<c[i])v=t[j++];
+        else {v=c[i++];j++;}
+        out[n++]=v; if(n>K)return n;
+    }
+    return n;
+}
+void dfs(St& s,int start){
+    if(found.load(memory_order_relaxed))return;
+    if(++s.nodes>cap){capHit=true;return;}
+    if((s.nodes&0xFFFFF)==0){
+        totalNodes.fetch_add(0);
+        if(s.nodes%4000000==0){fprintf(stderr,"progress nodes=%lld\n",(long long)totalNodes.load()+s.nodes);fflush(stderr);}
+    }
+    {
+        int par[16];for(int q=0;q<16;q++)par[q]=q;
+        auto find=[&](int x){while(par[x]!=x){par[x]=par[par[x]];x=par[x];}return x;};
+        auto uni=[&](int a,int b){a=find(a);b=find(b);if(a!=b)par[a]=b;};
+        for(int q=0;q<s.curN;q++)for(int r=0;r<s.curTn;r++)if(adj(s.cur[q],s.curT[r]))uni(q,s.curN+r);
+        int root=find(0);bool ok=true;
+        for(int q=1;q<s.curN+s.curTn;q++)if(find(q)!=root){ok=false;break;}
+        if(ok)connNodes.fetch_add(1);
+    }
+    if(s.curN==K+1){
+        long long lv=leaves.fetch_add(1);
+        if((lv&1023)==0){}
+        int par[16];for(int q=0;q<16;q++)par[q]=q;
+        auto find=[&](int x){while(par[x]!=x){par[x]=par[par[x]];x=par[x];}return x;};
+        auto uni=[&](int a,int b){a=find(a);b=find(b);if(a!=b)par[a]=b;};
+        for(int q=0;q<s.curN;q++)for(int r=0;r<s.curTn;r++)if(adj(s.cur[q],s.curT[r]))uni(q,s.curN+r);
+        int root=find(0);bool ok=true;
+        for(int q=1;q<s.curN+s.curTn;q++)if(find(q)!=root){ok=false;break;}
+        if(ok)connLeaves.fetch_add(1);
+        return;
+    }
+    for(int i=start;i<m&&!found.load(memory_order_relaxed);i++){
+        bool ok=true;
+        for(int q=0;q<s.curN;q++) if(adj(s.cur[q],L[i].v)){ok=false;break;}
+        if(!ok)continue;
+        int u[16]; int nu=unionN(s.curT,s.curTn,L[i].t,L[i].n,u);
+        if(nu>K)continue;
+        int save[16]; int sn=s.curTn; for(int q=0;q<sn;q++)save[q]=s.curT[q];
+        for(int q=0;q<nu;q++)s.curT[q]=u[q]; s.curTn=nu;
+        s.cur[s.curN++]=L[i].v;
+        dfs(s,i+1);
+        s.curN--; s.curTn=sn; for(int q=0;q<sn;q++)s.curT[q]=save[q];
+    }
+}
+int main(int argc,char**argv){
+    const char* path="/Users/shiny/.sclaw/workspace/few-shots-notes/src/scnet/p004/R367.txt";
+    K=argc>1?atoi(argv[1]):3;
+    cap=argc>2?atoll(argv[2]):2000000000000LL;
+    int lo=argc>3?atoi(argv[3]):0;
+    int hi=argc>4?atoi(argv[4]):-1;
+    int threads=argc>5?atoi(argv[5]):8;
+    for(int v=0;v<N5;v++){int x=v;for(int i=0;i<5;i++){dig[v][i]=x%7;x/=7;}}
+    FILE* f=fopen(path,"r"); if(!f)return 1;
+    vector<int> S; int a[5];
+    while(fscanf(f,"%d %d %d %d %d",a,a+1,a+2,a+3,a+4)==5) S.push_back(enc(a));
+    fclose(f);
+    vector<char> inS(N5,0); for(int s:S) inS[s]=1;
+    for(int v=0;v<N5;v++){
+        if(inS[v])continue;
+        Ent e; e.v=v; e.n=0; bool ok=true;
+        for(int s:S) if(adj(v,s)){ if(e.n>=K+1){ok=false;break;} e.t[e.n++]=s; }
+        if(ok) L.push_back(e);
+    }
+    m=L.size(); if(hi<0||hi>m)hi=m; if(lo<0)lo=0; if(lo>hi)lo=hi;
+    fprintf(stderr,"K=%d |A|=%d L=%d range=[%d,%d) threads=%d\n",K,K+1,m,lo,hi,threads); fflush(stderr);
+    auto t0=chrono::steady_clock::now();
+    std::atomic<int> nextTask(lo);
+    auto worker=[&](){
+        St s;
+        while(true){
+            int i0=nextTask.fetch_add(1,memory_order_relaxed);
+            if(i0>=hi)break;
+            if(found.load(memory_order_relaxed)||capHit)break;
+            if(L[i0].n>K)continue;
+            s.curN=0;s.curTn=0;s.nodes=0;
+            s.cur[0]=L[i0].v;s.curN=1;
+            s.curTn=L[i0].n;for(int q=0;q<s.curTn;q++)s.curT[q]=L[i0].t[q];
+            dfs(s,i0+1);
+            totalNodes.fetch_add(s.nodes,memory_order_relaxed);
+        }
+    };
+    std::vector<std::thread> pool;
+    for(int t=0;t<threads;t++)pool.emplace_back(worker);
+    for(auto&t:pool)t.join();
+    double sec=chrono::duration<double>(chrono::steady_clock::now()-t0).count();
+    long long n=totalNodes.load();
+    if(found.load()){printf("FOUND_%d_EXCHANGE nodes=%lld seconds=%.1f\n",K,n,sec);}
+    else if(capHit){printf("CAP_REACHED nodes=%lld seconds=%.1f\n",n,sec);}
+    else{printf("NO_%d_EXCHANGE nodes=%lld seconds=%.1f range=[%d,%d)\n",K,n,sec,lo,hi);}
+    if(K>=5){printf("NODESTAT nodes=%lld connected=%lld\n",(long long)totalNodes.load(),(long long)connNodes.load());}
+    return 0;
+}

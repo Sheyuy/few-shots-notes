@@ -26,6 +26,7 @@ int main(int argc,char**argv){
     int kmin=argc>3?atoi(argv[3]):6, kmax=argc>4?atoi(argv[4]):14;
     long long iters=argc>5?atoll(argv[5]):100000;
     int target=argc>6?atoi(argv[6]):-1;
+    unsigned long long seed=argc>7?strtoull(argv[7],0,10):12345ULL;
     U=1;pw.assign(D,1);for(int i=1;i<D;i++)pw[i]=pw[i-1]*7;U=1;for(int i=0;i<D;i++)U*=7;
     long long tot=1;for(int i=0;i<D;i++)tot*=3;
     OFF.clear();OFF.reserve(tot);
@@ -57,7 +58,7 @@ int main(int argc,char**argv){
     vector<int> free0;
     for(long long v=0;v<U;v++)if(!inS[v]&&cnt[v]==0)free0.push_back((int)v);
     printf("FREE0 %zu\n",free0.size());fflush(stdout);
-    vector<int> cur=S;Rng rng(12345);
+    vector<int> cur=S;Rng rng((uint32_t)seed);
     vector<int> removed,added,cand;vector<uint32_t> stamp(U,0);uint32_t st=0;
     if(target<0)target=(int)cur.size();
     int best=(int)cur.size();

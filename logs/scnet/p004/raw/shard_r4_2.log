@@ -1,0 +1,7 @@
+SELFTEST coordinate_cases=49 random_graphs=1000 targets_per_graph=6 forced_hash_collisions=100 PASS
+SHARD {"index":2,"count":8,"deep6":1}
+MASK_SELFTEST random_pairs=100000 PASS baseline=134753
+COUNTS m0=0 m1=5178 m2=144861 m3=999144 m4=2131704 m5=2550704 m6=3197204 blocker_mismatches=0 truncations=0
+KEYS rank1=5152 rank2=136379 rank3=966479 rank4=2076092 rank5=2479863 rank6=3003919 max_multiplicity=6 linked_records=9028795
+STAGE rank4_extensions_k6 sets_or_anchor_instances=18666299 eligible=1146394 max_pool=27 complete=0 found=0 shard=2/8
+RESULT {"status":"incomplete_time_budget","max_k_completed":0,"requested_max_k":6,"found":0,"truncations":0}

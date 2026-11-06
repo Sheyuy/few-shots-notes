@@ -66,3 +66,18 @@ canonical hash 会变。`asym_r1_checkpoint.json` / `asym_r2_checkpoint.json` �
 - rearranged 集合的 `m1` 没有单独记录；它的 `m0 = 0` 经过检验，k ≤ 5 的交换排除也做过。
 - 所有文件的点均为 0–6 的数字串，不含坐标分隔符；`verify_points.py` 会去掉空白，
   因此空格分隔的原始格式也能直接读。
+
+## 补充数据（2026-11-06 归档）
+
+| 文件 | 内容 |
+| --- | --- |
+| `R362.txt` | C7⁵ 上的 362 点独立集（所有点均校验过，0 冲突），LNS 正向对照的起点 |
+| `R364.txt` | 364 点独立集，中间态 |
+| `C73.txt` | C7³ 的 27 点集，小维度示例/自检用 |
+| `alt367_00.txt` … `alt367_04.txt` | `gen367.cpp` 生成的 5 个**替代** 367 点集；与 `R367.txt` 的对称差分别是 0 / 2 / 4 / 8 / 10，用来检验“换一个 367 集会不会更容易加一点” |
+| `root_scan.json` | 50 个第 9 对候选的建族结果，全部 `STRUCTURE_REJECTED`（`unexpected pair count`） |
+| `d9_scan_result.json` | `{"tested": 1450, "valid": 0, "hits": []}`，`|D|=9` 扫描的机读结果 |
+
+`alt367_*` 的结论是否定的：五个替代集的 LNS 都塌回 367（对称差 0/2/4/8/10），
+没有出现 368。`root_scan.json` 与 `d9_scan_result.json` 分别是 `root_scan.py`、
+`d9_scan.py` 的完整输出，正文引用的数字都能从这里复查。
