@@ -21,6 +21,13 @@ cd few-shots
 python3 tools/run_tests.py  # 可选，15 秒
 ```
 
+本指南里的 `$WORK` 指仓库外的工作目录（脚本会在里面写证书和临时文件），
+先建好并导出：
+
+```bash
+export WORK=~/few-shots-work && mkdir -p $WORK
+```
+
 ## 1. p003 · R(4,6) 下界
 
 ### 1.1 基线复现
@@ -37,7 +44,7 @@ python3 problems/p003-ramsey-r46/verify/verify.py problems/p003-ramsey-r46/basel
 
 ```bash
 # 下载 37 个 35 点图
-cd /workspace/few-shots-work/p003
+cd $WORK/p003
 curl -sL --max-time 60 -o r46_35some.g6 https://users.cecs.anu.edu.au/~bdm/data/r46_35some.g6
 
 # 解析为文本格式
@@ -78,8 +85,8 @@ python3 src/p003/ext_sat.py
 **源码**: `src/p003/sat.py`
 
 ```bash
-cd /workspace/few-shots-work/p003
-PYTHONPATH=/workspace/few-shots-work/pylibs timeout 1800 python3 src/p003/sat.py > sat.log 2>&1
+cd $WORK/p003
+PYTHONPATH=$WORK/pylibs timeout 1800 python3 src/p003/sat.py > sat.log 2>&1
 # 预期: 2006697 clauses, 求解时间不确定 (可能需要数小时)
 # 输出: solve True 或 False，若 True 生成 sat_certificate.json
 ```
@@ -89,7 +96,7 @@ PYTHONPATH=/workspace/few-shots-work/pylibs timeout 1800 python3 src/p003/sat.py
 **源码**: `src/p003/sat_deg2.py`
 
 ```bash
-cd /workspace/few-shots-work/p003
+cd $WORK/p003
 # 对每个合法度数 d=11..17 运行 (每个 15-30 分钟)
 for d in 11 12 13 14 15 16 17; do
   timeout 1800 python3 src/p003/sat_deg2.py $d kissat > deg_$d.log 2>&1 &
@@ -103,7 +110,7 @@ done
 **源码**: `src/p003/symq.py`
 
 ```bash
-cd /workspace/few-shots-work/p003
+cd $WORK/p003
 # 支持的循环型: inv0 (18 对换), inv4 (4 不动点+16 对换), ord3 (12 3-循环),
 #              ord4 (9 4-循环), ord6 (6 6-循环), ord2fix2, ord3fix 等
 for kind in inv0 ord3 ord4 ord6; do
@@ -117,7 +124,7 @@ done
 **源码**: `src/p003/search.c`
 
 ```bash
-cd /workspace/few-shots-work/p003
+cd $WORK/p003
 gcc -O3 -march=native -o search src/p003/search.c -lm
 # 模式 B: 固定 35 点图，搜索第 36 点的邻域
 ./search B seeds/g0.txt 30 > out_B.txt 2> log_B.txt
@@ -152,7 +159,7 @@ python3 problems/p004-shannon-capacity-c7/verify/verify.py problems/p004-shannon
 **源码**: `src/p004/maximal.c`
 
 ```bash
-cd /workspace/few-shots-work/p004
+cd $WORK/p004
 # 导出基线点集
 cd few-shots
 python3 - <<'EOF'
@@ -162,7 +169,7 @@ def to7(s):
     x=0
     for ch in s: x=x*7+int(ch)
     return x
-with open("/workspace/few-shots-work/p004/points.txt","w") as f:
+with open("$WORK/p004/points.txt","w") as f:
     for s in pts: f.write(str(to7(s))+"\n")
 EOF
 
@@ -177,7 +184,7 @@ gcc -O3 -march=native -o maximal src/p004/maximal.c
 **源码**: `src/p004/exchange.c`
 
 ```bash
-cd /workspace/few-shots-work/p004
+cd $WORK/p004
 gcc -O3 -march=native -o exchange src/p004/exchange.c
 ./exchange points.txt
 # 预期输出: "NONE" (18 秒)
@@ -188,7 +195,7 @@ gcc -O3 -march=native -o exchange src/p004/exchange.c
 **源码**: `src/p004/exchange2.c`
 
 ```bash
-cd /workspace/few-shots-work/p004
+cd $WORK/p004
 gcc -O3 -march=native -o exchange2 src/p004/exchange2.c
 ./exchange2 points.txt
 # 预期输出: "NONE" (11 秒)
@@ -199,7 +206,7 @@ gcc -O3 -march=native -o exchange2 src/p004/exchange2.c
 **源码**: `src/p004/exchange3.c`
 
 ```bash
-cd /workspace/few-shots-work/p004
+cd $WORK/p004
 gcc -O3 -march=native -o exchange3 src/p004/exchange3.c
 ./exchange3 points.txt
 # 预期输出: "NONE" (15 秒)
@@ -220,7 +227,7 @@ python3 problems/p005-cap-set-8d/verify/verify.py problems/p005-cap-set-8d/basel
 **源码**: `src/p005/targeted2.py`
 
 ```bash
-cd /workspace/few-shots-work/p005
+cd $WORK/p005
 # 导出基线点集索引
 cd few-shots
 python3 - <<'EOF'
@@ -230,13 +237,13 @@ def idx(p):
     x=0
     for v in p: x=x*3+v
     return x
-with open("/workspace/few-shots-work/p005/init.txt","w") as f:
+with open("$WORK/p005/init.txt","w") as f:
     f.write(str(len(pts))+"\n")
     for p in pts: f.write(str(idx(p))+"\n")
 EOF
 
 # 运行 (PYTHONPATH 指向 pysat 安装位置)
-PYTHONPATH=/workspace/few-shots-work/pylibs python3 src/p005/targeted2.py 300
+PYTHONPATH=$WORK/pylibs python3 src/p005/targeted2.py 300
 # 预期输出: "done trials ... best=512"
 ```
 
@@ -255,7 +262,7 @@ python3 problems/p006-labs-100/verify/verify.py problems/p006-labs-100/baseline
 **源码**: `src/p006/sa.c`
 
 ```bash
-cd /workspace/few-shots-work/p006
+cd $WORK/p006
 gcc -O3 -march=native -o sa src/p006/sa.c -lm
 ./sa 300 300
 # 预期输出: "done bestE=..." (最好 806)
@@ -276,13 +283,13 @@ python3 problems/p001-kissing-number-11d/verify/verify.py problems/p001-kissing-
 **源码**: `src/p001/pocs.c`
 
 ```bash
-cd /workspace/few-shots-work/p001
+cd $WORK/p001
 # 导出向量
 cd few-shots
 python3 - <<'EOF'
 import json
 V=json.load(open("problems/p001-kissing-number-11d/baseline/certificate.json"))["vectors"]
-with open("/workspace/few-shots-work/p001/vecs.txt","w") as f:
+with open("$WORK/p001/vecs.txt","w") as f:
     for v in V: f.write(' '.join(f'{p} {q}' for p,q in v)+'\n')
 EOF
 
@@ -334,6 +341,51 @@ print("dead gates:", [g["out"] for g in gates if g["out"] not in set(outs+[g["a"
 # 预期输出: 0 个重复，0 个死门
 EOF
 ```
+
+## 7. p014 · 29 阶 Golomb 尺（基线 623）
+
+**源码**: `src/scnet/p014/`（`golomb.c`、`golomb2.c`、`cpsat_probe.py`）
+
+```bash
+cd src/scnet/p014
+gcc -O3 -march=native golomb.c -o golomb
+# 用法: ./golomb <L> <秒> [种子] [随机起点 0/1] [初温]
+./golomb 623 60 88172645463325252 0 3.0
+# 基线种子：L=623 上代价为 0（自检通过，说明代价函数与 delta 更新正确）
+
+./golomb 622 60 88172645463325252 1 3.0
+# 随机起点：代价降到 30 上下，但从未到 0
+
+gcc -O3 -march=native golomb2.c -o golomb2 && ./golomb2
+# ±1 禁忌 + 平台容忍：16,729,446 次迭代，代价冻结在 14
+
+python3 cpsat_probe.py 622 60
+# status=UNKNOWN；不给 hint 时 60 s 连已知存在的 623 都找不到
+```
+
+CP-SAT 的 hint 只能从 Python 传（`solve(L, lim, workers, hint=marks)`），没有命令行开关；
+归档的那次是用基线 623 的 29 个位置作 hint，0.1 s 得到 OPTIMAL。
+
+结论：三种独立方法都停在“14 个重复差分”上，没有找到 622；**这不是 622 不存在的证明**。
+
+## 8. p009 · TA41 作业车间（30×20，基线 2005）
+
+**源码**: `src/scnet/p009/jssp.c`（单文件无依赖）；四种早期元启发式在 `p009/`
+**数据**: `data/p009/instance.txt`、`data/p009/baseline_orders.txt`
+
+```bash
+cd src/scnet/p009 && gcc -O3 -march=native jssp.c -o jssp
+mkdir -p $WORK/p009
+cp ../../../data/p009/instance.txt ../../../data/p009/baseline_orders.txt $WORK/p009/
+cd $WORK/p009 && cp baseline_orders.txt orders.txt && /path/to/jssp
+# baseline makespan 2006
+```
+
+`jssp.c` 的 `printf` 没有 `fflush`，输出重定向到文件时是块缓冲；用终端或
+`script -q /dev/null ./jssp` 才看得到进度。
+
+`logs/p009/` 里以 2006 收尾的 22 份日志合计 **1,002,838,046** 次迭代，`best` 恒为 **2006**；
+官方基线是 2005，因此没有突破、没有提交 shot。
 
 ## 关键依赖
 
@@ -1625,7 +1677,7 @@ TIME=540 bash src/kimi/p005/run_compressed_sat.sh \
 
 第 12.31 节主命令归档为 `s UNKNOWN`、退出码 0，求解时间 535.16 秒、峰值常驻内存 2,470 MB。没有 SAT 候选，因此本轮没有官方 verifier 输入；UNKNOWN 也不是 UNSAT 或 512 的全局最优证明。
 
-## 11. CodeArts 轮次：p005 后续否证（对称破缺 / 171 分层 / 禁止 baseline / 第 13 壳层）
+## 13. CodeArts 轮次：p005 后续否证（对称破缺 / 171 分层 / 禁止 baseline / 第 13 壳层）
 
 依赖：`numpy`、`ortools`（x86_64 用最新版即可；aarch64 必须 `ortools==9.11.4210`）。
 
@@ -1673,7 +1725,7 @@ bash src/codearts/p005/deploy_layer21.sh 1 2 3 4
 
 所有 `FEASIBLE 512` / `UNKNOWN` / 超时都只记为“未判定”，不得写成 UNSAT。
 
-## 13. SCNet 2026-10-31：p004 深挖与 p005 收尾
+## 14. SCNet 2026-10-31：p004 深挖与 p005 收尾
 
 本轮代码在 `src/scnet/`，数据在 `data/scnet/p004/`。所有命令都从仓库根目录执行，
 并假设 few-shots 克隆可由 `FEW_SHOTS_REPO` 找到。
@@ -1949,7 +2001,7 @@ python3 /abs/path/src/scnet/p005/solve513.py
 
 ---
 
-## 9. mavis · 2026-11-01 补充（解码 Exoo 35 点图 + 近失解流水线）
+## 15. mavis · 2026-11-01 补充（解码 Exoo 35 点图 + 近失解流水线）
 
 ```bash
 # 1) 解码 Exoo 的 37 个 35 点图并独立校验 K4 / I6
@@ -1975,7 +2027,7 @@ violations(B + v) = tri(B[S]) + ind5(B[V(B)\S])
 
 ---
 
-## 8. mavis · 2026-10-30 补充（p003 对称类 SAT / p004 P-S 复现与联合爬山）
+## 16. mavis · 2026-10-30 补充（p003 对称类 SAT / p004 P-S 复现与联合爬山）
 
 源码在 `src/mavis/`，结果与记录在 `results/mavis/`，完整说明见
 `docs/mavis-2026-10-30/README.md` 与 `docs/mavis-2026-10-30/METHOD-LOG.md`。
@@ -2006,3 +2058,30 @@ gcc -O2 -o pipe src/mavis/p004/pipe.c
 ./pipe vj 382 1 7 49 343 109 3600 12345 0 40 123 40 123 40 src/mavis/p004/ps_bounds.txt
 # 日志里 "global" 是全局最优；>367 即 368 点（×乘积 135424 > 134753，破纪录）
 ```
+
+## 17. SCNet 2026-11-01 → 11-05：C7⁵ 连通枚举、k=12 与 10 维 LNS 彩票
+
+**源码**: `src/scnet/p004/xk7.cpp` … `xk10.cpp`、`lnsd.cpp`、`sixm3.c`
+**日志**: `logs/scnet/p004/xk7_connected_2026-11-03.log`、`xk9_k12_2026-11-04.log`、
+`xk10_k11_2026-11-04.log`、`lnsd_lottery_2026-11-05.log`
+
+```bash
+cd src/scnet/p004
+g++ -x c++ -std=c++17 -O3 xk10.cpp -o xk10 -pthread
+./xk10 --selftest 2000 8 7 6     # 与暴力对拍，mismatches=0
+./xk10 9 15 R367.txt             # K=9, 15 线程：count=0, 204.1 s
+./xk10 11 15 R367.txt            # K=11：count=0, 2,495.6 s
+```
+
+k=0…12 全部 `count=0`（`xk7/xk8/xk9/xk10` 四个实现交叉验证，k=12 由两个实现各跑一次），
+等价于“任何 368 点集与 R367 的对称差 ≥ 25”。k=13 需要 ≈39 h（节点数每 k 增长 6.80×），
+超出当时配额，没有跑。
+
+10 维 LNS 彩票（15 进程 × 10 小时，种子 1001–1015，毁坏半径 4–26）：
+
+```bash
+g++ -x c++ -std=c++17 -O3 lnsd.cpp -o lnsd
+./lnsd 10 ../../../data/scnet/p004/cc_10_7_134753_paper.txt 6 16 1000000000 134754 1001
+```
+
+15 份日志全部只有 4 行（`BUILD` / `MAXCOUNT 121` / `FREE0 0`），十小时零改进。

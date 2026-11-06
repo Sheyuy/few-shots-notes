@@ -41,8 +41,11 @@
 - [p004 香农容量](p004/README.md)
 - [p005 帽集](p005/README.md)
 - [p006 LABS](p006/README.md)
-- [p014 Golomb 尺](p014/README.md)
+- [p007 汤姆孙问题（仅调研）](p007/RESEARCH.md)
 - [p008 AES 电路](p008/README.md)
+- [p009 TA41 作业车间](p009/README.md)
+- [p010 Mona Lisa TSP](p010/README.md)
+- [p014 Golomb 尺](p014/README.md)
 - [CodeArts 轮次完整报告（p001/p003/p005 + 远端 640 核经验）](docs/REPORT_CODEARTS.md)
 - [Kimi p005 独立轮次：射影截面、非对称搜索、精确壳层](docs/REPORT_KIMI_P005.md)
 - [SCNet 2026-10-31：p004 审计/九对族 17 空位 + p005 插入代价与 CP-SAT 边界](docs/REPORT_SCNET_2026-10-31.md)
@@ -68,18 +71,37 @@
 
 ## 仓库结构与归档索引
 
-```
-pNNN/README.md              每个题的完整叙述：结论、强度、证据、复现命令
-src/scnet/pNNN/             本轮全部源码；每个目录一份 README 文件索引
-logs/scnet/pNNN/            整理后的运行日志
-logs/scnet/pNNN/raw/        未整理的原始输出（含调试与失败跑批）
-logs/kimi/、logs/codearts/  其他轮次的日志
-data/scnet/pNNN/            点集 / 证书 / 机读结果（附 SHA-256 清单）
-docs/                       专题报告与 CLAIM-EVIDENCE 对照表
-results/                    各题提交格式的证书样例
-```
+仓库按**轮次**存放代码，同一个题在不同轮次下可以有多份实现（按轮次分组，不按题合并）；
+每题的结论与证据统一写在根目录的 `pNNN/README.md`。
 
-2026-11-06 做过一次全量归档：把本机工作目录里剩下的 **90 个源码文件、14 个数据文件、
+| 轮次 | 代码 | 日志 | 数据 / 结果 |
+| --- | --- | --- | --- |
+| 早期本地（2026-10-29/30） | `src/pNNN/`、`pNNN/` | `logs/pNNN/` | `data/pNNN/`、`results/p006`、`results/p009` |
+| mavis | `src/mavis/pNNN/` | `logs/pNNN/` | `data/pNNN/`、`results/mavis/` |
+| CodeArts（640 核远端） | `src/codearts/pNNN/` | `logs/pNNN/` | — |
+| Kimi | `src/kimi/p005/` | `logs/kimi/p005/` | `data/kimi/p005/`、`results/kimi/p005/` |
+| SCNet（本轮） | `src/scnet/pNNN/` | `logs/scnet/pNNN/` | `data/scnet/pNNN/` |
+
+题目 × 轮次：
+
+| 题目 | 有哪些实现 | 叙述 |
+| --- | --- | --- |
+| p001 接吻数 11 维 | `src/p001/`、`src/codearts/p001/` | `p001/README.md` |
+| p003 R(4,6) | `src/p003/`、`src/codearts/p003/`、`src/mavis/p003/` | `p003/README.md` |
+| p004 C7 香农容量 | `src/p004/`、`src/mavis/p004/`、`src/mavis/p004-shannon-capacity-c7/`、`src/scnet/p004/` | `p004/README.md` |
+| p005 帽集 8 维 | `src/p005/`、`src/codearts/p005/`、`src/kimi/p005/`、`src/scnet/p005/` | `p005/README.md` |
+| p006 LABS-100 | `p006/labs_sa.c`、`src/p006/`、`src/mavis/p006/` | `p006/README.md` |
+| p007 汤姆孙 N=960 | 仅调研，无求解器 | `p007/RESEARCH.md` |
+| p008 AES S-box | `p008/` | `p008/README.md` |
+| p009 TA41 | `p009/`（四种元启发式）、`src/mavis/p009/`、`src/scnet/p009/` | `p009/README.md` |
+| p010 Mona Lisa TSP | `p010/` | `p010/README.md` |
+| p011 排序网络 17 | `src/mavis/p011/`（仅源码） | — |
+| p014 Golomb 尺 | `src/mavis/p014/`、`src/scnet/p014/` | `p014/README.md` |
+
+其他目录：`docs/`（专题报告、`CLAIM-EVIDENCE.md` 对照表、`docs/legacy/` 历史快照）、
+`results/`（各轮次求解产物）、`tools/`（生成 shot 自检脚本）。
+
+2026-11-06 做过一次全量归档：把本机工作目录里剩下的 **90 个源码文件、10 个数据文件、
 41 个原始日志**补进仓库，并给 p009 / p014 新建了源码索引。补进来的历史脚本按家族分组，
 每条一句话说明；其中早期小结构枚举（`tri45*`、`quad45*`、`five6*` 等）**已知有 bug**，
 仅作留档，结论以 `sixm3.c` 为准。

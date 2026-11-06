@@ -1,3 +1,15 @@
+> **历史快照（已过时，2026-11-06 归档）**
+>
+> 这份 README 来自 2026-10 的另一轮工作，使用的是**当时的题号与另一套目录布局**：
+> 它把 AES 电路写作 p005（当前官方题号是 **p008**），并写着“p001/p002/p004 均未投入”
+> ——这与本仓库后来对 p004 的深挖完全不符。文中所有路径（`docs/REPORT.md`、
+> `data/p005/baseline_pts.txt`、根目录下的 `p005/` 等）都已不再对应当前仓库。
+>
+> **当前权威入口是根目录 [`README.md`](../../README.md)**；本文件只作历史留存，
+> 不要按它复现任何实验。
+
+---
+
 # Few Shots 开放题攻坚笔记
 
 对 [few-shots](https://github.com/few-shots/few-shots) 开放题的一次系统性攻坚：**5 道题 + 1 题调研、14 节完整报告、全部源码、全部运行日志、全部实例数据**。
@@ -165,7 +177,7 @@ few-shots 的规则是：**必须严格优于纪录（ε 以内）才算一次 s
 
 `data/` 下的实例与基线解**不是我的作品**，来自 few-shots 及其上游（Taillard 的 JOB-SHOP、Bosch/Cook 的 Mona Lisa TSP、Romera-Paredes et al. 的 512-cap、Jain 2026 的 106 门电路、参与者 huangxin-design 的 102 门电路）。few-shots 的数据以 **CC0 1.0** 分发，故本仓库同样按 CC0 原样提供，仅作可复现用途。
 
-逐文件的来源与授权见 **[`data/PROVENANCE.md`](data/PROVENANCE.md)**。
+逐文件的来源与授权见 **[`data/PROVENANCE.md`](../../data/PROVENANCE.md)**。
 
 ## License
 
