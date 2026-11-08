@@ -1,0 +1,127 @@
+name: p003-new35
+# Hunt for NEW 35-vertex (4,6)-counterexamples starting from our 134 known ones.
+#
+# Why this matters: Lehavi's Algorithm 1 says every 36-vertex counterexample
+# must have all 36 of its 35-vertex subgraphs be counterexamples.  So the only
+# way left to a 36-vertex graph is to know MORE 35-vertex counterexamples than
+# we do.  Our closure over the current 134 is already at a fixed point, so the
+# only remaining lever is to discover new ones.
+#
+# The search itself (p003r tabu) has a buggy incremental violation counter --
+# it can even go negative -- so every candidate is gated by an INDEPENDENT
+# validator (validate35.py, brute-force enumeration) before it counts.
+#
+#   gh workflow run p003-new35.yml -f secs=60 -f rounds=3
+
+on:
+  workflow_dispatch:
+    inputs:
+      secs:
+        description: "seconds per tabu run"
+        required: true
+        default: "60"
+      rounds:
+        description: "rounds over the base set"
+        required: true
+        default: "3"
+      bases:
+        description: "how many base graphs to start from (max 134)"
+        required: true
+        default: "134"
+
+permissions:
+  contents: read
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o p003r src/mavis/p003/p003r.c -lm
+          echo built
+
+      - name: self-test the independent validator
+        run: |
+          set -e
+          python3 - <<'EOF'
+          import json, sys
+          sys.path.insert(0, "src/mavis/p003")
+          from validate35 import counts, load_any
+          # a known valid graph must pass
+          d = json.load(open("src/mavis/p003/pool35_extended.json"))
+          for g in d[:3]:
+              A = [[int(c) for c in r] for r in g["adjacency"]]
+              assert counts(A) == (0, 0), "a known valid graph was rejected"
+          # a graph with a planted independent 6-set must fail
+          A = [[0]*12 for _ in range(12)]
+          for i in range(12):
+              for j in range(i+1, 12):
+                  if (i+j) % 3: A[i][j] = A[j][i] = 1
+          for i in range(6):
+              for j in range(i+1, 6): A[i][j] = A[j][i] = 0
+          assert counts(A)[1] > 0, "validator misses a planted independent 6-set"
+          print("validator self-test OK")
+          EOF
+
+      - name: hunt from every base graph
+        run: |
+          set -e
+          mkdir -p cand
+          python3 - <<'PY'
+          import json
+          d = json.load(open("src/mavis/p003/pool35_extended.json"))
+          for i, g in enumerate(d):
+              json.dump({"adjacency": g["adjacency"]}, open("/tmp/seed_%d.json" % i, "w"))
+          print("wrote", len(d), "seeds")
+          PY
+          N="${{ inputs.bases }}"
+          SECS="${{ inputs.secs }}"
+          for r in $(seq 1 "${{ inputs.rounds }}"); do
+            for i in $(seq 0 $(( N - 1 )) ); do
+              ./p003r tabu "/tmp/seed_${i}.json" "$SECS" $(( r * 1000 + i )) \
+                  "cand/r${r}_g${i}.json" 35 > "cand/r${r}_g${i}.log" 2>&1 || true
+            done
+          done
+          echo "candidates:"; ls cand/*.json | wc -l
+
+      - name: gate with the independent validator
+        run: |
+          set -e
+          python3 - <<'PY'
+          import glob, json, os
+          merged = []
+          for f in sorted(glob.glob("cand/*.json")):
+              try:
+                  d = json.load(open(f))
+                  merged.append(d if isinstance(d, dict) and "adjacency" in d else {"adjacency": d})
+              except Exception:
+                  pass
+          json.dump(merged, open("cand_all.json", "w"))
+          print("merged", len(merged))
+          PY
+          python3 src/mavis/p003/validate35.py cand_all.json \
+              --known src/mavis/p003/pool35_extended.json --out NEW35.json
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-new35-${{ github.run_id }}
+          path: |
+            NEW35.json
+            cand_all.json
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 new-35 hunt"
+            ls -la NEW35.json 2>/dev/null || echo "(no novel graph file)"
+            python3 -c "import json;d=json.load(open('NEW35.json'));print('novel 35-graphs:',len(d))" 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
