@@ -1,0 +1,94 @@
+name: p003-hunt
+# Hunt for new 35-vertex (4,6)-counterexamples from our base pool.
+#
+# Each trial: flip k random edges of a base graph, let p003r's tabu search pull
+# it back to a valid (4,6)-graph, then gate the result through the INDEPENDENT
+# validator (brute-force K4 count + exhaustive independent-6 search) and a
+# 4-round WL dedup.  A candidate that survives is a new isomorphism class.
+#
+# Every new class widens the closure, which is the only lever left for the
+# 36-vertex question (Lehavi's Algorithm 1: a 36-vertex counterexample must
+# have all 36 of its 35-vertex subgraphs be counterexamples).
+#
+#   gh workflow run p003-hunt.yml -f trials=3000 -f secs=3 -f seed=1
+
+on:
+  workflow_dispatch:
+    inputs:
+      trials:
+        description: "number of trials"
+        required: true
+        default: "3000"
+      secs:
+        description: "seconds per tabu run"
+        required: true
+        default: "3"
+      seed:
+        description: "RNG seed"
+        required: true
+        default: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o p003r src/mavis/p003/p003r.c -lm
+          echo built
+
+      - name: validator self-test
+        run: |
+          set -e
+          python3 - <<'EOF'
+          import json, sys
+          sys.path.insert(0, "src/mavis/p003")
+          from validate35 import counts
+          d = json.load(open("src/mavis/p003/pool35_extended.json"))
+          for g in d[:3]:
+              assert counts([[int(c) for c in r] for r in g["adjacency"]]) == (0, 0)
+          A = [[0]*12 for _ in range(12)]
+          for i in range(12):
+              for j in range(i+1, 12):
+                  if (i+j) % 3: A[i][j] = A[j][i] = 1
+          for i in range(6):
+              for j in range(i+1, 6): A[i][j] = A[j][i] = 0
+          assert counts(A)[1] > 0
+          print("validator self-test OK")
+          EOF
+
+      - name: hunt
+        run: |
+          set -e
+          mkdir -p hunt
+          timeout $(( 330 * 60 )) python3 src/mavis/p003/hunt35.py \
+            src/mavis/p003/pool35_extended.json hunt \
+            "${{ inputs.trials }}" "${{ inputs.secs }}" "${{ inputs.seed }}" \
+            | tee hunt/hunt.log || echo "(hunt hit the time cap)"
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-hunt-${{ github.run_id }}
+          path: |
+            hunt/NEW35_*.json
+            hunt/HUNT_STATS.json
+            hunt/hunt.log
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 new-35 hunt"
+            cat hunt/HUNT_STATS.json 2>/dev/null || echo "(no stats)"
+            ls hunt/NEW35_*.json 2>/dev/null | wc -l
+          } >> "$GITHUB_STEP_SUMMARY"
