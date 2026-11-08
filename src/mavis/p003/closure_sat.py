@@ -163,7 +163,11 @@ def has_independent_set(A, k):
             return True
         if cand.bit_count() < need:
             return False
-        # branch on the candidate with the fewest non-neighbours left
+        # Branch on an arbitrary pivot (fewest non-neighbours left = better
+        # pruning).  IMPORTANT: the "include" branch must NOT restrict the
+        # candidates to larger indices -- that restriction is only valid when
+        # the pivot is always the minimum, and using it with an arbitrary pivot
+        # silently drops solutions (which made invalid graphs pass the check).
         best = -1
         bestmask = 0
         bestcnt = None
@@ -171,7 +175,7 @@ def has_independent_set(A, k):
         while m:
             v = (m & -m).bit_length() - 1
             m &= m - 1
-            c = cand & ~adj[v] & ~((1 << v) - 1)
+            c = cand & ~adj[v] & ~(1 << v)
             cnt = c.bit_count()
             if bestcnt is None or cnt < bestcnt:
                 bestcnt = cnt

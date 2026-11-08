@@ -47,6 +47,18 @@ OPTS = dict(
 )
 
 
+def adj_of(g):
+    """Adjacency matrix of a networkx graph without numpy (the runner's
+    Python 3.14 has no numpy and nx.to_numpy_array needs it)."""
+    nodes = sorted(g.nodes())
+    idx = {v: i for i, v in enumerate(nodes)}
+    n = len(nodes)
+    A = [[0] * n for _ in range(n)]
+    for u, v in g.edges():
+        A[idx[u]][idx[v]] = A[idx[v]][idx[u]] = 1
+    return A
+
+
 def to_nx(A):
     n = len(A)
     g = nx.Graph()
@@ -128,7 +140,7 @@ def main():
             res = []
         added = 0
         for i, g in enumerate(res):
-            A = [[int(x) for x in row] for row in nx.to_numpy_array(g)]
+            A = adj_of(g)
             if len(A) != 35:
                 continue
             h = wl_hash(A)
