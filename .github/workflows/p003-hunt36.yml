@@ -1,0 +1,96 @@
+name: p003-hunt36
+# DIRECT search for a 36-vertex (4,6)-graph -- the world record for p003.
+#
+# Our SAT extension test proves that none of our 35-vertex bases *extends* to
+# 36 vertices, but the tabu search may flip any edge of the whole graph, so
+# this is NOT restricted to extensions.  Starting from a valid 35-vertex
+# (4,6)-graph plus one isolated vertex, the search sits at ~16 violations
+# instead of the ~43 it reaches from a random start: the landscape around a
+# valid counterexample is far friendlier.
+#
+# Safety: the search's own counter is ignored; every candidate is re-checked
+# with the independent brute-force validator before it is called a hit.
+#
+#   gh workflow run p003-hunt36.yml -f trials=4000 -f secs=5 -f seed=1
+
+on:
+  workflow_dispatch:
+    inputs:
+      trials:
+        description: "number of trials"
+        required: true
+        default: "4000"
+      secs:
+        description: "seconds per tabu run"
+        required: true
+        default: "5"
+      seed:
+        description: "RNG seed"
+        required: true
+        default: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          set -e
+          gcc -O3 -o p003r src/mavis/p003/p003r.c -lm
+          echo built
+
+      - name: validator self-test
+        run: |
+          set -e
+          python3 - <<'EOF'
+          import json, sys
+          sys.path.insert(0, "src/mavis/p003")
+          from validate35 import counts
+          d = json.load(open("src/mavis/p003/pool35_extended.json"))
+          for g in d[:3]:
+              assert counts([[int(c) for c in r] for r in g["adjacency"]]) == (0, 0)
+          A = [[0]*12 for _ in range(12)]
+          for i in range(12):
+              for j in range(i+1, 12):
+                  if (i+j) % 3: A[i][j] = A[j][i] = 1
+          for i in range(6):
+              for j in range(i+1, 6): A[i][j] = A[j][i] = 0
+          assert counts(A)[1] > 0
+          print("validator self-test OK")
+          EOF
+
+      - name: hunt for a 36-vertex counterexample
+        run: |
+          set -e
+          mkdir -p hunt36
+          timeout $(( 330 * 60 )) python3 src/mavis/p003/hunt36.py \
+            src/mavis/p003/pool35_extended.json hunt36 \
+            "${{ inputs.trials }}" "${{ inputs.secs }}" "${{ inputs.seed }}" \
+            | tee hunt36/hunt36.log || echo "(hunt hit the time cap)"
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-hunt36-${{ github.run_id }}
+          path: |
+            hunt36/FOUND36_*.json
+            hunt36/HUNT36_STATS.json
+            hunt36/hunt36.log
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 direct 36-vertex hunt"
+            cat hunt36/HUNT36_STATS.json 2>/dev/null || echo "(no stats)"
+            ls hunt36/FOUND36_*.json 2>/dev/null && echo "### 36-VERTEX COUNTEREXAMPLE EXISTS -- WORLD RECORD"
+            true
+          } >> "$GITHUB_STEP_SUMMARY"
