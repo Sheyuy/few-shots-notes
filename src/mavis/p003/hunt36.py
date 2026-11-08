@@ -96,6 +96,16 @@ def main():
         except subprocess.TimeoutExpired:
             pass
         stats["trials"] += 1
+        if stats["trials"] % 25 == 0:
+            # write often and print progress: a job killed by the time cap must
+            # still leave usable statistics behind (the first hunt36 runs
+            # produced empty artifacts for exactly this reason)
+            stats["seconds"] = round(time.time() - t0, 1)
+            json.dump(stats, open(os.path.join(outdir, "HUNT36_STATS.json"), "w"), indent=1)
+            if stats["trials"] % 250 == 0:
+                print("  %d trials, valid=%d hits=%d (%.0f s)"
+                      % (stats["trials"], stats["valid"], stats["hits"],
+                         time.time() - t0), flush=True)
         try:
             cand = json.load(open(outf))
         except Exception:
