@@ -1,0 +1,89 @@
+name: p003-closure-sat
+# Our own SAT-based closure of the (4,6,35) counterexample set.
+#
+# Independent of Lehavi's ROVEaC (which needs networkx and is much slower);
+# this one only needs a Python interpreter, so it also runs as a fallback when
+# the third-party stack is unavailable.  Each round:
+#   (1) test whether any base extends to 36 vertices  -> a hit is a world record
+#   (2) decrement every base (delete one vertex)      -> R(4,6,34) graphs
+#   (3) extend each decremented graph back to 35      -> new bases, added
+#
+#   gh workflow run p003-closure-sat.yml -f rounds=8 -f minutes=280
+
+on:
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: "maximum number of closure rounds"
+        required: true
+        default: "8"
+      minutes:
+        description: "total time budget in minutes"
+        required: true
+        default: "280"
+
+permissions:
+  contents: read
+
+jobs:
+  closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: self-test the checker (positive and negative cases)
+        run: |
+          set -e
+          python3 - <<'EOF'
+          import sys, json, random
+          sys.path.insert(0, "src/mavis/p003")
+          from closure_sat import has_independent_set, is_counterexample
+          # positive case: a planted independent 6-set must be found
+          n = 14; random.seed(3)
+          A = [[0]*n for _ in range(n)]
+          for i in range(n):
+              for j in range(i+1, n):
+                  if random.random() < 0.5: A[i][j] = A[j][i] = 1
+          pl = {0,1,2,3,4,5}
+          for i in range(n):
+              for j in range(i+1, n):
+                  if i in pl and j in pl: A[i][j] = A[j][i] = 0
+          assert has_independent_set(A, 6), "checker misses a planted independent 6-set"
+          # negative case: the known valid 35-graphs must pass
+          d = json.load(open("src/mavis/p003/pool35_extended.json"))
+          for g in d[:8]:
+              B = [[int(c) for c in row] for row in g["adjacency"]]
+              assert is_counterexample(B), "a known valid (4,6)-graph was rejected"
+          print("self-test OK")
+          EOF
+
+      - name: closure loop
+        run: |
+          set -e
+          timeout $(( ${{ inputs.minutes }} * 60 )) python3 src/mavis/p003/closure_sat.py \
+            src/mavis/p003/pool35_extended.json "${{ inputs.rounds }}" \
+            | tee closure_sat.log || echo "(closure hit the time cap)"
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-closure-sat-${{ github.run_id }}
+          path: |
+            closure_sat.log
+            CLOSURE_SAT_SUMMARY.json
+            CLOSURE_SAT_BASE.json
+            FOUND36_*.json
+            NEW35_*.json
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 SAT closure"
+            cat CLOSURE_SAT_SUMMARY.json 2>/dev/null || echo "(no summary)"
+            ls FOUND36_*.json 2>/dev/null && echo "### 36-VERTEX COUNTEREXAMPLE EXISTS"
+            true
+          } >> "$GITHUB_STEP_SUMMARY"
