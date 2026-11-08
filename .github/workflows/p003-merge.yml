@@ -1,0 +1,64 @@
+name: p003-merge
+# Merge newly found 35-vertex (4,6)-counterexamples into the base pool -- ON THE
+# RUNNER, because the local sandbox restarts every couple of hours and keeps
+# killing long verification runs.
+#
+# Every candidate is verified with two independent implementations (a K4 count
+# plus an exhaustive independent-6 search, and a brute force over all C(36,6)
+# subsets) and deduplicated with a 4-round WL hash.
+#
+#   gh workflow run p003-merge.yml -f cand=hunt
+
+on:
+  workflow_dispatch:
+    inputs:
+      cand:
+        description: "which candidate set to merge: hunt | hunt2 | all"
+        required: true
+        default: "all"
+
+permissions:
+  contents: read
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: merge
+        run: |
+          set -e
+          mkdir -p cand
+          # candidate sets ship as one tarball (1833 files would be absurd to
+          # push file by file)
+          if [ -f src/mavis/p003/candidates.tar.gz ]; then
+            tar xzf src/mavis/p003/candidates.tar.gz -C /tmp
+            cp /tmp/candidates/*.json cand/ || true
+          fi
+          echo "candidates: $(ls cand/*.json 2>/dev/null | wc -l)"
+          python3 src/mavis/p003/merge_new35.py \
+            src/mavis/p003/pool35_extended.json cand/*.json | tee merge.log
+          python3 - <<'EOF'
+          import json
+          d = json.load(open("src/mavis/p003/pool35_extended.json"))
+          print("merged pool size:", len(d))
+          json.dump(d, open("MERGED_POOL.json", "w"))
+          EOF
+
+      - name: upload the merged pool
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p003-merged-pool-${{ github.run_id }}
+          path: MERGED_POOL.json
+          if-no-files-found: warn
+
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### p003 merged pool"
+            tail -3 merge.log 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
