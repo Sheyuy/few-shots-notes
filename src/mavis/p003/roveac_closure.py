@@ -113,7 +113,7 @@ def main():
             res36 = []
         hit36 = []
         for i, g in enumerate(res36):
-            A = [[int(x) for x in row] for row in nx.to_numpy_array(g)]
+            A = adj_of(g)
             if len(A) == 36:
                 hit36.append(A)
                 json.dump({"adjacency": A},
