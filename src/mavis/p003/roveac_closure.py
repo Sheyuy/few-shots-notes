@@ -47,6 +47,18 @@ OPTS = dict(
 )
 
 
+def relabel(g):
+    """Renumber the nodes of a graph to 0..n-1 (the decrementor returns graphs
+    with arbitrary labels; mixing label spaces makes the Extender raise
+    "The node N is not in the graph")."""
+    nodes = sorted(g.nodes())
+    mapping = {v: i for i, v in enumerate(nodes)}
+    h = nx.Graph()
+    h.add_nodes_from(range(len(nodes)))
+    h.add_edges_from((mapping[u], mapping[v]) for u, v in g.edges())
+    return h
+
+
 def adj_of(g):
     """Adjacency matrix of a networkx graph without numpy (the runner's
     Python 3.14 has no numpy and nx.to_numpy_array needs it)."""
@@ -132,6 +144,9 @@ def main():
             dec = set()
         print("  decremented set: %d graphs  [%.1f s]" % (len(dec), time.time() - t1),
               flush=True)
+        # the decrementor returns graphs whose node labels are arbitrary,
+        # while to_nx() numbers nodes 0..n-1 -> relabel before unioning
+        dec = {relabel(g) for g in dec}
         try:
             res = Extender.extend({to_nx(A) for A in base} | set(dec),
                                    s=4, t=6, **OPTS)
