@@ -91,6 +91,10 @@ def main():
             known.add(h)
             pool.append({"adjacency": ["".join(str(c) for c in r) for r in A]})
             added += 1
+            # write after EVERY addition: a sandbox restart in the middle of a
+            # long merge used to throw away hours of verification work
+            if added % 25 == 0:
+                json.dump(pool, open(pool_file, "w"))
     json.dump(pool, open(pool_file, "w"))
     print("pool: %d graphs (+%d new, %d rejected, %d duplicates)"
           % (len(pool), added, rejected, dup))
