@@ -68,7 +68,8 @@ jobs:
           python3 - <<'PY'
           import json
           gs = []
-          for f in ("src/mavis/p003/exoo35_graphs.json", "src/mavis/p003/pool35_graphs.json"):
+          for f in ("src/mavis/p003/exoo35_graphs.json", "src/mavis/p003/pool35_graphs.json",
+                    "src/mavis/p003/pool35_extended.json"):
               try:
                   gs += json.load(open(f))
               except Exception as e:
