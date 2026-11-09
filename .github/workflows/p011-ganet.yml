@@ -1,0 +1,29 @@
+name: p011-ganet
+on:
+  workflow_dispatch:
+    inputs:
+      seconds: {default: '3000'}
+      seed: {default: '1'}
+      pop: {default: '40'}
+      maxc: {default: '70'}
+jobs:
+  ganet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: |
+          gcc -O2 -o ganet ganet.c -lm
+          ./ganet baseline.json 30 ${{ github.event.inputs.seed }} warm.json 40 ${{ github.event.inputs.maxc }}
+      - name: run
+        run: |
+          ./ganet baseline.json ${{ github.event.inputs.seconds }} ${{ github.event.inputs.seed }} best.json ${{ github.event.inputs.pop }} ${{ github.event.inputs.maxc }}
+      - name: upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p011-ganet-${{ github.event.inputs.seed }}
+          path: |
+            best.json
+            ganet.c
