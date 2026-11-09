@@ -22,7 +22,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from validate35 import counts, wl_hash   # noqa: E402
+from validate35 import counts, quick_invalid, wl_hash   # noqa: E402
 
 
 def load_any(fn):

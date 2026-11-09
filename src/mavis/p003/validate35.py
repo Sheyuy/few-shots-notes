@@ -65,6 +65,45 @@ def counts(A):
     return k4, ind6
 
 
+def quick_invalid(A):
+    """Fast validity check for (4,6)-graphs: K4 count + a backtracking search
+    for an independent 6-set.  Same verdict as counts() but ~50x faster, because
+    counts() brute-forces all C(n,5) subsets while this prunes."""
+    n = len(A)
+    adj = [0] * n
+    for i in range(n):
+        for j in range(n):
+            if A[i][j]:
+                adj[i] |= 1 << j
+    # K4?
+    for i in range(n):
+        nb = [j for j in range(n) if A[i][j]]
+        for a in range(len(nb)):
+            for b in range(a + 1, len(nb)):
+                if not (adj[nb[a]] >> nb[b]) & 1:
+                    continue
+                for c in range(b + 1, len(nb)):
+                    if (adj[nb[a]] >> nb[c]) & 1 and (adj[nb[b]] >> nb[c]) & 1:
+                        return True
+    # independent 6-set?  (backtracking with pruning)
+    def rec(cand, need):
+        if need == 0:
+            return True
+        if bin(cand).count("1") < need:
+            return False
+        best, bestmask, bestcnt = -1, 0, None
+        m = cand
+        while m:
+            v = (m & -m).bit_length() - 1
+            m &= m - 1
+            c = cand & ~adj[v] & ~(1 << v)
+            cnt = bin(c).count("1")
+            if bestcnt is None or cnt < bestcnt:
+                bestcnt, bestmask, best = cnt, c, v
+        return rec(bestmask, need - 1) or rec(cand & ~(1 << best), need)
+    return rec((1 << n) - 1, 6)
+
+
 def wl_hash(A, iters=4):
     n = len(A)
     nb = [frozenset(j for j in range(n) if A[i][j]) for i in range(n)]
