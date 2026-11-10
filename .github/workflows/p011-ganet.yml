@@ -10,6 +10,11 @@ jobs:
   ganet:
     runs-on: ubuntu-latest
     timeout-minutes: 340
+    # ganet.c and baseline.json live in src/mavis/p011; without this every
+    # run step starts at the repo root and `gcc ganet.c` fails in ~7 s.
+    defaults:
+      run:
+        working-directory: src/mavis/p011
     steps:
       - uses: actions/checkout@v4
       - name: build
@@ -24,6 +29,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: p011-ganet-${{ github.event.inputs.seed }}
+          # artifact paths are resolved from the repo root, not from
+          # defaults.run.working-directory
           path: |
-            best.json
-            ganet.c
+            src/mavis/p011/best.json
+            src/mavis/p011/ganet.c
