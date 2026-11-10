@@ -21,17 +21,20 @@ jobs:
           kissat --version | head -2
       - name: build
         run: |
+          cd src/mavis/p011
           gcc -O2 -o sortsat sortsat.c
           gcc -O2 -o netcheck netcheck.c
-          ./netcheck baseline_pairs.txt 17 || true
+          ./netcheck baseline_pairs.txt 17
       - name: prepare prefix
         run: |
+          cd src/mavis/p011
           if [ "${{ github.event.inputs.prefix }}" = "base" ]; then cp prefix_base.txt prefix_use.txt
           elif [ "${{ github.event.inputs.prefix }}" = "layer1" ]; then head -1 prefix_base.txt > prefix_use.txt
           else echo "#" > prefix_use.txt; fi
           cat prefix_use.txt
       - name: run iterative search
         run: |
+          cd src/mavis/p011
           mkdir -p work
           python3 sortsat_loop.py 17 ${{ github.event.inputs.depth }} \
             ${{ github.event.inputs.maxc }} prefix_use.txt work \
@@ -42,7 +45,7 @@ jobs:
         with:
           name: p011-sortsat-${{ github.event.inputs.depth }}-${{ github.event.inputs.maxc }}-${{ github.event.inputs.prefix }}-${{ github.event.inputs.seed }}
           path: |
-            work/
-            sortsat.c
-            netcheck.c
-            sortsat_loop.py
+            src/mavis/p011/work/
+            src/mavis/p011/sortsat.c
+            src/mavis/p011/netcheck.c
+            src/mavis/p011/sortsat_loop.py
