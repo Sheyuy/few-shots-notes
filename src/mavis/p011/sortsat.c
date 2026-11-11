@@ -117,6 +117,7 @@ int main(int argc, char **argv)
     int **pref = calloc(d, sizeof(int *));
     int *preflen = calloc(d, sizeof(int));
     int have_prefix = 0;
+    static int have_layer[256];
     /* prefix parser: each non-# line = one layer, pairs of ints */
     {
         FILE *f = fopen(prefixf, "r");
@@ -125,6 +126,7 @@ int main(int argc, char **argv)
         while (fgets(line, sizeof(line), f) && layer < d) {
             if (line[0] == '#') { layer++; continue; }
             have_prefix = 1;
+            if (layer < 256) have_layer[layer] = 1;
             int vals[512], nv = 0;
             char *p = line;
             while (*p && nv < 512) {
@@ -281,6 +283,11 @@ int main(int argc, char **argv)
     /* ---- prefix fixing ---------------------------------------------------- */
     if (have_prefix) {
         for (int k = 0; k < d; k++) {
+            /* Only layers that were actually given in the prefix file are
+             * fixed.  Fixing the others to "empty" collapsed the whole
+             * network into a single layer -- which made the prefix=layer1
+             * instance UNSAT even at maxC=71 (the baseline is a witness). */
+            if (!have_layer[k]) continue;
             int used[n][n];
             memset(used, 0, sizeof(used));
             for (int i = 0; i < preflen[k]; i++) {
