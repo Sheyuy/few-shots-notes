@@ -392,9 +392,13 @@ static void write_net(const char *path, const Net *n)
     FILE *f = fopen(path, "w");
     if (!f) { perror(path); return; }
     fprintf(f, "{\"comparators\": [");
+    int first = 1;
     for (int t = 0; t < n->L; t++)
-        for (int i = n->start[t]; i < n->start[t + 1]; i++)
-            fprintf(f, "[%d,%d],", n->c[i][0], n->c[i][1]);
+        for (int i = n->start[t]; i < n->start[t + 1]; i++) {
+            if (!first) fprintf(f, ",");
+            first = 0;
+            fprintf(f, "[%d,%d]", n->c[i][0], n->c[i][1]);
+        }
     fprintf(f, "], \"layers\": %d}\n", n->L);
     fclose(f);
 }
