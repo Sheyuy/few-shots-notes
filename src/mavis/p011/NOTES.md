@@ -166,3 +166,8 @@ once 约束 + update（min/max）+ sorts（0-1 原理）+ Sinz 基数计数 + �
 
 * `p011-ganet.yml` 在仓库根目录找 `ganet.c` / `baseline.json`，而文件在 `src/mavis/p011/` ⇒ 6 个 run 全部失败（**不是算法问题**）✔
 * 修好后重派 3 个（2400 秒，pop=48，maxc=70）✔（作为 SAT 主线之外的廉价彩票）
+
+### 2026-11-15 04:05：分层 GA 的**产物上传路径**也修了
+
+* 前一轮产物里只有源码、没有 `best.json` ⇒ upload 的 path 写的是根目录的 `best.json`，而文件在 `src/mavis/p011/` ✔
+* ⇒ **同一个工作流里连续踩两次路径坑（build 路径 + upload 路径）** ⇒ ⇒ **教训 ㉛：远程工作流第一次跑通后，必须立刻验证"产物里真的有结果文件"，而不是只看 job 是 success** ✔
