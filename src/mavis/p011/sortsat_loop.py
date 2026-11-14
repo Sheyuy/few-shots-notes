@@ -118,24 +118,33 @@ def main():
                 "%d comparators, sorts all %d inputs\n" % (len(comps), 1 << n))
             print("*** FOUND A SORTING NETWORK WITH %d COMPARATORS ***" % len(comps), flush=True)
             return
-        # add the counterexample input and iterate
-        ce = None
-        for t in v.stdout.split():
-            if t.startswith('first_counterexample='):
-                ce = int(t.split('=')[1])
+        # add ALL counterexamples of this round (not just the first one):
+        # one SAT solve then tightens the instance by many inputs at once.
+        cex = []
+        for line in v.stdout.splitlines():
+            if line.startswith('counterexamples:'):
+                cex = [int(t) for t in line.split()[1:]]
                 break
-        if ce is None or ce < 0:
-            print("no counterexample found; stopping", flush=True)
-            return
+        if not cex:
+            ce = None
+            for t in v.stdout.split():
+                if t.startswith('first_counterexample='):
+                    ce = int(t.split('=')[1])
+                    break
+            if ce is None or ce < 0:
+                print("no counterexample found; stopping", flush=True)
+                return
+            cex = [ce]
         cur = set(int(x) for x in open(inp_file).read().split())
-        if ce in cur:
-            print("counterexample %d already in the test set -- stuck" % ce, flush=True)
-            open(os.path.join(work, "RESULT_STUCK"), 'w').write("ce %d already present" % ce)
+        new_cex = [c for c in cex if c not in cur]
+        if not new_cex:
+            print("all counterexamples already in the test set -- stuck", flush=True)
+            open(os.path.join(work, "RESULT_STUCK"), 'w').write("no new counterexample")
             return
-        cur.add(ce)
+        cur.update(new_cex)
         with open(inp_file, 'w') as f:
             f.write('\n'.join(map(str, sorted(cur))) + '\n')
-        print("[it %d] added counterexample %d" % (it, ce), flush=True)
+        print("[it %d] added %d counterexamples (total %d)" % (it, len(new_cex), len(cur)), flush=True)
     open(os.path.join(work, "RESULT_TIMEOUT"), 'w').write("timeout after %d iterations\n" % it)
     print("time limit reached", flush=True)
 

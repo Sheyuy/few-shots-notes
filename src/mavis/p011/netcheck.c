@@ -36,6 +36,7 @@ int main(int argc, char **argv)
     fclose(f);
 
     long bad = 0, firstbad = -1;
+    long cex[64]; int ncex = 0;          /* up to 64 counterexamples */
     uint64_t pats[64];
     for (long base = 0; base < TOTAL; base += 64) {
         for (int k = 0; k < 64; k++) pats[k] = (uint64_t)(base + k);
@@ -55,9 +56,14 @@ int main(int argc, char **argv)
         int nb = __builtin_popcountll(uns);
         if (nb) {
             bad += nb;
-            if (firstbad < 0) firstbad = base + __builtin_ctzll(uns);
+            long x = base + __builtin_ctzll(uns);
+            if (firstbad < 0) firstbad = x;
+            if (ncex < 64) cex[ncex++] = x;
         }
     }
     printf("comparators=%d unsorted_inputs=%ld first_counterexample=%ld\n", nc, bad, firstbad);
+    printf("counterexamples:");
+    for (int i = 0; i < ncex; i++) printf(" %ld", cex[i]);
+    printf("\n");
     return bad == 0 ? 0 : 1;
 }
